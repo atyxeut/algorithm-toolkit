@@ -14,4 +14,5 @@
 
 export module aty.gatk;
 
+export import aty.gatk.math;
 export import aty.gatk.util;
