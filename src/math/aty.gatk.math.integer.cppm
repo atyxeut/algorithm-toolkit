@@ -86,27 +86,39 @@ class u
 namespace tmp {
 
 template <typename>
-struct is_custom_fixed_width_signed_integral : std::false_type
+struct is_no_cv_custom_fixed_width_signed_integral : std::false_type
 {
 };
 
 template <usize WidthBits>
-struct is_custom_fixed_width_signed_integral<fixed_width_integer::i<WidthBits>> : std::true_type
+struct is_no_cv_custom_fixed_width_signed_integral<fixed_width_integer::i<WidthBits>> : std::true_type
 {
 };
+
+template <typename T>
+constexpr bool is_no_cv_custom_fixed_width_signed_integral_v = is_no_cv_custom_fixed_width_signed_integral<T>::value;
+
+template <typename T>
+using is_custom_fixed_width_signed_integral = is_no_cv_custom_fixed_width_signed_integral<std::remove_cv_t<T>>;
 
 template <typename T>
 constexpr bool is_custom_fixed_width_signed_integral_v = is_custom_fixed_width_signed_integral<T>::value;
 
 template <typename>
-struct is_custom_fixed_width_unsigned_integral : std::false_type
+struct is_no_cv_custom_fixed_width_unsigned_integral : std::false_type
 {
 };
 
 template <usize WidthBits>
-struct is_custom_fixed_width_unsigned_integral<fixed_width_integer::u<WidthBits>> : std::true_type
+struct is_no_cv_custom_fixed_width_unsigned_integral<fixed_width_integer::u<WidthBits>> : std::true_type
 {
 };
+
+template <typename T>
+constexpr bool is_no_cv_custom_fixed_width_unsigned_integral_v = is_no_cv_custom_fixed_width_unsigned_integral<T>::value;
+
+template <typename T>
+using is_custom_fixed_width_unsigned_integral = is_no_cv_custom_fixed_width_unsigned_integral<std::remove_cv_t<T>>;
 
 template <typename T>
 constexpr bool is_custom_fixed_width_unsigned_integral_v = is_custom_fixed_width_unsigned_integral<T>::value;
@@ -225,6 +237,10 @@ using make_unsigned = make_unsigned_selector<T>;
 
 export template <typename T>
 using make_unsigned_t = make_unsigned<T>::type;
+
+} // namespace aty::gatk::tmp
+
+namespace aty::gatk::tmp {
 
 template <typename T, usize = (sizeof(T) < sizeof(i32) ? 0 : sizeof(T))>
 struct make_larger_width_selector_for_standard;

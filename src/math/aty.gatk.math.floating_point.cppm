@@ -52,27 +52,39 @@ class d
 namespace tmp {
 
 template <typename>
-struct is_custom_ieee754_binary_floating_point : std::false_type
+struct is_no_cv_custom_ieee754_binary_floating_point : std::false_type
 {
 };
 
 template <usize PrecisionBits>
-struct is_custom_ieee754_binary_floating_point<ieee754_float::f<PrecisionBits>> : std::true_type
+struct is_no_cv_custom_ieee754_binary_floating_point<ieee754_float::f<PrecisionBits>> : std::true_type
 {
 };
+
+template <typename T>
+constexpr bool is_no_cv_custom_ieee754_binary_floating_point_v = is_no_cv_custom_ieee754_binary_floating_point<T>::value;
+
+template <typename T>
+using is_custom_ieee754_binary_floating_point = is_no_cv_custom_ieee754_binary_floating_point<std::remove_cv_t<T>>;
 
 template <typename T>
 constexpr bool is_custom_ieee754_binary_floating_point_v = is_custom_ieee754_binary_floating_point<T>::value;
 
 template <typename>
-struct is_custom_ieee754_decimal_floating_point : std::false_type
+struct is_no_cv_custom_ieee754_decimal_floating_point : std::false_type
 {
 };
 
 template <usize PrecisionBits>
-struct is_custom_ieee754_decimal_floating_point<ieee754_float::d<PrecisionBits>> : std::true_type
+struct is_no_cv_custom_ieee754_decimal_floating_point<ieee754_float::d<PrecisionBits>> : std::true_type
 {
 };
+
+template <typename T>
+constexpr bool is_no_cv_custom_ieee754_decimal_floating_point_v = is_no_cv_custom_ieee754_decimal_floating_point<T>::value;
+
+template <typename T>
+using is_custom_ieee754_decimal_floating_point = is_no_cv_custom_ieee754_decimal_floating_point<std::remove_cv_t<T>>;
 
 template <typename T>
 constexpr bool is_custom_ieee754_decimal_floating_point_v = is_custom_ieee754_decimal_floating_point<T>::value;
