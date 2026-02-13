@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export module aty.gatk.math.real_number;
+export module aty.gatk.math.floating_point;
 
 import std;
 

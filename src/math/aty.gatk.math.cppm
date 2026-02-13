@@ -14,5 +14,5 @@
 
 export module aty.gatk.math;
 
+export import aty.gatk.math.floating_point;
 export import aty.gatk.math.integer;
-export import aty.gatk.math.real_number;
