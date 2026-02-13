@@ -1,5 +1,5 @@
 set_xmakever("3.0.6")
-set_project("aty-general-algorithm-toolbox")
+set_project("aty-general-algorithm-toolkit")
 set_languages("c++latest")
 
 add_rules("mode.debug", "mode.release")
