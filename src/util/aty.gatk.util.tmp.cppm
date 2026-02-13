@@ -19,17 +19,42 @@ import std;
 
 namespace aty::gatk::tmp {
 
-export template <typename>
-struct is_std_array : std::false_type
+template <typename TFrom, typename TTo, bool = std::is_const_v<TFrom>, bool = std::is_volatile_v<TFrom>>
+struct claim_cv_selector;
+
+// branch 1: has both cv qualifiers
+template <typename TFrom, typename TTo>
+struct claim_cv_selector<TFrom, TTo, true, true>
 {
+  using type = std::add_cv_t<TTo>;
 };
 
-export template <typename T, std::size_t N>
-struct is_std_array<std::array<T, N>> : std::true_type
+// branch 2: has only const qualifier
+template <typename TFrom, typename TTo>
+struct claim_cv_selector<TFrom, TTo, true, false>
 {
+  using type = std::add_const_t<TTo>;
 };
 
-export template <typename T>
-constexpr bool is_std_array_v = is_std_array<T>::value;
+// branch 3: has only volatile qualifier
+template <typename TFrom, typename TTo>
+struct claim_cv_selector<TFrom, TTo, false, true>
+{
+  using type = std::add_volatile_t<TTo>;
+};
+
+// branch 4: has no cv qualifiers
+template <typename TFrom, typename TTo>
+struct claim_cv_selector<TFrom, TTo, false, false>
+{
+  using type = TTo;
+};
+
+// extract the cv-qualifiers of TFrom and apply them to TTo
+export template <typename TFrom, typename TTo>
+using claim_cv = claim_cv_selector<TFrom, TTo>;
+
+export template <typename TFrom, typename TTo>
+using claim_cv_t = claim_cv<TFrom, TTo>::type;
 
 } // namespace aty::gatk::tmp

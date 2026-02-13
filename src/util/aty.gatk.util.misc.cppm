@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export module aty.gatk.util:misc;
+export module aty.gatk.util.misc;
 
 import std;
 
@@ -43,7 +43,7 @@ constexpr auto peg_name_lower = "abc";
 namespace get_move_cnt {
 
 // initially all disks stack on one peg `from`, finally they all stack on one peg `to`
-export constexpr move_cnt_type from_one_to_one_form(u32 disk_cnt) noexcept(noexcept((move_cnt_type(1) << disk_cnt) - 1))
+export [[nodiscard]] constexpr move_cnt_type from_one_to_one_form(u32 disk_cnt) noexcept(noexcept((move_cnt_type(1) << disk_cnt) - 1))
 {
   // denote the moves of a problem regarding n disks by T(n)
   // 1. to move disk n to `to`, we can first move disk n - 1 to 1 the auxiliary (third) peg, from peg `from`
@@ -65,7 +65,7 @@ export constexpr move_cnt_type from_one_to_one_form(u32 disk_cnt) noexcept(noexc
 
 // initially all disks stack scatteredly, but finally they all stack on one peg `to`
 // from_list[i]: the (i + 1)-th disk's initial peg
-export constexpr move_cnt_type from_different_to_one_form(u32 disk_cnt, std::span<const u32> from_list, u32 to) noexcept(noexcept(from_one_to_one_form(disk_cnt)))
+export [[nodiscard]] constexpr move_cnt_type from_different_to_one_form(u32 disk_cnt, std::span<const u32> from_list, u32 to) noexcept(noexcept(from_one_to_one_form(disk_cnt)))
 {
   if (disk_cnt == 0)
     return 0;
@@ -83,7 +83,7 @@ export constexpr move_cnt_type from_different_to_one_form(u32 disk_cnt, std::spa
 
 // initially all disks stack on one peg `from`, but finally they stack scatteredly
 // to_list[i]: the (i + 1)-th disk's destination peg
-export constexpr move_cnt_type from_one_to_different_form(u32 disk_cnt, u32 from, std::span<const u32> to_list) noexcept(noexcept(from_one_to_one_form(disk_cnt)))
+export [[nodiscard]] constexpr move_cnt_type from_one_to_different_form(u32 disk_cnt, u32 from, std::span<const u32> to_list) noexcept(noexcept(from_one_to_one_form(disk_cnt)))
 {
   if (disk_cnt == 0)
     return 0;
@@ -97,7 +97,7 @@ export constexpr move_cnt_type from_one_to_different_form(u32 disk_cnt, u32 from
 }
 
 // move the largest disk from peg `from` to peg `to` using only one step (in most cases this is optimal)
-constexpr move_cnt_type general_form_one_step_strategy(u32 disk_cnt, std::span<const u32> from_list, std::span<const u32> to_list) noexcept(noexcept(from_one_to_one_form(disk_cnt)))
+[[nodiscard]] constexpr move_cnt_type general_form_one_step_strategy(u32 disk_cnt, std::span<const u32> from_list, std::span<const u32> to_list) noexcept(noexcept(from_one_to_one_form(disk_cnt)))
 {
   // 1. move disks above the largest disk n and on peg `to[n]` to peg `aux`, so that disk n can move
   // 2. move disk n to the destination, then move the remaining n - 1 disks on peg `aux` to their destinations
@@ -124,7 +124,7 @@ constexpr move_cnt_type general_form_one_step_strategy(u32 disk_cnt, std::span<c
 //   move 2 from C to A
 //   move 1 from B to A
 //   move 3 from B to A (the second move)
-constexpr move_cnt_type general_form_two_step_strategy(u32 disk_cnt, std::span<const u32> from_list, std::span<const u32> to_list) noexcept(noexcept(from_one_to_one_form(disk_cnt)))
+[[nodiscard]] constexpr move_cnt_type general_form_two_step_strategy(u32 disk_cnt, std::span<const u32> from_list, std::span<const u32> to_list) noexcept(noexcept(from_one_to_one_form(disk_cnt)))
 {
   // 1. clear disks above the largest disk n and on peg `aux`, move them to peg `to[n]`
   // 2. move disk n to peg `aux` (the first move)
@@ -137,7 +137,7 @@ constexpr move_cnt_type general_form_two_step_strategy(u32 disk_cnt, std::span<c
 }
 
 // initially all disks stack scatteredly, and finally they also stack scatteredly
-export constexpr move_cnt_type general_form(u32 disk_cnt, std::span<const u32> from_list, std::span<const u32> to_list) noexcept(noexcept(from_one_to_one_form(disk_cnt)))
+export [[nodiscard]] constexpr move_cnt_type general_form(u32 disk_cnt, std::span<const u32> from_list, std::span<const u32> to_list) noexcept(noexcept(from_one_to_one_form(disk_cnt)))
 {
   if (disk_cnt == 0)
     return 0;
