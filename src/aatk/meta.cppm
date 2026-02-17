@@ -193,8 +193,9 @@ struct has_any : std::negation<has_none<T, U>>
 export template <typename T, list_of_types U>
 constexpr bool has_any_v = has_any<T, U>::value;
 
-// behave like Haskell List length: get the length of a type list
+// get the length of a type list
 // O(1) time complexity (assuming sizeof...(Ts) has O(1) time complexity)
+// name after Haskell Data.List length
 export template <list_of_types>
 struct length;
 
@@ -224,24 +225,27 @@ struct nth<Idx, type_list<Ts...>>
 export template <std::size_t Idx, list_of_types T>
 using nth_t = nth<Idx, T>::type;
 
-// behave like Haskell List head: get the first type of a type list
-// O(1) time complexity
+// get the first type of a type list
+// O(1) time complexity (assuming `nth` has O(1) time complexity)
+// name after Haskell Data.List head
 export template <list_of_types T>
 using head = nth<0, T>;
 
 export template <list_of_types T>
 using head_t = head<T>::type;
 
-// behave like Haskell List last: get the last type of a type list
-// O(1) time complexity
+// get the last type of a type list
+// O(1) time complexity (assuming `nth` has O(1) time complexity)
+// name after Haskell Data.List last
 export template <list_of_types T>
 using last = nth<length_v<T> - 1, T>;
 
 export template <list_of_types T>
 using last_t = last<T>::type;
 
-// behave like Haskell List : operator (1 : [1, 2] --> [1, 1, 2]): get a type list that has one element added to the beginning comparing to the given type list
+// get a type list that has one element added to the beginning comparing to the given type list
 // O(1) time complexity
+// name after Haskell Data.List : operator (1 : [1, 2] --> [1, 1, 2])
 export template <typename, list_of_types>
 struct cons;
 
@@ -254,7 +258,7 @@ struct cons<T, type_list<Ts...>>
 export template <typename T, list_of_types U>
 using cons_t = cons<T, U>::type;
 
-// behave like Haskell Seq |> operator (fromList [1, 2] |> 3 --> fromList [1, 2, 3]): get a type list that has one element added to the end comparing to the given type list
+// get a type list that has one element added to the end comparing to the given type list
 // O(1) time complexity
 export template <typename, list_of_types>
 struct snoc;
@@ -268,8 +272,9 @@ struct snoc<T, type_list<Ts...>>
 export template <typename T, list_of_types U>
 using snoc_t = snoc<T, U>::type;
 
-// behave like Haskell List concat: get the concatenation of several type lists
+// get the concatenation of several type lists
 // O(n) time complexity, where n is the count of type lists to concatenate
+// name after Haskell Data.List concat
 export template <list_of_types...>
 struct concat;
 
@@ -293,8 +298,9 @@ struct concat<T0, T1, Ts...> : concat<typename concat<T0, T1>::type, Ts...>
 export template <list_of_types... Ts>
 using concat_t = concat<Ts...>::type;
 
-// behave like Haskell List reverse: get a type list that is the reverse of the given type list
+// get a type list that is the reverse of the given type list
 // O(n) time complexity, where n is the length of the given type list
+// name after Haskell Data.List reverse
 export template <list_of_types>
 struct reverse;
 
@@ -312,8 +318,9 @@ struct reverse<type_list<T, Ts...>> : snoc<T, typename reverse<type_list<Ts...>>
 export template <list_of_types T>
 using reverse_t = reverse<T>::type;
 
-// behave like Haskell List tail: get a type list with the first type removed comparing to the given type list
+// get a type list with the first type removed comparing to the given type list
 // O(1) time complexity
+// name after Haskell Data.List tail
 export template <list_of_types>
 struct tail;
 
@@ -329,8 +336,9 @@ struct tail<type_list<T, Ts...>>
 export template <list_of_types T>
 using tail_t = tail<T>::type;
 
-// behave like Haskell List init: get a type list with the last type removed comparing to the given type list
+// get a type list with the last type removed comparing to the given type list
 // O(n) time complexity, where n is the length of the given type list
+// name after Haskell Data.List init
 export template <list_of_types>
 struct init;
 
@@ -351,8 +359,9 @@ struct init<type_list<T, Ts...>> : cons<T, typename init<type_list<Ts...>>::type
 export template <list_of_types T>
 using init_t = init<T>::type;
 
-// behave like Haskell repeat: get a type list that contains N identical types
+// get a type list that contains N identical types
 // O(N) time complexity
+// name after Haskell Data.List repeat
 export template <std::size_t N, typename T>
 struct repeat : cons<T, typename repeat<N - 1, T>::type>
 {
@@ -367,8 +376,9 @@ struct repeat<0, T>
 export template <std::size_t N, typename T>
 using repeat_t = repeat<N, T>::type;
 
-// behave like Haskell List take: get a type list that contains the first N types of the given type list
+// get a type list that contains the first N types of the given type list
 // O(N) time complexity
+// name after Haskell Data.List take
 export template <std::size_t N, list_of_types T>
   requires (N <= length_v<T>)
 struct take : cons<head_t<T>, typename take<N - 1, tail_t<T>>::type>
@@ -406,8 +416,9 @@ struct take_end : take_end_impl<length_v<T> - N, T>
 export template <std::size_t N, list_of_types T>
 using take_end_t = take_end<N, T>::type;
 
-// behave like Haskell List drop: get a type list with the first N types removed comparing to the given type list
+// get a type list with the first N types removed comparing to the given type list
 // O(N) time complexity
+// name after Haskell Data.List drop
 export template <std::size_t N, list_of_types T>
   requires (N <= length_v<T>)
 struct drop : drop<N - 1, tail_t<T>>
@@ -475,8 +486,9 @@ constexpr bool is_predicate_v = is_predicate<TT, ArityLimit>::value;
 export template <template <typename...> typename TT>
 concept predicate = is_predicate_v<TT>;
 
-// behave like Haskell List takeWhile: get the longest prefix type list whose types all satisfy a given predicate
+// get the longest prefix type list whose types all satisfy a given predicate
 // O(n) time complexity, where n is the length of the longest prefix
+// name after Haskell Data.List takeWhile
 export template <template <typename> typename TTPred, list_of_types>
   requires predicate<TTPred>
 struct take_while;
@@ -506,8 +518,9 @@ struct take_while_end : reverse<take_while_t<TTPred, reverse_t<T>>>
 export template <template <typename> typename TTPred, list_of_types T>
 using take_while_end_t = take_while_end<TTPred, T>::type;
 
-// behave like Haskell List dropWhile: get a type list with a longest prefix type list removed, whose types all satisfy a given predicate
+// get a type list with a longest prefix type list removed, whose types all satisfy a given predicate
 // O(n) time complexity, where n is the count of types dropped
+// name after Haskell Data.List dropWhile
 export template <template <typename> typename TTPred, list_of_types T>
   requires predicate<TTPred>
 struct drop_while : std::conditional<TTPred<head_t<T>>::value, typename drop_while<TTPred, tail_t<T>>::type, T>
@@ -523,8 +536,9 @@ struct drop_while<TTPred, empty_type_list>
 export template <template <typename> typename TTPred, list_of_types T>
 using drop_while_t = drop_while<TTPred, T>::type;
 
-// behave like Haskell List dropWhileEnd: get a type list with a longest suffix type list removed, whose types all satisfy a given predicate
+// get a type list with a longest suffix type list removed, whose types all satisfy a given predicate
 // O(n) time complexity, where n is the length of the given type list
+// name after Haskell Data.List dropWhileEnd
 export template <template <typename> typename TTPred, list_of_types T>
   requires predicate<TTPred>
 struct drop_while_end : reverse<drop_while_t<TTPred, reverse_t<T>>>
@@ -534,8 +548,9 @@ struct drop_while_end : reverse<drop_while_t<TTPred, reverse_t<T>>>
 export template <template <typename> typename TTPred, list_of_types T>
 using drop_while_end_t = drop_while_end<TTPred, T>::type;
 
-// behave like Haskell List filter: get a type list that contains all the types that satisfy a given predicate
+// get a type list that contains all the types that satisfy a given predicate
 // O(n) time complexity, where n is the length of the given type list
+// name after Haskell Data.List filter
 export template <template <typename> typename TTPred, list_of_types>
   requires predicate<TTPred>
 struct filter;
