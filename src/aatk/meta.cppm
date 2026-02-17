@@ -399,8 +399,17 @@ struct concat<T, Ts...> : concat_impl<0, 1 + sizeof...(Ts), type_list<T, Ts...>>
 export template <list_of_types... Ts>
 using concat_t = concat<Ts...>::type;
 
+template <typename, typename...>
+struct reverse_impl;
+
+template <std::size_t... Is, typename... Ts>
+struct reverse_impl<std::index_sequence<Is...>, Ts...>
+{
+  using type = type_list<Ts...[Is]...>;
+};
+
 // get a type list that is the reverse of the given type list
-// O(n) time complexity, where n is the length of the given type list
+// O(1) time complexity (assuming pack expansion, C++26 pack indexing and making `std::index_sequence` all have O(1) time complexity)
 // name after Haskell Data.List reverse
 export template <list_of_types>
 struct reverse;
@@ -411,8 +420,8 @@ struct reverse<empty_type_list>
   using type = empty_type_list;
 };
 
-export template <typename T, typename... Ts>
-struct reverse<type_list<T, Ts...>> : snoc<T, typename reverse<type_list<Ts...>>::type>
+export template <typename... Ts>
+struct reverse<type_list<Ts...>> : reverse_impl<make_reversed_index_sequence<sizeof...(Ts)>, Ts...>
 {
 };
 
