@@ -20,6 +20,18 @@ import aatk.meta;
 
 namespace test::aatk::meta {
 
+export consteval void does_meta_custom_integer_sequence_helper_work() noexcept
+{
+  static_assert(std::same_as<::aatk::meta::make_reversed_integer_sequence<int, 8>, std::integer_sequence<int, 7, 6, 5, 4, 3, 2, 1, 0>> == true);
+  static_assert(std::same_as<::aatk::meta::make_reversed_index_sequence<8>, std::index_sequence<7, 6, 5, 4, 3, 2, 1, 0>> == true);
+  static_assert(std::same_as<::aatk::meta::reversed_index_sequence_for<int, int, int, int, int>, std::index_sequence<4, 3, 2, 1, 0>> == true);
+
+  static_assert(std::same_as<::aatk::meta::make_integer_sequence_of_range<int, 3, 7>, std::integer_sequence<int, 3, 4, 5, 6, 7>> == true);
+  static_assert(std::same_as<::aatk::meta::make_index_sequence_of_range<3, 10>, std::index_sequence<3, 4, 5, 6, 7, 8, 9, 10>> == true);
+  static_assert(std::same_as<::aatk::meta::make_reversed_integer_sequence_of_range<int, 3, 7>, std::integer_sequence<int, 7, 6, 5, 4, 3>> == true);
+  static_assert(std::same_as<::aatk::meta::make_reversed_index_sequence_of_range<3, 10>, std::index_sequence<10, 9, 8, 7, 6, 5, 4, 3>> == true);
+}
+
 export consteval void does_meta_is_none_any_of_work() noexcept
 {
   static_assert(::aatk::meta::is_none_of_v<int, double, long double, char, const char, float, std::string, const int> == true);

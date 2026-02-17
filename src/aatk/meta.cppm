@@ -79,6 +79,62 @@ concept no_cvref_not_same_as = !no_cvref_same_as<T, U>;
 export template <std::size_t N>
 using index_constant = std::integral_constant<std::size_t, N>;
 
+template <typename TIntegerSequence>
+struct make_reversed_integer_sequence_impl;
+
+template <std::integral T, T... Is>
+struct make_reversed_integer_sequence_impl<std::integer_sequence<T, Is...>>
+{
+  using type = std::integer_sequence<T, (sizeof...(Is) - 1 - Is)...>;
+};
+
+export template <std::integral T, T N>
+using make_reversed_integer_sequence = make_reversed_integer_sequence_impl<std::make_integer_sequence<T, N>>::type;
+
+export template <std::size_t N>
+using make_reversed_index_sequence = make_reversed_integer_sequence_impl<std::make_integer_sequence<std::size_t, N>>::type;
+
+export template <typename... Ts>
+using reversed_index_sequence_for = make_reversed_index_sequence<sizeof...(Ts)>;
+
+template <std::integral T, T Begin, typename TIntegerSequence>
+struct make_integer_sequence_of_range_impl;
+
+template <std::integral T, T Begin, T... Is>
+struct make_integer_sequence_of_range_impl<T, Begin, std::integer_sequence<T, Is...>>
+{
+  using type = std::integer_sequence<T, (Begin + Is)...>;
+};
+
+// generate a sequence of integers of type T in [Begin, End]
+export template <std::integral T, T Begin, T End>
+  requires (Begin <= End)
+using make_integer_sequence_of_range = make_integer_sequence_of_range_impl<T, Begin, std::make_integer_sequence<T, End - Begin + 1>>::type;
+
+// generate a sequence of integers of type std::size_t in [Begin, End]
+export template <std::size_t Begin, std::size_t End>
+  requires (Begin <= End)
+using make_index_sequence_of_range = make_integer_sequence_of_range<std::size_t, Begin, End>;
+
+template <std::integral T, T End, typename TIntegerSequence>
+struct make_reversed_integer_sequence_of_range_impl;
+
+template <std::integral T, T End, T... Is>
+struct make_reversed_integer_sequence_of_range_impl<T, End, std::integer_sequence<T, Is...>>
+{
+  using type = std::integer_sequence<T, (End - Is)...>;
+};
+
+// generate a sequence of integers of type T in [Begin, End] in a reversed order
+export template <std::integral T, T Begin, T End>
+  requires (Begin <= End)
+using make_reversed_integer_sequence_of_range = make_reversed_integer_sequence_of_range_impl<T, End, std::make_integer_sequence<T, End - Begin + 1>>::type;
+
+// generate a sequence of integers of type std::size_t in [Begin, End] in a reversed order
+export template <std::size_t Begin, std::size_t End>
+  requires (Begin <= End)
+using make_reversed_index_sequence_of_range = make_reversed_integer_sequence_of_range<std::size_t, Begin, End>;
+
 export template <typename T, typename... Us>
   requires (sizeof...(Us) > 0)
 struct is_none_of : std::conjunction<is_none_of<T, Us>...>
