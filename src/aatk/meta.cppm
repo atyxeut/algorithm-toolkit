@@ -76,10 +76,6 @@ concept no_cvref_same_as = std::same_as<std::remove_cvref_t<T>, std::remove_cvre
 export template <typename T, typename U>
 concept no_cvref_not_same_as = !no_cvref_same_as<T, U>;
 
-} // namespace aatk::meta
-
-namespace aatk::meta {
-
 export template <std::size_t N>
 using index_constant = std::integral_constant<std::size_t, N>;
 
@@ -129,24 +125,6 @@ struct all_the_same<T0, T1, Ts...> : std::bool_constant<std::same_as<T0, T1> && 
 
 export template <typename... Ts>
 constexpr bool all_the_same_v = all_the_same<Ts...>::value;
-
-// clang-format off
-export template <template <typename, typename...> typename TT>
-struct is_predicate : std::bool_constant<requires { { TT<void, void>::value } -> no_cvref_same_as<bool>; } || requires { { TT<void>::value } -> no_cvref_same_as<bool>; }>
-{
-};
-// clang-format on
-
-export template <template <typename, typename...> typename TT>
-constexpr bool is_predicate_v = is_predicate<TT>::value;
-
-export template <template <typename, typename...> typename TT>
-concept predicate = is_predicate_v<TT>;
-
-} // namespace aatk::meta
-
-// type list and its helpers
-namespace aatk::meta {
 
 export template <typename... Ts>
 using type_list = std::tuple<Ts...>;
@@ -431,37 +409,6 @@ struct take_end : take_end_impl<length_v<T> - N, T>
 export template <std::size_t N, list_of_types T>
 using take_end_t = take_end<N, T>::type;
 
-// behave like Haskell List takeWhile: get the longest prefix type list whose types all satisfy a given predicate
-// O(n) time complexity, where n is the length of the longest prefix
-export template <template <typename> typename TTPred, list_of_types>
-  requires predicate<TTPred>
-struct take_while;
-
-export template <template <typename> typename TTPred>
-struct take_while<TTPred, empty_type_list>
-{
-  using type = empty_type_list;
-};
-
-export template <template <typename> typename TTPred, typename T, typename... Ts>
-struct take_while<TTPred, type_list<T, Ts...>> : std::conditional<TTPred<T>::value, concat_t<type_list<T>, typename take_while<TTPred, type_list<Ts...>>::type>, empty_type_list>
-{
-};
-
-export template <template <typename> typename TTPred, list_of_types T>
-using take_while_t = take_while<TTPred, T>::type;
-
-// get the longest suffix type list whose types all satisfy a given predicate
-// O(n) time complexity, where n is the length of the given type list
-export template <template <typename> typename TTPred, list_of_types T>
-  requires predicate<TTPred>
-struct take_while_end : reverse<take_while_t<TTPred, reverse_t<T>>>
-{
-};
-
-export template <template <typename> typename TTPred, list_of_types T>
-using take_while_end_t = take_while_end<TTPred, T>::type;
-
 // behave like Haskell List drop: get a type list with the first N types removed comparing to the given type list
 // O(N) time complexity
 export template <std::size_t N, list_of_types T>
@@ -500,6 +447,67 @@ struct drop_end : drop_end_impl<length_v<T> - N, T>
 
 export template <std::size_t N, list_of_types T>
 using drop_end_t = drop_end<N, T>::type;
+
+template <template <typename...> typename, typename>
+struct is_predicate_tester;
+
+// clang-format off
+template <template <typename...> typename TT, typename... Ts>
+struct is_predicate_tester<TT, type_list<Ts...>> : std::bool_constant<requires { { TT<Ts...>::value } -> no_cvref_same_as<bool>; }>
+{
+};
+// clang-format on
+
+template <template <typename...> typename, typename>
+struct is_predicate_impl;
+
+template <template <typename...> typename TT, std::size_t... Is>
+struct is_predicate_impl<TT, std::index_sequence<Is...>> : std::disjunction<is_predicate_tester<TT, repeat_t<Is + 1, void>>...>
+{
+};
+
+export template <template <typename...> typename TT, std::size_t ArityLimit = 10>
+  requires (ArityLimit > 0)
+struct is_predicate : is_predicate_impl<TT, std::make_index_sequence<ArityLimit>>
+{
+};
+
+export template <template <typename...> typename TT, std::size_t ArityLimit = 10>
+constexpr bool is_predicate_v = is_predicate<TT, ArityLimit>::value;
+
+export template <template <typename...> typename TT>
+concept predicate = is_predicate_v<TT>;
+
+// behave like Haskell List takeWhile: get the longest prefix type list whose types all satisfy a given predicate
+// O(n) time complexity, where n is the length of the longest prefix
+export template <template <typename> typename TTPred, list_of_types>
+  requires predicate<TTPred>
+struct take_while;
+
+export template <template <typename> typename TTPred>
+struct take_while<TTPred, empty_type_list>
+{
+  using type = empty_type_list;
+};
+
+export template <template <typename> typename TTPred, typename T, typename... Ts>
+struct take_while<TTPred, type_list<T, Ts...>> : std::conditional<TTPred<T>::value, concat_t<type_list<T>, typename take_while<TTPred, type_list<Ts...>>::type>, empty_type_list>
+{
+};
+
+export template <template <typename> typename TTPred, list_of_types T>
+using take_while_t = take_while<TTPred, T>::type;
+
+// get the longest suffix type list whose types all satisfy a given predicate
+// O(n) time complexity, where n is the length of the given type list
+export template <template <typename> typename TTPred, list_of_types T>
+  requires predicate<TTPred>
+struct take_while_end : reverse<take_while_t<TTPred, reverse_t<T>>>
+{
+};
+
+export template <template <typename> typename TTPred, list_of_types T>
+using take_while_end_t = take_while_end<TTPred, T>::type;
 
 // behave like Haskell List dropWhile: get a type list with a longest prefix type list removed, whose types all satisfy a given predicate
 // O(n) time complexity, where n is the count of types dropped

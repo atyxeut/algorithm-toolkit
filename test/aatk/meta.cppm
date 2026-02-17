@@ -35,21 +35,6 @@ export consteval void does_meta_all_the_same_work() noexcept
   static_assert(::aatk::meta::all_the_same_v<int, int, int, int, int, int, int, int> == true);
 }
 
-export consteval void does_meta_is_predicate_work() noexcept
-{
-  // test for templates that accept 1 template parameter
-  static_assert(::aatk::meta::is_predicate_v<std::is_integral> == true);
-
-  // test for templates that accept more than 1 (but fixed) template parameter
-  static_assert(::aatk::meta::is_predicate_v<std::is_same> == true);
-
-  // test for templates that accept variadic template parameters
-  static_assert(::aatk::meta::is_predicate_v<std::is_constructible> == true);
-
-  // test for templates whose `value` member does not have type bool
-  static_assert(::aatk::meta::is_predicate_v<std::tuple_size> == false);
-}
-
 using type_list_1 = ::aatk::meta::type_list<double, float, std::vector<int>, long long>;
 using type_list_2 = ::aatk::meta::type_list<std::string, unsigned, const volatile bool, bool>;
 using type_list_3 = ::aatk::meta::type_list<int, char, const int, volatile char>;
@@ -129,6 +114,57 @@ export consteval void does_meta_take_end_work() noexcept
   static_assert(std::same_as<::aatk::meta::take_end_t<6, type_list_5>, take_6_type_list_of_5_from_end>);
 }
 
+export consteval void does_meta_drop_work() noexcept
+{
+  using dropped_0_type_list_of_1 = ::aatk::meta::type_list<double, float, std::vector<int>, long long>;
+  static_assert(std::same_as<::aatk::meta::drop_t<0, type_list_1>, dropped_0_type_list_of_1>);
+
+  using dropped_0_type_list_of_2 = ::aatk::meta::type_list<std::string, unsigned, const volatile bool, bool>;
+  static_assert(std::same_as<::aatk::meta::drop_t<0, type_list_2>, dropped_0_type_list_of_2>);
+
+  using dropped_3_type_list_of_1 = ::aatk::meta::type_list<long long>;
+  static_assert(std::same_as<::aatk::meta::drop_t<3, type_list_1>, dropped_3_type_list_of_1>);
+
+  using dropped_3_type_list_of_2 = ::aatk::meta::type_list<bool>;
+  static_assert(std::same_as<::aatk::meta::drop_t<3, type_list_2>, dropped_3_type_list_of_2>);
+}
+
+export consteval void does_meta_drop_end_work() noexcept
+{
+  using dropped_0_type_list_of_1_from_end = ::aatk::meta::type_list<double, float, std::vector<int>, long long>;
+  static_assert(std::same_as<::aatk::meta::drop_end_t<0, type_list_1>, dropped_0_type_list_of_1_from_end>);
+
+  using dropped_0_type_list_of_2_from_end = ::aatk::meta::type_list<std::string, unsigned, const volatile bool, bool>;
+  static_assert(std::same_as<::aatk::meta::drop_end_t<0, type_list_2>, dropped_0_type_list_of_2_from_end>);
+
+  using dropped_3_type_list_of_1_from_end = ::aatk::meta::type_list<double>;
+  static_assert(std::same_as<::aatk::meta::drop_end_t<3, type_list_1>, dropped_3_type_list_of_1_from_end>);
+
+  using dropped_3_type_list_of_2_from_end = ::aatk::meta::type_list<std::string>;
+  static_assert(std::same_as<::aatk::meta::drop_end_t<3, type_list_2>, dropped_3_type_list_of_2_from_end>);
+
+  using dropped_2_type_list_of_3_from_end = ::aatk::meta::type_list<int, char>;
+  static_assert(std::same_as<::aatk::meta::drop_end_t<2, type_list_3>, dropped_2_type_list_of_3_from_end>);
+}
+
+export consteval void does_meta_is_predicate_work() noexcept
+{
+  // test for templates that accept 1 template parameter
+  static_assert(::aatk::meta::is_predicate_v<std::is_integral> == true);
+
+  // test for templates that accept more than 1 (but fixed) template parameter
+  static_assert(::aatk::meta::is_predicate_v<std::is_same> == true);
+
+  // test for templates that accept variadic template parameters
+  static_assert(::aatk::meta::is_predicate_v<std::is_constructible> == true);
+
+  // test for templates whose `value` member does not have type bool
+  static_assert(::aatk::meta::is_predicate_v<std::tuple_size> == false);
+
+  // test for templates that do not have a `value` member
+  static_assert(::aatk::meta::is_predicate_v<std::add_const> == false);
+}
+
 export consteval void does_meta_take_while_work() noexcept
 {
   using take_while_type_list_of_empty_list = ::aatk::meta::empty_type_list;
@@ -175,39 +211,6 @@ export consteval void does_meta_take_while_end_work() noexcept
 
   using take_while_type_list_of_5_2_from_end = ::aatk::meta::empty_type_list;
   static_assert(std::same_as<::aatk::meta::take_while_end_t<std::is_floating_point, type_list_5>, take_while_type_list_of_5_2_from_end>);
-}
-
-export consteval void does_meta_drop_work() noexcept
-{
-  using dropped_0_type_list_of_1 = ::aatk::meta::type_list<double, float, std::vector<int>, long long>;
-  static_assert(std::same_as<::aatk::meta::drop_t<0, type_list_1>, dropped_0_type_list_of_1>);
-
-  using dropped_0_type_list_of_2 = ::aatk::meta::type_list<std::string, unsigned, const volatile bool, bool>;
-  static_assert(std::same_as<::aatk::meta::drop_t<0, type_list_2>, dropped_0_type_list_of_2>);
-
-  using dropped_3_type_list_of_1 = ::aatk::meta::type_list<long long>;
-  static_assert(std::same_as<::aatk::meta::drop_t<3, type_list_1>, dropped_3_type_list_of_1>);
-
-  using dropped_3_type_list_of_2 = ::aatk::meta::type_list<bool>;
-  static_assert(std::same_as<::aatk::meta::drop_t<3, type_list_2>, dropped_3_type_list_of_2>);
-}
-
-export consteval void does_meta_drop_end_work() noexcept
-{
-  using dropped_0_type_list_of_1_from_end = ::aatk::meta::type_list<double, float, std::vector<int>, long long>;
-  static_assert(std::same_as<::aatk::meta::drop_end_t<0, type_list_1>, dropped_0_type_list_of_1_from_end>);
-
-  using dropped_0_type_list_of_2_from_end = ::aatk::meta::type_list<std::string, unsigned, const volatile bool, bool>;
-  static_assert(std::same_as<::aatk::meta::drop_end_t<0, type_list_2>, dropped_0_type_list_of_2_from_end>);
-
-  using dropped_3_type_list_of_1_from_end = ::aatk::meta::type_list<double>;
-  static_assert(std::same_as<::aatk::meta::drop_end_t<3, type_list_1>, dropped_3_type_list_of_1_from_end>);
-
-  using dropped_3_type_list_of_2_from_end = ::aatk::meta::type_list<std::string>;
-  static_assert(std::same_as<::aatk::meta::drop_end_t<3, type_list_2>, dropped_3_type_list_of_2_from_end>);
-
-  using dropped_2_type_list_of_3_from_end = ::aatk::meta::type_list<int, char>;
-  static_assert(std::same_as<::aatk::meta::drop_end_t<2, type_list_3>, dropped_2_type_list_of_3_from_end>);
 }
 
 export consteval void does_meta_drop_while_work() noexcept
