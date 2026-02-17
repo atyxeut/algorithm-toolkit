@@ -117,13 +117,13 @@ struct all_the_same<> : std::true_type
 {
 };
 
-export template <typename T0, typename T1>
-struct all_the_same<T0, T1> : std::bool_constant<std::same_as<T0, T1>>
+export template <typename T>
+struct all_the_same<T> : std::true_type
 {
 };
 
 export template <typename T0, typename T1, typename... Ts>
-struct all_the_same<T0, T1, Ts...> : std::bool_constant<all_the_same<T0, T1>::value && all_the_same<T1, Ts...>::value>
+struct all_the_same<T0, T1, Ts...> : std::bool_constant<std::same_as<T0, T1> && all_the_same<T1, Ts...>::value>
 {
 };
 
