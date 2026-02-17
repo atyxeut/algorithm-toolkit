@@ -335,7 +335,7 @@ struct repeat_impl<T, std::index_sequence<Is...>>
 };
 
 // get a type list that contains N identical types
-// O(1) time complexity (assuming pack expansion has O(1) time complexity)
+// O(1) time complexity (assuming pack expansion and make `std::integer_sequence` both have O(1) time complexity)
 // name after Haskell Data.List repeat
 export template <std::size_t N, typename T>
 struct repeat : repeat_impl<T, std::make_index_sequence<N>>
@@ -399,7 +399,7 @@ struct concat<T, Ts...> : concat_impl<0, 1 + sizeof...(Ts), type_list<T, Ts...>>
 export template <list_of_types... Ts>
 using concat_t = concat<Ts...>::type;
 
-template <typename, typename...>
+template <typename TIndexSequence, typename... Ts>
 struct reverse_impl;
 
 template <std::size_t... Is, typename... Ts>
