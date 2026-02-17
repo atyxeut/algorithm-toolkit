@@ -16,15 +16,12 @@ export module aatk.debug.benchmark;
 
 import std;
 
-import aatk.util.stl_helper;
-
 namespace aatk::benchmark {
 
-export template <typename TRep, typename TRatio = std::milli, typename TDuration>
-  requires meta::is_std_duration_v<TDuration>
-void print_duration_as(TDuration&& duration, bool endline = true)
+export template <typename TRep, typename TPeriod = std::milli, typename TOtherRep, typename TOtherPeriod>
+void print_duration_as(std::chrono::duration<TOtherRep, TOtherPeriod> duration, bool endline = true)
 {
-  const auto dur = std::chrono::duration_cast<std::chrono::duration<TRep, TRatio>>(std::forward<TDuration>(duration));
+  const auto dur = std::chrono::duration_cast<std::chrono::duration<TRep, TPeriod>>(duration);
   if constexpr (std::floating_point<TRep>)
     std::cerr << std::fixed << std::setprecision(3) << dur;
   else
@@ -34,25 +31,23 @@ void print_duration_as(TDuration&& duration, bool endline = true)
     std::println(std::cerr);
 }
 
-export template <typename TDuration>
-  requires meta::is_std_duration_v<TDuration>
-void print_duration(TDuration&& duration, bool endline = true)
+export template <typename TRep, typename TPeriod>
+void print_duration(std::chrono::duration<TRep, TPeriod> duration, bool endline = true)
 {
-  print_duration_as<TDuration::rep, TDuration::period>(std::forward<TDuration>(duration), endline);
+  print_duration_as<TRep, TPeriod>(duration, endline);
 }
 
-template <typename TDuration, typename TResult = void>
-  requires meta::is_std_duration_v<TDuration>
+template <typename TRep, typename TPeriod, typename TResult>
 struct timed_invocation_result
 {
-  TDuration duration;
+  std::chrono::duration<TRep, TPeriod> duration;
   TResult result;
 };
 
-template <typename TDuration>
-struct timed_invocation_result<TDuration, void>
+template <typename TRep, typename TPeriod>
+struct timed_invocation_result<TRep, TPeriod, void>
 {
-  TDuration duration;
+  std::chrono::duration<TRep, TPeriod> duration;
 };
 
 export template <typename TFn, typename... TArgs>
@@ -88,12 +83,12 @@ export template <typename TFn, typename... TArgs>
     if constexpr (std::is_void_v<result_type>) {
       std::invoke(std::forward<TFn>(func), std::forward<TArgs>(args)...);
       controller.end_timer();
-      return timed_invocation_result<duration_type> {timer_end - timer_begin};
+      return timed_invocation_result<duration_type::rep, duration_type::period, void> {timer_end - timer_begin};
     }
     else {
       auto result = std::invoke(std::forward<TFn>(func), std::forward<TArgs>(args)...);
       controller.end_timer();
-      return timed_invocation_result<duration_type, result_type> {timer_end - timer_begin, std::move(result)};
+      return timed_invocation_result {timer_end - timer_begin, std::move(result)};
     }
   }
   catch (...) {
