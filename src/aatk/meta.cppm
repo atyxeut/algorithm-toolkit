@@ -270,9 +270,9 @@ export template <typename T, list_of_types U>
 using snoc_t = snoc<T, U>::type;
 
 // get the concatenation of several type lists
-// O(n) time complexity, where n is the count of type lists to concatenate
+// O(log n) time complexity, where n is the count of type lists to concatenate
 // name after Haskell Data.List concat
-export template <list_of_types...>
+export template <list_of_types... Ts>
 struct concat;
 
 export template <typename... Ts>
@@ -281,14 +281,37 @@ struct concat<type_list<Ts...>>
   using type = type_list<Ts...>;
 };
 
-export template <typename... TsOfLeft, typename... TsOfRight>
-struct concat<type_list<TsOfLeft...>, type_list<TsOfRight...>>
+export template <typename... Ts, typename... Us>
+struct concat<type_list<Ts...>, type_list<Us...>>
 {
-  using type = type_list<TsOfLeft..., TsOfRight...>;
+  using type = type_list<Ts..., Us...>;
 };
 
-export template <list_of_types T0, list_of_types T1, list_of_types... Ts>
-struct concat<T0, T1, Ts...> : concat<typename concat<T0, T1>::type, Ts...>
+// devide and conquer for >= 3 type lists for better time complexity:
+// 1. divide
+//  left half of the original type list is `concat_impl<BeginIdx, N / 2, Ts...>::type`
+//  right half of the original type list is `concat_impl<BeginIdx + N / 2, N - N / 2, Ts...>::type`
+// 2. merge
+//  use the 2 lists specialization of `concat` to merge
+template <std::size_t BeginIdx, std::size_t N, list_of_types... Ts>
+struct concat_impl : concat<typename concat_impl<BeginIdx, N / 2, Ts...>::type, typename concat_impl<BeginIdx + N / 2, N - N / 2, Ts...>::type>
+{
+};
+
+template <std::size_t BeginIdx, list_of_types... Ts>
+struct concat_impl<BeginIdx, 1, Ts...>
+{
+  using type = Ts...[BeginIdx];
+};
+
+template <std::size_t BeginIdx, list_of_types... Ts>
+struct concat_impl<BeginIdx, 0, Ts...>
+{
+  using type = empty_type_list;
+};
+
+export template <list_of_types T, list_of_types... Ts>
+struct concat<T, Ts...> : concat_impl<0, 1 + sizeof...(Ts), T, Ts...>
 {
 };
 
