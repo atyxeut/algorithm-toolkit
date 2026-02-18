@@ -425,15 +425,7 @@ using select_by_index_sequence_t = select_by_index_sequence<TIndexSequence, T>::
 // O(1) time complexity
 // name after Haskell Data.List reverse
 export template <list_of_types T>
-struct reverse : select_by_index_sequence<make_reversed_index_sequence<length_v<T>>, T>
-{
-};
-
-export template <>
-struct reverse<empty_type_list>
-{
-  using type = empty_type_list;
-};
+using reverse = select_by_index_sequence<make_reversed_index_sequence<length_v<T>>, T>;
 
 export template <list_of_types T>
 using reverse_t = reverse<T>::type;

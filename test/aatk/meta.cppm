@@ -108,6 +108,9 @@ export consteval void does_meta_concat_work() noexcept
 
 export consteval void does_meta_reverse_work() noexcept
 {
+  using reversed_empty_type_list = ::aatk::meta::empty_type_list;
+  static_assert(std::same_as<::aatk::meta::reverse_t<::aatk::meta::empty_type_list>, reversed_empty_type_list>);
+
   using reversed_type_list_of_1 = ::aatk::meta::type_list<long long, std::vector<int>, float, double>;
   static_assert(std::same_as<::aatk::meta::reverse_t<type_list_1>, reversed_type_list_of_1>);
 
