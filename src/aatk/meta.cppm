@@ -379,10 +379,10 @@ struct concat<type_list<Ts...>, type_list<Us...>>
 
 // devide and conquer for >= 3 type lists for better time complexity:
 // 1. divide
-//  left half of the original type list is `concat_impl<BeginIdx, N / 2, Ts...>::type`
-//  right half of the original type list is `concat_impl<BeginIdx + N / 2, N - N / 2, Ts...>::type`
+// left half of the original type list is `concat_impl<BeginIdx, N / 2, Ts...>::type`
+// right half of the original type list is `concat_impl<BeginIdx + N / 2, N - N / 2, Ts...>::type`
 // 2. merge
-//  use the 2 lists specialization of `concat` to merge
+// use the 2 lists specialization of `concat` to merge
 template <std::size_t BeginIdx, std::size_t N, list_of_types T>
 struct concat_impl : concat<typename concat_impl<BeginIdx, N / 2, T>::type, typename concat_impl<BeginIdx + N / 2, N - N / 2, T>::type>
 {
