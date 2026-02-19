@@ -349,7 +349,7 @@ using repeat_t = repeat<N, T>::type;
 // get the concatenation of several type lists
 // O(log n) time complexity, where n is the count of type lists to concatenate
 // name after Haskell Data.List concat
-export template <list_of_types... Ts>
+export template <list_of_types...>
 struct concat;
 
 export template <typename... Ts>
