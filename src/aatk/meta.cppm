@@ -655,7 +655,7 @@ export template <template <typename> typename TTPred, list_of_types T>
 using drop_while_end_t = drop_while_end<TTPred, T>::type;
 
 // get a type list that contains all the types that satisfy a given predicate
-// O(log n) time complexity, limited by `concat` (assuming pack expansion has O(1) time complexity), where n is the length of the given type list
+// O(log n) time complexity, limited by `concat`, where n is the length of the given type list
 // name after Haskell Data.List filter
 export template <template <typename> typename TTPred, list_of_types>
   requires predicate<TTPred>
