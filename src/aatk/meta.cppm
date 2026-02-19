@@ -486,19 +486,11 @@ export template <std::size_t N, list_of_types T>
 using take_end_t = take_end<N, T>::type;
 
 // get a type list with the first N types removed comparing to the given type list
-// O(N) time complexity
+// O(1) time complexity
 // name after Haskell Data.List drop
 export template <std::size_t N, list_of_types T>
   requires (N <= length_v<T>)
-struct drop : drop<N - 1, tail_t<T>>
-{
-};
-
-export template <list_of_types T>
-struct drop<0, T>
-{
-  using type = T;
-};
+using drop = take_end<length_v<T> - N, T>;
 
 export template <std::size_t N, list_of_types T>
 using drop_t = drop<N, T>::type;

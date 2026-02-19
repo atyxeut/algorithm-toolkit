@@ -172,6 +172,9 @@ export consteval void does_meta_take_end_work() noexcept
 
 export consteval void does_meta_drop_work() noexcept
 {
+  using dropped_0_type_list_of_empty = ::aatk::meta::empty_type_list;
+  static_assert(std::same_as<::aatk::meta::drop_t<0, ::aatk::meta::empty_type_list>, dropped_0_type_list_of_empty>);
+
   using dropped_0_type_list_of_1 = ::aatk::meta::type_list<double, float, std::vector<int>, long long>;
   static_assert(std::same_as<::aatk::meta::drop_t<0, type_list_1>, dropped_0_type_list_of_1>);
 
