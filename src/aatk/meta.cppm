@@ -495,24 +495,11 @@ using drop = take_end<length_v<T> - N, T>;
 export template <std::size_t N, list_of_types T>
 using drop_t = drop<N, T>::type;
 
-template <std::size_t N, list_of_types T>
-struct drop_end_impl : cons<head_t<T>, typename drop_end_impl<N - 1, tail_t<T>>::type>
-{
-};
-
-template <list_of_types T>
-struct drop_end_impl<0, T>
-{
-  using type = empty_type_list;
-};
-
 // same as drop, but drop from the end
-// O(length - N) time complexity
+// O(1) time complexity
 export template <std::size_t N, list_of_types T>
   requires (N <= length_v<T>)
-struct drop_end : drop_end_impl<length_v<T> - N, T>
-{
-};
+using drop_end = take<length_v<T> - N, T>;
 
 export template <std::size_t N, list_of_types T>
 using drop_end_t = drop_end<N, T>::type;
