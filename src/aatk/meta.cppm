@@ -253,7 +253,7 @@ export template <typename T, list_of_types U>
 constexpr bool has_any_v = has_any<T, U>::value;
 
 // get the length of a type list
-// O(1) time complexity (assuming sizeof...(Ts) has O(1) time complexity)
+// O(1) time complexity
 // name after Haskell Data.List length
 export template <list_of_types>
 struct length;
