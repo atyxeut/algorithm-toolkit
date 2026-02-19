@@ -13,17 +13,4 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module aatk.math;
-
-export import aatk.math.equation;
-export import aatk.math.floating_point;
-export import aatk.math.fraction;
-export import aatk.math.geometry;
-export import aatk.math.integer;
-
-export namespace aatk::meta {
-
-template <typename T>
-concept arithmetic = integral<T> || floating_point<T>;
-
-} // namespace aatk::meta
+export module aatk.math.equation;
