@@ -225,6 +225,14 @@ export consteval void does_meta_is_predicate_work() noexcept
 
   // test for templates that do not have a `value` member
   static_assert(::aatk::meta::is_predicate_v<std::add_const> == false);
+
+  // test if `wrapped_predicate` concept works
+  static_assert(::aatk::meta::predicate<std::is_integral> == true);
+  static_assert(::aatk::meta::wrapped_predicate<::aatk::meta::template_wrapper<std::is_integral>> == true);
+  static_assert(::aatk::meta::predicate<std::is_same> == true);
+  static_assert(::aatk::meta::wrapped_predicate<::aatk::meta::template_wrapper<std::is_same>> == true);
+  static_assert(::aatk::meta::predicate<std::add_const> == false);
+  static_assert(::aatk::meta::wrapped_predicate<::aatk::meta::template_wrapper<std::add_const>> == false);
 }
 
 export consteval void does_meta_take_while_work() noexcept

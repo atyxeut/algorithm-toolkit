@@ -521,6 +521,47 @@ constexpr bool is_predicate_v = is_predicate<TT, ArityLimit>::value;
 export template <template <typename...> typename TT>
 concept predicate = is_predicate_v<TT>;
 
+export template <template <typename...> typename TT>
+struct template_wrapper
+{
+  template <typename... TArgs>
+  using type = TT<TArgs...>;
+};
+
+export template <typename>
+struct is_no_cv_template_wrapper : std::false_type
+{
+};
+
+export template <template <typename...> typename TT>
+struct is_no_cv_template_wrapper<template_wrapper<TT>> : std::true_type
+{
+};
+
+export template <typename T>
+constexpr bool is_no_cv_template_wrapper_v = is_no_cv_template_wrapper<T>::value;
+
+export template <typename T>
+using is_template_wrapper = is_no_cv_template_wrapper<std::remove_cv_t<T>>;
+
+export template <typename T>
+constexpr bool is_template_wrapper_v = is_template_wrapper<T>::value;
+
+export template <typename T>
+concept wrapped_template = is_template_wrapper_v<T>;
+
+export template <typename T>
+concept wrapped_predicate = wrapped_template<T> && predicate<T::template type>;
+
+export template <wrapped_template T, typename... TArgs>
+using invoke = T::template type<TArgs...>;
+
+export template <wrapped_template T, typename... TArgs>
+using invoke_t = invoke<T, TArgs...>::type;
+
+export template <wrapped_template T, typename... TArgs>
+constexpr auto invoke_v = invoke<T, TArgs...>::value;
+
 // get the longest prefix type list whose types all satisfy a given predicate
 // O(n) time complexity, where n is the length of the longest prefix
 // name after Haskell Data.List takeWhile
