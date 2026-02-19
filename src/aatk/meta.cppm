@@ -562,24 +562,28 @@ using invoke_t = invoke<T, TArgs...>::type;
 export template <wrapped_template T, typename... TArgs>
 constexpr auto invoke_v = invoke<T, TArgs...>::value;
 
-template <wrapped_predicate, list_of_types>
+template <wrapped_predicate TPred, list_of_types TRemainingList, list_of_types TTakenList = empty_type_list>
 struct take_while_impl;
 
-template <wrapped_predicate TPred>
-struct take_while_impl<TPred, empty_type_list>
+template <wrapped_predicate TPred, list_of_types TTakenList>
+struct take_while_impl<TPred, empty_type_list, TTakenList>
 {
-  using type = empty_type_list;
+  using type = TTakenList;
 };
 
-template <wrapped_predicate TPred, list_of_types T0, list_of_types T1>
-struct take_while_lazy_evaluation_helper
+template <wrapped_predicate, list_of_types, list_of_types>
+struct take_while_impl_lazy_evaluation_helper;
+
+template <wrapped_predicate TPred, typename T, typename... Ts, typename... TTaken>
+struct take_while_impl_lazy_evaluation_helper<TPred, type_list<T, Ts...>, type_list<TTaken...>>
 {
   // cannot use inheritance here, otherwise the evaluation is not lazy
-  using type = concat_t<T0, typename take_while_impl<TPred, T1>::type>;
+  using type = take_while_impl<TPred, type_list<Ts...>, type_list<TTaken..., T>>::type;
 };
 
-template <wrapped_predicate TPred, typename T, typename... Ts>
-struct take_while_impl<TPred, type_list<T, Ts...>> : std::conditional_t<invoke_v<TPred, T>, take_while_lazy_evaluation_helper<TPred, type_list<T>, type_list<Ts...>>, std::type_identity<empty_type_list>>
+template <wrapped_predicate TPred, typename T, typename... Ts, typename... TTaken>
+struct take_while_impl<TPred, type_list<T, Ts...>, type_list<TTaken...>>
+  : std::conditional_t<invoke_v<TPred, T>, take_while_impl_lazy_evaluation_helper<TPred, type_list<T, Ts...>, type_list<TTaken...>>, std::type_identity<type_list<TTaken...>>>
 {
 };
 
@@ -587,13 +591,14 @@ struct take_while_impl<TPred, type_list<T, Ts...>> : std::conditional_t<invoke_v
 // O(k) time complexity, where k is the length of the longest prefix
 // name after Haskell Data.List takeWhile
 export template <template <typename> typename TTPred, list_of_types T>
+  requires predicate<TTPred>
 using take_while = take_while_impl<template_wrapper<TTPred>, T>;
 
 export template <template <typename> typename TTPred, list_of_types T>
 using take_while_t = take_while<TTPred, T>::type;
 
 // get the longest suffix type list whose types all satisfy a given predicate
-// O(n) time complexity, where n is the length of the given type list
+// O(k) time complexity, where k is the length of the longest suffix
 export template <template <typename> typename TTPred, list_of_types T>
   requires predicate<TTPred>
 struct take_while_end : reverse<take_while_t<TTPred, reverse_t<T>>>
