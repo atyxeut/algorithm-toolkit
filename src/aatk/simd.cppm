@@ -13,13 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module aatk;
+export module aatk.simd;
 
-export import aatk.data_structure;
-export import aatk.debug;
-export import aatk.math;
-export import aatk.memory;
-export import aatk.meta;
-export import aatk.random;
-export import aatk.simd;
-export import aatk.util;
+namespace aatk::simd {
+
+} // namespace aatk::simd
