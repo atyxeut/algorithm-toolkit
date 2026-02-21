@@ -197,7 +197,9 @@ export template <typename... Ts>
 constexpr bool all_the_same_v = all_the_same<Ts...>::value;
 
 export template <typename... Ts>
-using type_list = std::tuple<Ts...>;
+struct type_list
+{
+};
 
 export using empty_type_list = type_list<>;
 
