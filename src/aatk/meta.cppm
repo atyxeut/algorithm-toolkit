@@ -157,7 +157,7 @@ using make_reversed_index_sequence_of_range = make_reversed_integer_sequence_of_
 export template <std::integral T, T Offset, typename TIntegerSequence>
 struct shift_integer_sequence;
 
-export template <typename TInt, TInt Offset, TInt... Is>
+template <typename TInt, TInt Offset, TInt... Is>
 struct shift_integer_sequence<TInt, Offset, std::integer_sequence<TInt, Is...>>
 {
   using type = std::integer_sequence<TInt, (Is + Offset)...>;
@@ -168,10 +168,10 @@ using shift_integer_sequence_t = shift_integer_sequence<TInt, Offset, TIntegerSe
 
 // add an offset to all indices in the given `std::index_sequence`
 // O(1) time complexity
-template <std::size_t Offset, typename TIndexSequence>
+export template <std::size_t Offset, typename TIndexSequence>
 using shift_index_sequence = shift_integer_sequence<std::size_t, Offset, TIndexSequence>;
 
-template <std::size_t Offset, typename TIndexSequence>
+export template <std::size_t Offset, typename TIndexSequence>
 using shift_index_sequence_t = shift_index_sequence<Offset, TIndexSequence>::type;
 
 export template <typename T, typename... Us>
@@ -180,7 +180,7 @@ struct is_none_of : std::conjunction<is_none_of<T, Us>...>
 {
 };
 
-export template <typename T, typename U>
+template <typename T, typename U>
 struct is_none_of<T, U> : std::bool_constant<!std::same_as<T, U>>
 {
 };
@@ -200,17 +200,17 @@ constexpr bool is_any_of_v = is_any_of<T, Us...>::value;
 export template <typename...>
 struct all_the_same;
 
-export template <>
+template <>
 struct all_the_same<> : std::true_type
 {
 };
 
-export template <typename T>
+template <typename T>
 struct all_the_same<T> : std::true_type
 {
 };
 
-export template <typename T0, typename T1, typename... Ts>
+template <typename T0, typename T1, typename... Ts>
 struct all_the_same<T0, T1, Ts...> : std::bool_constant<std::same_as<T0, T1> && all_the_same<T1, Ts...>::value>
 {
 };
@@ -230,7 +230,7 @@ struct is_no_cv_type_list : std::false_type
 {
 };
 
-export template <typename... Ts>
+template <typename... Ts>
 struct is_no_cv_type_list<type_list<Ts...>> : std::true_type
 {
 };
@@ -249,7 +249,7 @@ struct is_no_cv_empty_type_list : std::false_type
 {
 };
 
-export template <>
+template <>
 struct is_no_cv_empty_type_list<empty_type_list> : std::true_type
 {
 };
@@ -279,7 +279,7 @@ constexpr auto indexed_type_v = indexed_type<I, T>::value;
 export template <typename TIndexedType>
 struct unwrap_indexed_type;
 
-export template <std::size_t I, typename T>
+template <std::size_t I, typename T>
 struct unwrap_indexed_type<indexed_type<I, T>> : indexed_type<I, T>
 {
 };
@@ -293,7 +293,7 @@ constexpr auto unwrap_indexed_type_v = unwrap_indexed_type<TIndexedType>::value;
 export template <typename TIndexSequence, typename TTypeList>
 struct indexed_type_list;
 
-export template <std::size_t... Is, typename... Ts>
+template <std::size_t... Is, typename... Ts>
 struct indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>> : indexed_type<Is, Ts>...
 {
 };
@@ -305,7 +305,7 @@ struct is_no_cv_indexed_type_list : std::false_type
 {
 };
 
-export template <std::size_t... Is, typename... Ts>
+template <std::size_t... Is, typename... Ts>
 struct is_no_cv_indexed_type_list<indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>> : std::true_type
 {
 };
@@ -324,7 +324,7 @@ struct is_no_cv_empty_indexed_type_list : std::false_type
 {
 };
 
-export template <>
+template <>
 struct is_no_cv_empty_indexed_type_list<empty_indexed_type_list> : std::true_type
 {
 };
@@ -347,22 +347,22 @@ concept nonempty_list_of_types = list_of_types<T> && !is_empty_type_list_v<T> &&
 export template <typename, typename TListOfTypes>
 struct has_none;
 
-export template <typename T>
+template <typename T>
 struct has_none<T, empty_type_list> : std::true_type
 {
 };
 
-export template <typename T>
+template <typename T>
 struct has_none<T, empty_indexed_type_list> : std::true_type
 {
 };
 
-export template <typename T, typename... Us>
+template <typename T, typename... Us>
 struct has_none<T, type_list<Us...>> : is_none_of<T, Us...>
 {
 };
 
-export template <typename T, std::size_t... Is, typename... Us>
+template <typename T, std::size_t... Is, typename... Us>
 struct has_none<T, indexed_type_list<std::index_sequence<Is...>, type_list<Us...>>> : is_none_of<T, Us...>
 {
 };
@@ -384,12 +384,12 @@ constexpr bool has_any_v = has_any<T, U>::value;
 export template <typename TListOfTypes>
 struct length;
 
-export template <typename... Ts>
+template <typename... Ts>
 struct length<type_list<Ts...>> : index_constant<sizeof...(Ts)>
 {
 };
 
-export template <std::size_t... Is, typename... Ts>
+template <std::size_t... Is, typename... Ts>
 struct length<indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>> : index_constant<sizeof...(Ts)>
 {
 };
@@ -403,13 +403,13 @@ export template <std::size_t Idx, typename TListOfTypes>
   requires (Idx < length_v<TListOfTypes>)
 struct nth;
 
-export template <std::size_t Idx, typename... Ts>
+template <std::size_t Idx, typename... Ts>
 struct nth<Idx, type_list<Ts...>>
 {
   using type = Ts...[Idx];
 };
 
-export template <std::size_t Idx, std::size_t... Is, typename... Ts>
+template <std::size_t Idx, std::size_t... Is, typename... Ts>
 struct nth<Idx, indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>>
 {
   using type = indexed_type<Is...[Idx], Ts...[Idx]>;
@@ -460,7 +460,7 @@ using map_t = map<I, TIndexedTypeList>::type;
 export template <typename, list_of_types>
 struct cons;
 
-export template <typename T, typename... Ts>
+template <typename T, typename... Ts>
 struct cons<T, type_list<Ts...>>
 {
   using type = type_list<T, Ts...>;
@@ -474,7 +474,7 @@ using cons_t = cons<T, U>::type;
 export template <typename, list_of_types>
 struct snoc;
 
-export template <typename T, typename... Ts>
+template <typename T, typename... Ts>
 struct snoc<T, type_list<Ts...>>
 {
   using type = type_list<Ts..., T>;
@@ -541,13 +541,13 @@ public:
   using type = divide_helper<0, sizeof...(Ts)>::type;
 };
 
-export template <typename... Ts>
+template <typename... Ts>
 struct concat<type_list<Ts...>>
 {
   using type = type_list<Ts...>;
 };
 
-export template <typename... Ts, typename... Us>
+template <typename... Ts, typename... Us>
 struct concat<type_list<Ts...>, type_list<Us...>>
 {
   using type = type_list<Ts..., Us...>;
@@ -561,7 +561,7 @@ using concat_t = concat<TTypeLists...>::type;
 export template <typename TIndexSequence, list_of_types>
 struct select_by_index_sequence;
 
-export template <std::size_t... Is, typename... Ts>
+template <std::size_t... Is, typename... Ts>
 struct select_by_index_sequence<std::index_sequence<Is...>, type_list<Ts...>>
 {
   using type = type_list<Ts...[Is]...>;
@@ -585,7 +585,7 @@ using reverse_t = reverse<TTypeList>::type;
 export template <nonempty_list_of_types>
 struct tail;
 
-export template <typename T, typename... Ts>
+template <typename T, typename... Ts>
 struct tail<type_list<T, Ts...>>
 {
   using type = type_list<Ts...>;
@@ -621,7 +621,7 @@ struct take_end : select_by_index_sequence<make_index_sequence_of_range<length_v
 {
 };
 
-export template <typename TTypeList>
+template <typename TTypeList>
 struct take_end<0, TTypeList>
 {
   using type = empty_type_list;
@@ -695,7 +695,7 @@ struct is_no_cv_template_wrapper : std::false_type
 {
 };
 
-export template <template <typename...> typename TT>
+template <template <typename...> typename TT>
 struct is_no_cv_template_wrapper<template_wrapper<TT>> : std::true_type
 {
 };
@@ -831,13 +831,13 @@ export template <template <typename> typename TTPred, list_of_types>
   requires predicate<TTPred>
 struct filter;
 
-export template <template <typename> typename TTPred>
+template <template <typename> typename TTPred>
 struct filter<TTPred, empty_type_list>
 {
   using type = empty_type_list;
 };
 
-export template <template <typename> typename TTPred, typename... Ts>
+template <template <typename> typename TTPred, typename... Ts>
 struct filter<TTPred, type_list<Ts...>> : concat<std::conditional_t<TTPred<Ts>::value, type_list<Ts>, empty_type_list>...>
 {
 };
