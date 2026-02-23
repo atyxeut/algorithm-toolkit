@@ -508,8 +508,38 @@ using repeat_t = repeat<N, T>::type;
 // get the concatenation of several type lists
 // O(log n) time complexity, where n is the count of type lists to concatenate
 // name after Haskell Data.List concat
-export template <list_of_types...>
-struct concat;
+export template <list_of_types... Ts>
+struct concat
+{
+private:
+  // divide and conquer for >= 3 type lists for better time complexity:
+  // 1. divide
+  // `divide_helper<BeginIdx, N / 2>` represents the left half
+  // `divide_helper<BeginIdx + N / 2, N - N / 2>` represents the right half
+  // 2. merge
+  // use the 2 lists specialization of `concat` to merge
+  //
+  // note: placing this helper inside improves compilation time significantly, since in this way we can avoid the unnecessary copies of pack `Ts...` during the recursion
+  template <std::size_t BeginIdx, std::size_t N>
+  struct divide_helper : concat<typename divide_helper<BeginIdx, N / 2>::type, typename divide_helper<BeginIdx + N / 2, N - N / 2>::type>
+  {
+  };
+
+  template <std::size_t BeginIdx>
+  struct divide_helper<BeginIdx, 1>
+  {
+    using type = Ts...[BeginIdx];
+  };
+
+  template <std::size_t BeginIdx>
+  struct divide_helper<BeginIdx, 0>
+  {
+    using type = empty_type_list;
+  };
+
+public:
+  using type = divide_helper<0, sizeof...(Ts)>::type;
+};
 
 export template <typename... Ts>
 struct concat<type_list<Ts...>>
@@ -521,37 +551,6 @@ export template <typename... Ts, typename... Us>
 struct concat<type_list<Ts...>, type_list<Us...>>
 {
   using type = type_list<Ts..., Us...>;
-};
-
-namespace detail {
-
-// devide and conquer for >= 3 type lists for better time complexity:
-// 1. divide
-// left half of the original type list is `concat_impl<BeginIdx, N / 2, Ts...>::type`
-// right half of the original type list is `concat_impl<BeginIdx + N / 2, N - N / 2, Ts...>::type`
-// 2. merge
-// use the 2 lists specialization of `concat` to merge
-template <std::size_t BeginIdx, std::size_t N, typename TTypeList>
-struct concat_impl : concat<typename concat_impl<BeginIdx, N / 2, TTypeList>::type, typename concat_impl<BeginIdx + N / 2, N - N / 2, TTypeList>::type>
-{
-};
-
-template <std::size_t BeginIdx, typename TTypeList>
-struct concat_impl<BeginIdx, 1, TTypeList> : nth<BeginIdx, TTypeList>
-{
-};
-
-template <std::size_t BeginIdx, typename TTypeList>
-struct concat_impl<BeginIdx, 0, TTypeList>
-{
-  using type = empty_type_list;
-};
-
-} // namespace detail
-
-export template <typename TTypeList, typename... TTypeLists>
-struct concat<TTypeList, TTypeLists...> : detail::concat_impl<0, 1 + sizeof...(TTypeLists), type_list<TTypeList, TTypeLists...>>
-{
 };
 
 export template <typename... TTypeLists>
