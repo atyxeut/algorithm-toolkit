@@ -17,10 +17,12 @@ export module aatk.memory;
 
 export namespace aatk::memory {
 
+// represent std::allocator<T>
 struct std_allocator_tag
 {
 };
 
+// represent std::pmr::polymorphic_allocator<T>
 struct std_pmr_allocator_tag
 {
 };
