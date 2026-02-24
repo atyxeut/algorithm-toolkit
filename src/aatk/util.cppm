@@ -23,10 +23,10 @@ export import aatk.util.stl_helper;
 namespace aatk {
 
 // same values map to the same rank
-export template <std::ranges::forward_range TRange>
-[[nodiscard]] constexpr auto compress_coordinates(const TRange& range)
+export template <std::ranges::forward_range Range>
+[[nodiscard]] constexpr auto compress_coordinates(const Range& range)
 {
-  std::vector<std::ranges::range_value_t<TRange>> tmp(std::ranges::begin(range), std::ranges::end(range));
+  std::vector<std::ranges::range_value_t<Range>> tmp(std::ranges::begin(range), std::ranges::end(range));
   std::ranges::sort(tmp);
   const auto [tmp_end, _] = std::ranges::unique(tmp);
 
@@ -40,14 +40,14 @@ export template <std::ranges::forward_range TRange>
 }
 
 // every value maps to a unique rank, smaller index in the original range maps to a lower rank
-export template <std::ranges::input_range TRange>
-[[nodiscard]] constexpr auto compress_coordinates_to_unique(TRange&& range)
+export template <std::ranges::input_range Range>
+[[nodiscard]] constexpr auto compress_coordinates_to_unique(Range&& range)
 {
   const auto n = std::ranges::size(range);
-  std::vector<std::pair<std::ranges::range_value_t<TRange>, std::size_t>> tmp;
+  std::vector<std::pair<std::ranges::range_value_t<Range>, std::size_t>> tmp;
   tmp.reserve(n);
   for (std::size_t i = 0; auto&& elem : range) {
-    if constexpr (std::is_rvalue_reference_v<TRange>)
+    if constexpr (std::is_rvalue_reference_v<Range>)
       tmp.emplace_back(std::move(elem), i++);
     else
       tmp.emplace_back(elem, i++);

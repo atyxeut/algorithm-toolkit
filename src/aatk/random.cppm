@@ -20,44 +20,38 @@ import std;
 import aatk.data_structure.graph;
 import aatk.math.integer;
 
-export namespace aatk::random {
+namespace aatk::random {
 
-inline const auto time_seed = std::chrono::steady_clock::now().time_since_epoch().count();
-inline std::random_device seed_generator;
+export inline const auto time_seed = std::chrono::steady_clock::now().time_since_epoch().count();
+export inline std::random_device seed_generator;
 
-inline std::mt19937 mt19937_engine(seed_generator());
-inline std::mt19937_64 mt19937_64_engine(seed_generator());
+export inline std::mt19937 mt19937_engine(seed_generator());
+export inline std::mt19937_64 mt19937_64_engine(seed_generator());
 
-template <std::integral T>
+export template <std::integral T>
 [[nodiscard]] auto uniform_distribution(T l, T r)
 {
   return std::uniform_int_distribution<T>(l, r);
 }
 
-template <std::floating_point T>
+export template <std::floating_point T>
 [[nodiscard]] auto uniform_distribution(T l, T r)
 {
   return std::uniform_real_distribution<T>(l, r);
 }
 
-template <typename T, typename TEngine = std::mt19937>
+export template <typename T, typename Engine = std::mt19937>
   requires std::is_arithmetic_v<T>
-[[nodiscard]] T rand(T l, T r, TEngine& engine = mt19937_engine)
+[[nodiscard]] T rand(T l, T r, Engine& engine = mt19937_engine)
 {
   return uniform_distribution(l, r)(engine);
 }
 
-} // namespace aatk::random
-
-namespace aatk::random::generate {
+namespace generate {
 
 constexpr char decimal_digit_character[10] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-} // namespace aatk::random::generate
-
-export namespace aatk::random::generate {
-
-template <bool OnlyPositiveInteger = false>
+export template <bool OnlyPositiveInteger = false>
 [[nodiscard]] auto integer(usize integer_length)
 {
   std::string data;
@@ -72,7 +66,7 @@ template <bool OnlyPositiveInteger = false>
   return data;
 }
 
-template <std::integral T>
+export template <std::integral T>
 [[nodiscard]] auto permutation(T begin, T end)
 {
   if (begin > end)
@@ -85,7 +79,7 @@ template <std::integral T>
 }
 
 // get the edge list of a random unweighted tree
-template <bool FlowerGraph = false, std::integral T>
+export template <bool FlowerGraph = false, std::integral T>
 [[nodiscard]] auto unweighted_tree(T vertex_begin, T vertex_end)
 {
   if (vertex_begin > vertex_end)
@@ -108,8 +102,8 @@ template <bool FlowerGraph = false, std::integral T>
 }
 
 // get the edge list of a random weighted tree
-template <bool FlowerGraph = false, std::integral TVertex, std::integral TWeight>
-[[nodiscard]] auto weighted_tree(TVertex vertex_begin, TVertex vertex_end, TWeight weight_begin, TWeight weight_end)
+export template <bool FlowerGraph = false, std::integral Vertex, std::integral Weight>
+[[nodiscard]] auto weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end)
 {
   if (vertex_begin > vertex_end)
     throw std::invalid_argument("invalid vertex index range");
@@ -120,7 +114,7 @@ template <bool FlowerGraph = false, std::integral TVertex, std::integral TWeight
   const auto p = permutation(vertex_begin, vertex_end);
 
   const auto edge_cnt = vertex_end - vertex_begin;
-  graph::edge_list<TVertex, TWeight> data;
+  graph::edge_list<Vertex, Weight> data;
   data.reserve(edge_cnt);
 
   auto w_dist = uniform_dist(weight_begin, weight_end);
@@ -134,4 +128,6 @@ template <bool FlowerGraph = false, std::integral TVertex, std::integral TWeight
   return data;
 }
 
-} // namespace aatk::random::generate
+} // namespace generate
+
+} // namespace aatk::random

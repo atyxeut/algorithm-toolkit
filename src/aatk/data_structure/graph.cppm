@@ -35,29 +35,29 @@ struct weight<T>
   T w;
 };
 
-template <std::integral TVertex, typename TWeight = void>
-struct edge_from : weight<TWeight>
+template <std::integral Vertex, typename Weight = void>
+struct edge_from : weight<Weight>
 {
-  TVertex u;
+  Vertex u;
 };
 
-template <std::integral TVertex, typename TWeight = void>
-struct edge_to : weight<TWeight>
+template <std::integral Vertex, typename Weight = void>
+struct edge_to : weight<Weight>
 {
-  TVertex v;
+  Vertex v;
 };
 
-template <std::integral TVertex, typename TWeight = void>
-struct edge : weight<TWeight>
+template <std::integral Vertex, typename Weight = void>
+struct edge : weight<Weight>
 {
-  TVertex u;
-  TVertex v;
+  Vertex u;
+  Vertex v;
 };
 
-export template <std::integral TVertex, typename TWeight = void>
+export template <std::integral Vertex, typename Weight = void>
 class edge_list
 {
-  std::vector<edge<TVertex, TWeight>> edges_;
+  std::vector<edge<Vertex, Weight>> edges_;
 
 public:
   [[nodiscard]] constexpr const auto& operator [](usize idx) const { return edges_[idx]; }
@@ -72,10 +72,10 @@ public:
   [[nodiscard]] constexpr auto size() const noexcept { return edges_.size(); }
   constexpr void reserve(usize capacity) { edges_.reserve(capacity); }
 
-  template <typename... TArgs>
-  constexpr auto& add_edge(TArgs... args)
+  template <typename... Args>
+  constexpr auto& add_edge(Args... args)
   {
-    return edges_.emplace_back(std::forward<TArgs>(args)...);
+    return edges_.emplace_back(std::forward<Args>(args)...);
   }
 };
 

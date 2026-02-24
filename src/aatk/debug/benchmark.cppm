@@ -19,11 +19,11 @@ import std;
 
 namespace aatk::benchmark {
 
-export template <typename TRep, typename TPeriod = std::milli, typename TOtherRep, typename TOtherPeriod>
-void print_duration_as(std::chrono::duration<TOtherRep, TOtherPeriod> duration, bool endline = true)
+export template <typename Rep, typename Period = std::milli, typename OtherRep, typename OtherPeriod>
+void print_duration_as(std::chrono::duration<OtherRep, OtherPeriod> duration, bool endline = true)
 {
-  const auto dur = std::chrono::duration_cast<std::chrono::duration<TRep, TPeriod>>(duration);
-  if constexpr (std::floating_point<TRep>)
+  const auto dur = std::chrono::duration_cast<std::chrono::duration<Rep, Period>>(duration);
+  if constexpr (std::floating_point<Rep>)
     std::cerr << std::fixed << std::setprecision(3) << dur;
   else
     std::cerr << dur;
@@ -32,31 +32,31 @@ void print_duration_as(std::chrono::duration<TOtherRep, TOtherPeriod> duration, 
     std::println(std::cerr);
 }
 
-export template <typename TRep, typename TPeriod>
-void print_duration(std::chrono::duration<TRep, TPeriod> duration, bool endline = true)
+export template <typename Rep, typename Period>
+void print_duration(std::chrono::duration<Rep, Period> duration, bool endline = true)
 {
-  print_duration_as<TRep, TPeriod>(duration, endline);
+  print_duration_as<Rep, Period>(duration, endline);
 }
 
-template <typename TRep, typename TPeriod, typename TResult>
+template <typename Rep, typename Period, typename TResult>
 struct timed_invocation_result
 {
-  std::chrono::duration<TRep, TPeriod> duration;
+  std::chrono::duration<Rep, Period> duration;
   TResult result;
 };
 
-template <typename TRep, typename TPeriod>
-struct timed_invocation_result<TRep, TPeriod, void>
+template <typename Rep, typename Period>
+struct timed_invocation_result<Rep, Period, void>
 {
-  std::chrono::duration<TRep, TPeriod> duration;
+  std::chrono::duration<Rep, Period> duration;
 };
 
-export template <typename TFn, typename... TArgs>
-[[nodiscard]] auto timed_invocation(TFn&& func, TArgs&&... args)
+export template <typename Fn, typename... Args>
+[[nodiscard]] auto timed_invocation(Fn&& func, Args&&... args)
 {
   using time_point_type = std::chrono::steady_clock::time_point;
   using duration_type = time_point_type::duration;
-  using result_type = std::invoke_result_t<TFn, TArgs...>;
+  using result_type = std::invoke_result_t<Fn, Args...>;
 
   struct timer_controller
   {
@@ -82,12 +82,12 @@ export template <typename TFn, typename... TArgs>
     timer_controller controller {timer_end};
     timer_begin = std::chrono::steady_clock::now();
     if constexpr (std::is_void_v<result_type>) {
-      std::invoke(std::forward<TFn>(func), std::forward<TArgs>(args)...);
+      std::invoke(std::forward<Fn>(func), std::forward<Args>(args)...);
       controller.end_timer();
       return timed_invocation_result<duration_type::rep, duration_type::period, void> {timer_end - timer_begin};
     }
     else {
-      auto result = std::invoke(std::forward<TFn>(func), std::forward<TArgs>(args)...);
+      auto result = std::invoke(std::forward<Fn>(func), std::forward<Args>(args)...);
       controller.end_timer();
       return timed_invocation_result {timer_end - timer_begin, std::move(result)};
     }

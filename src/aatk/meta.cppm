@@ -38,42 +38,42 @@ constexpr bool is_cv_v = is_cv<T>::value;
 
 namespace detail {
 
-template <typename TFrom, typename TTo, bool = std::is_const_v<TFrom>, bool = std::is_volatile_v<TFrom>>
+template <typename From, typename To, bool = std::is_const_v<From>, bool = std::is_volatile_v<From>>
 struct claim_cv_selector;
 
 // branch 1: has both cv qualifiers
-template <typename TFrom, typename TTo>
-struct claim_cv_selector<TFrom, TTo, true, true> : std::add_cv<TTo>
+template <typename From, typename To>
+struct claim_cv_selector<From, To, true, true> : std::add_cv<To>
 {
 };
 
 // branch 2: has only const qualifier
-template <typename TFrom, typename TTo>
-struct claim_cv_selector<TFrom, TTo, true, false> : std::add_const<TTo>
+template <typename From, typename To>
+struct claim_cv_selector<From, To, true, false> : std::add_const<To>
 {
 };
 
 // branch 3: has only volatile qualifier
-template <typename TFrom, typename TTo>
-struct claim_cv_selector<TFrom, TTo, false, true> : std::add_volatile<TTo>
+template <typename From, typename To>
+struct claim_cv_selector<From, To, false, true> : std::add_volatile<To>
 {
 };
 
 // branch 4: has no cv qualifiers
-template <typename TFrom, typename TTo>
-struct claim_cv_selector<TFrom, TTo, false, false>
+template <typename From, typename To>
+struct claim_cv_selector<From, To, false, false>
 {
-  using type = TTo;
+  using type = To;
 };
 
 } // namespace detail
 
-// extract the cv-qualifiers of TFrom and apply them to TTo
-export template <typename TFrom, typename TTo>
-using claim_cv = detail::claim_cv_selector<TFrom, TTo>;
+// extract the cv-qualifiers of From and apply them to To
+export template <typename From, typename To>
+using claim_cv = detail::claim_cv_selector<From, To>;
 
-export template <typename TFrom, typename TTo>
-using claim_cv_t = claim_cv<TFrom, TTo>::type;
+export template <typename From, typename To>
+using claim_cv_t = claim_cv<From, To>::type;
 
 export template <typename T, typename U>
 concept no_cvref_same_as = std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<U>>;
@@ -86,13 +86,13 @@ using index_constant = std::integral_constant<std::size_t, N>;
 
 namespace detail {
 
-template <typename TIntegerSequence>
+template <typename>
 struct make_reversed_integer_sequence_impl;
 
-template <typename TInt, TInt... Is>
-struct make_reversed_integer_sequence_impl<std::integer_sequence<TInt, Is...>>
+template <typename Int, Int... Is>
+struct make_reversed_integer_sequence_impl<std::integer_sequence<Int, Is...>>
 {
-  using type = std::integer_sequence<TInt, (sizeof...(Is) - 1 - Is)...>;
+  using type = std::integer_sequence<Int, (sizeof...(Is) - 1 - Is)...>;
 };
 
 } // namespace detail
@@ -110,13 +110,13 @@ using reversed_index_sequence_for = make_reversed_index_sequence<sizeof...(Ts)>;
 
 namespace detail {
 
-template <typename TInt, TInt Begin, typename TIntegerSequence>
+template <typename Int, Int, typename>
 struct make_integer_sequence_of_range_impl;
 
-template <typename TInt, TInt Begin, TInt... Is>
-struct make_integer_sequence_of_range_impl<TInt, Begin, std::integer_sequence<TInt, Is...>>
+template <typename Int, Int Begin, Int... Is>
+struct make_integer_sequence_of_range_impl<Int, Begin, std::integer_sequence<Int, Is...>>
 {
-  using type = std::integer_sequence<TInt, (Begin + Is)...>;
+  using type = std::integer_sequence<Int, (Begin + Is)...>;
 };
 
 } // namespace detail
@@ -132,13 +132,13 @@ using make_index_sequence_of_range = make_integer_sequence_of_range<std::size_t,
 
 namespace detail {
 
-template <typename TInt, TInt End, typename TIntegerSequence>
+template <typename Int, Int, typename>
 struct make_reversed_integer_sequence_of_range_impl;
 
-template <typename TInt, TInt End, TInt... Is>
-struct make_reversed_integer_sequence_of_range_impl<TInt, End, std::integer_sequence<TInt, Is...>>
+template <typename Int, Int End, Int... Is>
+struct make_reversed_integer_sequence_of_range_impl<Int, End, std::integer_sequence<Int, Is...>>
 {
-  using type = std::integer_sequence<TInt, (End - Is)...>;
+  using type = std::integer_sequence<Int, (End - Is)...>;
 };
 
 } // namespace detail
@@ -154,25 +154,25 @@ using make_reversed_index_sequence_of_range = make_reversed_integer_sequence_of_
 
 // add an offset to all the integers in the given `std::integer_sequence`
 // O(1) time complexity
-export template <std::integral T, T Offset, typename TIntegerSequence>
+export template <std::integral T, T, typename>
 struct shift_integer_sequence;
 
-template <typename TInt, TInt Offset, TInt... Is>
-struct shift_integer_sequence<TInt, Offset, std::integer_sequence<TInt, Is...>>
+template <typename Int, Int Offset, Int... Is>
+struct shift_integer_sequence<Int, Offset, std::integer_sequence<Int, Is...>>
 {
-  using type = std::integer_sequence<TInt, (Is + Offset)...>;
+  using type = std::integer_sequence<Int, (Is + Offset)...>;
 };
 
-export template <typename TInt, TInt Offset, typename TIntegerSequence>
-using shift_integer_sequence_t = shift_integer_sequence<TInt, Offset, TIntegerSequence>::type;
+export template <typename Int, Int Offset, typename IntegerSequence>
+using shift_integer_sequence_t = shift_integer_sequence<Int, Offset, IntegerSequence>::type;
 
 // add an offset to all indices in the given `std::index_sequence`
 // O(1) time complexity
-export template <std::size_t Offset, typename TIndexSequence>
-using shift_index_sequence = shift_integer_sequence<std::size_t, Offset, TIndexSequence>;
+export template <std::size_t Offset, typename IndexSequence>
+using shift_index_sequence = shift_integer_sequence<std::size_t, Offset, IndexSequence>;
 
-export template <std::size_t Offset, typename TIndexSequence>
-using shift_index_sequence_t = shift_index_sequence<Offset, TIndexSequence>::type;
+export template <std::size_t Offset, typename IndexSequence>
+using shift_index_sequence_t = shift_index_sequence<Offset, IndexSequence>::type;
 
 export template <typename T, typename... Us>
   requires (sizeof...(Us) > 0)
@@ -276,7 +276,7 @@ using indexed_type_t = indexed_type<I, T>::type;
 export template <std::size_t I, typename T>
 constexpr auto indexed_type_v = indexed_type<I, T>::value;
 
-export template <typename TIndexedType>
+export template <typename>
 struct unwrap_indexed_type;
 
 template <std::size_t I, typename T>
@@ -284,13 +284,13 @@ struct unwrap_indexed_type<indexed_type<I, T>> : indexed_type<I, T>
 {
 };
 
-export template <typename TIndexedType>
-using unwrap_indexed_type_t = unwrap_indexed_type<TIndexedType>::type;
+export template <typename IndexedType>
+using unwrap_indexed_type_t = unwrap_indexed_type<IndexedType>::type;
 
-export template <typename TIndexedType>
-constexpr auto unwrap_indexed_type_v = unwrap_indexed_type<TIndexedType>::value;
+export template <typename IndexedType>
+constexpr auto unwrap_indexed_type_v = unwrap_indexed_type<IndexedType>::value;
 
-export template <typename TIndexSequence, typename TTypeList>
+export template <typename, typename>
 struct indexed_type_list;
 
 template <std::size_t... Is, typename... Ts>
@@ -342,9 +342,12 @@ export template <typename T>
 concept list_of_types = is_type_list_v<T> || is_indexed_type_list_v<T>;
 
 export template <typename T>
-concept nonempty_list_of_types = list_of_types<T> && !is_empty_type_list_v<T> && !is_empty_indexed_type_list_v<T>;
+concept empty_list_of_types = is_empty_type_list_v<T> || is_empty_indexed_type_list_v<T>;
 
-export template <typename, typename TListOfTypes>
+export template <typename T>
+concept nonempty_list_of_types = list_of_types<T> && !empty_list_of_types<T>;
+
+export template <typename, typename>
 struct has_none;
 
 template <typename T>
@@ -367,8 +370,8 @@ struct has_none<T, indexed_type_list<std::index_sequence<Is...>, type_list<Us...
 {
 };
 
-export template <typename T, typename TListOfTypes>
-constexpr bool has_none_v = has_none<T, TListOfTypes>::value;
+export template <typename T, typename AnyTypeList>
+constexpr bool has_none_v = has_none<T, AnyTypeList>::value;
 
 export template <typename T, list_of_types U>
 struct has_any : std::negation<has_none<T, U>>
@@ -381,7 +384,7 @@ constexpr bool has_any_v = has_any<T, U>::value;
 // get the length of a type list
 // O(1) time complexity
 // name after Haskell Data.List length
-export template <typename TListOfTypes>
+export template <typename>
 struct length;
 
 template <typename... Ts>
@@ -394,13 +397,13 @@ struct length<indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>> :
 {
 };
 
-export template <typename TListOfTypes>
-constexpr std::size_t length_v = length<TListOfTypes>::value;
+export template <typename AnyTypeList>
+constexpr std::size_t length_v = length<AnyTypeList>::value;
 
 // get the nth type of a type list, index starts at 0
 // O(1) time complexity, assume C++26 pack indexing has O(1) time complexity
-export template <std::size_t Idx, typename TListOfTypes>
-  requires (Idx < length_v<TListOfTypes>)
+export template <std::size_t Idx, typename AnyTypeList>
+  requires (Idx < length_v<AnyTypeList>)
 struct nth;
 
 template <std::size_t Idx, typename... Ts>
@@ -415,8 +418,8 @@ struct nth<Idx, indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>>
   using type = indexed_type<Is...[Idx], Ts...[Idx]>;
 };
 
-export template <std::size_t Idx, typename TListOfTypes>
-using nth_t = nth<Idx, TListOfTypes>::type;
+export template <std::size_t Idx, typename AnyTypeList>
+using nth_t = nth<Idx, AnyTypeList>::type;
 
 // get the first type of a type list
 // O(1) time complexity
@@ -444,20 +447,20 @@ indexed_type<I, T> map_indexed_type_helper(indexed_type<I, T>);
 } // namespace detail
 
 // get the corresponding indexed type with a given index
-export template <std::size_t I, typename TIndexedTypeList>
-  requires is_indexed_type_list_v<TIndexedTypeList>
+export template <std::size_t I, typename IndexedTypeList>
+  requires is_indexed_type_list_v<IndexedTypeList>
 struct map
 {
-  using type = decltype(detail::map_indexed_type_helper<I>(std::declval<TIndexedTypeList>()));
+  using type = decltype(detail::map_indexed_type_helper<I>(std::declval<IndexedTypeList>()));
 };
 
-export template <std::size_t I, typename TIndexedTypeList>
-using map_t = map<I, TIndexedTypeList>::type;
+export template <std::size_t I, typename IndexedTypeList>
+using map_t = map<I, IndexedTypeList>::type;
 
 // get a type list that has one element added to the beginning comparing to the given type list
 // O(1) time complexity
 // name after Haskell Data.List : operator (1 : [1, 2] --> [1, 1, 2])
-export template <typename, list_of_types>
+export template <typename, typename>
 struct cons;
 
 template <typename T, typename... Ts>
@@ -466,12 +469,12 @@ struct cons<T, type_list<Ts...>>
   using type = type_list<T, Ts...>;
 };
 
-export template <typename T, typename U>
-using cons_t = cons<T, U>::type;
+export template <typename T, typename AnyTypeList>
+using cons_t = cons<T, AnyTypeList>::type;
 
 // get a type list that has one element added to the end comparing to the given type list
 // O(1) time complexity
-export template <typename, list_of_types>
+export template <typename, typename>
 struct snoc;
 
 template <typename T, typename... Ts>
@@ -480,12 +483,12 @@ struct snoc<T, type_list<Ts...>>
   using type = type_list<Ts..., T>;
 };
 
-export template <typename T, typename U>
-using snoc_t = snoc<T, U>::type;
+export template <typename T, typename AnyTypeList>
+using snoc_t = snoc<T, AnyTypeList>::type;
 
 namespace detail {
 
-template <typename T, typename TIndexSequence>
+template <typename, typename>
 struct repeat_impl;
 
 template <typename T, std::size_t... Is>
@@ -553,12 +556,12 @@ struct concat<type_list<Ts...>, type_list<Us...>>
   using type = type_list<Ts..., Us...>;
 };
 
-export template <typename... TTypeLists>
-using concat_t = concat<TTypeLists...>::type;
+export template <typename... TypeLists>
+using concat_t = concat<TypeLists...>::type;
 
 // get a type list that contains types whose indices are in the given `std::index_sequence`
 // O(1) time complexity
-export template <typename TIndexSequence, list_of_types>
+export template <typename, list_of_types>
 struct select_by_index_sequence;
 
 template <std::size_t... Is, typename... Ts>
@@ -567,8 +570,8 @@ struct select_by_index_sequence<std::index_sequence<Is...>, type_list<Ts...>>
   using type = type_list<Ts...[Is]...>;
 };
 
-export template <typename TIndexSequence, typename TTypeList>
-using select_by_index_sequence_t = select_by_index_sequence<TIndexSequence, TTypeList>::type;
+export template <typename IndexSequence, typename TypeList>
+using select_by_index_sequence_t = select_by_index_sequence<IndexSequence, TypeList>::type;
 
 // get a type list that is the reverse of the given type list
 // O(1) time complexity
@@ -576,8 +579,8 @@ using select_by_index_sequence_t = select_by_index_sequence<TIndexSequence, TTyp
 export template <list_of_types T>
 using reverse = select_by_index_sequence<make_reversed_index_sequence<length_v<T>>, T>;
 
-export template <typename TTypeList>
-using reverse_t = reverse<TTypeList>::type;
+export template <typename TypeList>
+using reverse_t = reverse<TypeList>::type;
 
 // get a type list with the first type removed comparing to the given type list
 // O(1) time complexity
@@ -600,8 +603,8 @@ using tail_t = tail<T>::type;
 export template <nonempty_list_of_types T>
 using init = select_by_index_sequence<std::make_index_sequence<length_v<T> - 1>, T>;
 
-export template <typename TTypeList>
-using init_t = init<TTypeList>::type;
+export template <typename TypeList>
+using init_t = init<TypeList>::type;
 
 // get a type list that contains the first N types of the given type list
 // O(1) time complexity
@@ -610,8 +613,8 @@ export template <std::size_t N, list_of_types T>
   requires (N <= length_v<T>)
 using take = select_by_index_sequence<std::make_index_sequence<N>, T>;
 
-export template <std::size_t N, typename TTypeList>
-using take_t = take<N, TTypeList>::type;
+export template <std::size_t N, typename TypeList>
+using take_t = take<N, TypeList>::type;
 
 // same as take, but take from the end
 // O(1) time complexity
@@ -621,14 +624,14 @@ struct take_end : select_by_index_sequence<make_index_sequence_of_range<length_v
 {
 };
 
-template <typename TTypeList>
-struct take_end<0, TTypeList>
+template <typename TypeList>
+struct take_end<0, TypeList>
 {
   using type = empty_type_list;
 };
 
-export template <std::size_t N, typename TTypeList>
-using take_end_t = take_end<N, TTypeList>::type;
+export template <std::size_t N, typename TypeList>
+using take_end_t = take_end<N, TypeList>::type;
 
 // get a type list with the first N types removed comparing to the given type list
 // O(1) time complexity
@@ -637,8 +640,8 @@ export template <std::size_t N, list_of_types T>
   requires (N <= length_v<T>)
 using drop = take_end<length_v<T> - N, T>;
 
-export template <std::size_t N, typename TTypeList>
-using drop_t = drop<N, TTypeList>::type;
+export template <std::size_t N, typename TypeList>
+using drop_t = drop<N, TypeList>::type;
 
 // same as drop, but drop from the end
 // O(1) time complexity
@@ -646,8 +649,8 @@ export template <std::size_t N, list_of_types T>
   requires (N <= length_v<T>)
 using drop_end = take<length_v<T> - N, T>;
 
-export template <std::size_t N, typename TTypeList>
-using drop_end_t = drop_end<N, TTypeList>::type;
+export template <std::size_t N, typename TypeList>
+using drop_end_t = drop_end<N, TypeList>::type;
 
 namespace detail {
 
@@ -655,8 +658,8 @@ template <template <typename...> typename, typename>
 struct is_predicate_tester;
 
 // clang-format off
-template <template <typename...> typename TT, typename... Ts>
-struct is_predicate_tester<TT, type_list<Ts...>> : std::bool_constant<requires { { TT<Ts...>::value } -> no_cvref_same_as<bool>; }>
+template <template <typename...> typename T, typename... Ts>
+struct is_predicate_tester<T, type_list<Ts...>> : std::bool_constant<requires { { T<Ts...>::value } -> no_cvref_same_as<bool>; }>
 {
 };
 // clang-format on
@@ -664,30 +667,30 @@ struct is_predicate_tester<TT, type_list<Ts...>> : std::bool_constant<requires {
 template <template <typename...> typename, typename>
 struct is_predicate_impl;
 
-template <template <typename...> typename TT, std::size_t... Is>
-struct is_predicate_impl<TT, std::index_sequence<Is...>> : std::disjunction<is_predicate_tester<TT, repeat_t<Is + 1, void>>...>
+template <template <typename...> typename T, std::size_t... Is>
+struct is_predicate_impl<T, std::index_sequence<Is...>> : std::disjunction<is_predicate_tester<T, repeat_t<Is + 1, void>>...>
 {
 };
 
 } // namespace detail
 
-export template <template <typename...> typename TT, std::size_t ArityLimit = 5>
+export template <template <typename...> typename T, std::size_t ArityLimit = 5>
   requires (ArityLimit > 0)
-struct is_predicate : detail::is_predicate_impl<TT, std::make_index_sequence<ArityLimit>>
+struct is_predicate : detail::is_predicate_impl<T, std::make_index_sequence<ArityLimit>>
 {
 };
 
-export template <template <typename...> typename TT, std::size_t ArityLimit = 5>
-constexpr bool is_predicate_v = is_predicate<TT, ArityLimit>::value;
+export template <template <typename...> typename T, std::size_t ArityLimit = 5>
+constexpr bool is_predicate_v = is_predicate<T, ArityLimit>::value;
 
-export template <template <typename...> typename TT>
-concept predicate = is_predicate_v<TT>;
+export template <template <typename...> typename T>
+concept predicate = is_predicate_v<T>;
 
-export template <template <typename...> typename TT>
+export template <template <typename...> typename T>
 struct template_wrapper
 {
-  template <typename... TArgs>
-  using type = TT<TArgs...>;
+  template <typename... Args>
+  using type = T<Args...>;
 };
 
 export template <typename>
@@ -695,8 +698,8 @@ struct is_no_cv_template_wrapper : std::false_type
 {
 };
 
-template <template <typename...> typename TT>
-struct is_no_cv_template_wrapper<template_wrapper<TT>> : std::true_type
+template <template <typename...> typename T>
+struct is_no_cv_template_wrapper<template_wrapper<T>> : std::true_type
 {
 };
 
@@ -715,39 +718,38 @@ concept wrapped_template = is_template_wrapper_v<T>;
 export template <typename T>
 concept wrapped_predicate = wrapped_template<T> && predicate<T::template type>;
 
-export template <wrapped_template T, typename... TArgs>
-using invoke = T::template type<TArgs...>;
+export template <wrapped_template T, typename... Args>
+using invoke = T::template type<Args...>;
 
-export template <typename TWrappedTemplate, typename... TArgs>
-using invoke_t = invoke<TWrappedTemplate, TArgs...>::type;
+export template <typename WrappedTemplate, typename... Args>
+using invoke_t = invoke<WrappedTemplate, Args...>::type;
 
-export template <typename TWrappedTemplate, typename... TArgs>
-constexpr auto invoke_v = invoke<TWrappedTemplate, TArgs...>::value;
+export template <typename WrappedTemplate, typename... Args>
+constexpr auto invoke_v = invoke<WrappedTemplate, Args...>::value;
 
 namespace detail {
 
-template <typename TWrappedPred, typename TRemainingTypeList, typename TTakenTypeList = empty_type_list>
+template <template <typename> typename, typename, typename = empty_type_list>
 struct take_while_impl;
 
-template <typename TWrappedPred, typename TTakenTypeList>
-struct take_while_impl<TWrappedPred, empty_type_list, TTakenTypeList>
+template <template <typename> typename Pred, typename TypeListOfTaken>
+struct take_while_impl<Pred, empty_type_list, TypeListOfTaken>
 {
-  using type = TTakenTypeList;
+  using type = TypeListOfTaken;
 };
 
-template <typename TWrappedPred, typename TRemainingTypeList, typename TTakenTypeList>
+template <template <typename> typename, typename, typename>
 struct take_while_impl_lazy_evaluation_helper;
 
-template <typename TWrappedPred, typename T, typename... Ts, typename... TTaken>
-struct take_while_impl_lazy_evaluation_helper<TWrappedPred, type_list<T, Ts...>, type_list<TTaken...>>
+template <template <typename> typename Pred, typename T, typename... Ts, typename... Taken>
+struct take_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>, type_list<Taken...>>
 {
   // cannot use inheritance here, otherwise the evaluation is not lazy
-  using type = take_while_impl<TWrappedPred, type_list<Ts...>, type_list<TTaken..., T>>::type;
+  using type = take_while_impl<Pred, type_list<Ts...>, type_list<Taken..., T>>::type;
 };
 
-template <typename TWrappedPred, typename T, typename... Ts, typename... TTaken>
-struct take_while_impl<TWrappedPred, type_list<T, Ts...>, type_list<TTaken...>>
-  : std::conditional_t<invoke_v<TWrappedPred, T>, take_while_impl_lazy_evaluation_helper<TWrappedPred, type_list<T, Ts...>, type_list<TTaken...>>, std::type_identity<type_list<TTaken...>>>
+template <template <typename> typename Pred, typename T, typename... Ts, typename... Taken>
+struct take_while_impl<Pred, type_list<T, Ts...>, type_list<Taken...>> : std::conditional_t<Pred<T>::value, take_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>, type_list<Taken...>>, std::type_identity<type_list<Taken...>>>
 {
 };
 
@@ -756,47 +758,47 @@ struct take_while_impl<TWrappedPred, type_list<T, Ts...>, type_list<TTaken...>>
 // get the longest prefix type list whose types all satisfy a given predicate
 // O(k) time complexity, where k is the length of the longest prefix
 // name after Haskell Data.List takeWhile
-export template <template <typename> typename TTPred, list_of_types T>
-  requires predicate<TTPred>
-using take_while = detail::take_while_impl<template_wrapper<TTPred>, T>;
+export template <template <typename> typename Pred, list_of_types T>
+  requires predicate<Pred>
+using take_while = detail::take_while_impl<Pred, T>;
 
-export template <template <typename> typename TTPred, typename TTypeList>
-using take_while_t = take_while<TTPred, TTypeList>::type;
+export template <template <typename> typename Pred, typename TypeList>
+using take_while_t = take_while<Pred, TypeList>::type;
 
 // get the longest suffix type list whose types all satisfy a given predicate
 // O(k) time complexity, where k is the length of the longest suffix
-export template <template <typename> typename TTPred, list_of_types T>
-  requires predicate<TTPred>
-struct take_while_end : reverse<take_while_t<TTPred, reverse_t<T>>>
+export template <template <typename> typename Pred, list_of_types T>
+  requires predicate<Pred>
+struct take_while_end : reverse<take_while_t<Pred, reverse_t<T>>>
 {
 };
 
-export template <template <typename> typename TTPred, typename TTypeList>
-using take_while_end_t = take_while_end<TTPred, TTypeList>::type;
+export template <template <typename> typename Pred, typename TypeList>
+using take_while_end_t = take_while_end<Pred, TypeList>::type;
 
 namespace detail {
 
-template <template <typename> typename, typename TTypeList>
+template <template <typename> typename, typename>
 struct drop_while_impl;
 
-template <template <typename> typename TTPred>
-struct drop_while_impl<TTPred, empty_type_list>
+template <template <typename> typename Pred>
+struct drop_while_impl<Pred, empty_type_list>
 {
   using type = empty_type_list;
 };
 
-template <template <typename> typename, typename TTypeList>
+template <template <typename> typename, typename>
 struct drop_while_impl_lazy_evaluation_helper;
 
-template <template <typename> typename TTPred, typename T, typename... Ts>
-struct drop_while_impl_lazy_evaluation_helper<TTPred, type_list<T, Ts...>>
+template <template <typename> typename Pred, typename T, typename... Ts>
+struct drop_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>>
 {
   // cannot use inheritance here, otherwise the evaluation is not lazy
-  using type = drop_while_impl<TTPred, type_list<Ts...>>::type;
+  using type = drop_while_impl<Pred, type_list<Ts...>>::type;
 };
 
-template <template <typename> typename TTPred, typename T, typename... Ts>
-struct drop_while_impl<TTPred, type_list<T, Ts...>> : std::conditional_t<TTPred<T>::value, drop_while_impl_lazy_evaluation_helper<TTPred, type_list<T, Ts...>>, std::type_identity<type_list<T, Ts...>>>
+template <template <typename> typename Pred, typename T, typename... Ts>
+struct drop_while_impl<Pred, type_list<T, Ts...>> : std::conditional_t<Pred<T>::value, drop_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>>, std::type_identity<type_list<T, Ts...>>>
 {
 };
 
@@ -805,44 +807,44 @@ struct drop_while_impl<TTPred, type_list<T, Ts...>> : std::conditional_t<TTPred<
 // get a type list with a longest prefix type list removed, whose types all satisfy a given predicate
 // O(k) time complexity, where k is the longest dropped prefix
 // name after Haskell Data.List dropWhile
-export template <template <typename> typename TTPred, list_of_types T>
-  requires predicate<TTPred>
-using drop_while = detail::drop_while_impl<TTPred, T>;
+export template <template <typename> typename Pred, list_of_types T>
+  requires predicate<Pred>
+using drop_while = detail::drop_while_impl<Pred, T>;
 
-export template <template <typename> typename TTPred, typename TTypeList>
-using drop_while_t = drop_while<TTPred, TTypeList>::type;
+export template <template <typename> typename Pred, typename TypeList>
+using drop_while_t = drop_while<Pred, TypeList>::type;
 
 // get a type list with a longest suffix type list removed, whose types all satisfy a given predicate
 // O(k) time complexity, where k is the length of the longest dropped suffix
 // name after Haskell Data.List dropWhileEnd
-export template <template <typename> typename TTPred, list_of_types T>
-  requires predicate<TTPred>
-struct drop_while_end : reverse<drop_while_t<TTPred, reverse_t<T>>>
+export template <template <typename> typename Pred, list_of_types T>
+  requires predicate<Pred>
+struct drop_while_end : reverse<drop_while_t<Pred, reverse_t<T>>>
 {
 };
 
-export template <template <typename> typename TTPred, typename TTypeList>
-using drop_while_end_t = drop_while_end<TTPred, TTypeList>::type;
+export template <template <typename> typename Pred, typename TypeList>
+using drop_while_end_t = drop_while_end<Pred, TypeList>::type;
 
 // get a type list that contains all the types that satisfy a given predicate
 // O(log n) time complexity, limited by `concat`, where n is the length of the given type list
 // name after Haskell Data.List filter
-export template <template <typename> typename TTPred, list_of_types>
-  requires predicate<TTPred>
+export template <template <typename> typename Pred, list_of_types>
+  requires predicate<Pred>
 struct filter;
 
-template <template <typename> typename TTPred>
-struct filter<TTPred, empty_type_list>
+template <template <typename> typename Pred>
+struct filter<Pred, empty_type_list>
 {
   using type = empty_type_list;
 };
 
-template <template <typename> typename TTPred, typename... Ts>
-struct filter<TTPred, type_list<Ts...>> : concat<std::conditional_t<TTPred<Ts>::value, type_list<Ts>, empty_type_list>...>
+template <template <typename> typename Pred, typename... Ts>
+struct filter<Pred, type_list<Ts...>> : concat<std::conditional_t<Pred<Ts>::value, type_list<Ts>, empty_type_list>...>
 {
 };
 
-export template <template <typename> typename TTPred, typename TTypeList>
-using filter_t = filter<TTPred, TTypeList>::type;
+export template <template <typename> typename Pred, typename TypeList>
+using filter_t = filter<Pred, TypeList>::type;
 
 } // namespace aatk::meta
