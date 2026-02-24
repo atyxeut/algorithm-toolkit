@@ -499,10 +499,10 @@ using snoc_t = snoc<T, AnyTypeList>::type;
 namespace detail {
 
 template <typename, typename>
-struct repeat_impl;
+struct replicate_impl;
 
 template <typename T, std::size_t... Is>
-struct repeat_impl<T, std::index_sequence<Is...>>
+struct replicate_impl<T, std::index_sequence<Is...>>
 {
   using type = type_list<std::enable_if_t<(Is >= 0), T>...>;
 };
@@ -511,12 +511,12 @@ struct repeat_impl<T, std::index_sequence<Is...>>
 
 // get a type list that contains N identical types
 // O(1) time complexity
-// name after Haskell Data.List repeat
+// name after Haskell Data.List replicate
 export template <std::size_t N, typename T>
-using repeat = detail::repeat_impl<T, std::make_index_sequence<N>>;
+using replicate = detail::replicate_impl<T, std::make_index_sequence<N>>;
 
 export template <std::size_t N, typename T>
-using repeat_t = repeat<N, T>::type;
+using replicate_t = replicate<N, T>::type;
 
 // get the concatenation of several type lists
 // O(log n) time complexity, where n is the count of type lists to concatenate
@@ -678,7 +678,7 @@ template <template <typename...> typename, typename>
 struct is_predicate_impl;
 
 template <template <typename...> typename T, std::size_t... Is>
-struct is_predicate_impl<T, std::index_sequence<Is...>> : std::disjunction<is_predicate_tester<T, repeat_t<Is + 1, void>>...>
+struct is_predicate_impl<T, std::index_sequence<Is...>> : std::disjunction<is_predicate_tester<T, replicate_t<Is + 1, void>>...>
 {
 };
 

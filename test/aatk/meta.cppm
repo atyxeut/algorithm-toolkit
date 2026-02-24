@@ -94,13 +94,13 @@ export consteval void does_lookup_work() noexcept
   static_assert(std::same_as<lookup_t<length_v<indexed_type_list_6> - 1, indexed_type_list_6>, indexed_type<length_v<indexed_type_list_6> - 1, const void>>);
 }
 
-export consteval void does_repeat_work() noexcept
+export consteval void does_replicate_work() noexcept
 {
-  using repeated_0_time_type_list = empty_type_list;
-  static_assert(std::same_as<repeat_t<0, void>, repeated_0_time_type_list>);
+  using replicateed_0_time_type_list = empty_type_list;
+  static_assert(std::same_as<replicate_t<0, void>, replicateed_0_time_type_list>);
 
-  using int_repeated_5_times_type_list = type_list<int, int, int, int, int>;
-  static_assert(std::same_as<repeat_t<5, int>, int_repeated_5_times_type_list>);
+  using int_replicateed_5_times_type_list = type_list<int, int, int, int, int>;
+  static_assert(std::same_as<replicate_t<5, int>, int_replicateed_5_times_type_list>);
 }
 
 namespace detail {
@@ -132,9 +132,9 @@ export consteval void does_concat_work() noexcept
   using concatenation_of_1_2_3_4 = type_list<double, float, std::vector<int>, long long, std::string, unsigned, const volatile bool, bool, int, char, const int, volatile char, int, int, int, int, int, int, int>;
   static_assert(std::same_as<concat_t<type_list_1, type_list_2, type_list_3, type_list_4>, concatenation_of_1_2_3_4>);
 
-  // test `repeat` complexity, length_v<type_list_4> * 1500 recursion depth (for a O(N) recursive implementation) will make the compiler crash by default
-  using huge_concatenation_before = repeat_t<1500, type_list_4>;
-  using huge_concatenation_after = repeat_t<length_v<type_list_4> * 1500, int>;
+  // test `replicate` complexity, length_v<type_list_4> * 1500 recursion depth (for a O(N) recursive implementation) will make the compiler crash by default
+  using huge_concatenation_before = replicate_t<1500, type_list_4>;
+  using huge_concatenation_after = replicate_t<length_v<type_list_4> * 1500, int>;
 
   // test `concat` complexity, 1500 recursion depth (for a O(n) recursive implementation) will make the compiler crash by default
   static_assert(std::same_as<detail::huge_concat_test_helper_t<huge_concatenation_before>, huge_concatenation_after>);
