@@ -19,21 +19,29 @@ import std;
 
 import aatk.math.floating_point;
 
-namespace test::aatk::meta {
+namespace test::aatk {
+
+using namespace ::aatk;
+
+namespace meta {
+
+using namespace ::aatk::meta;
 
 consteval void does_make_higher_precision_work()
 {
-  static_assert(std::same_as<::aatk::meta::make_higher_precision_t<f32>, f64> == true);
-  static_assert(std::same_as<::aatk::meta::make_higher_precision_t<const f32>, const f64> == true);
-  static_assert(std::same_as<::aatk::meta::make_higher_precision_t<volatile f32>, volatile f64> == true);
-  static_assert(std::same_as<::aatk::meta::make_higher_precision_t<const volatile f32>, const volatile f64> == true);
-  static_assert(std::same_as<::aatk::meta::make_higher_precision_t<f64>, f80> == true);
-  static_assert(std::same_as<::aatk::meta::make_higher_precision_t<f80>, f128> == true);
-  static_assert(std::same_as<::aatk::meta::make_higher_precision_t<f128>, ::aatk::ieee754_float::f<256>> == true);
-  static_assert(std::same_as<::aatk::meta::make_higher_precision_t<::aatk::ieee754_float::f<256>>, ::aatk::ieee754_float::f<512>> == true);
-  static_assert(std::same_as<::aatk::meta::make_higher_precision_t<::aatk::ieee754_float::f<1024>>, ::aatk::ieee754_float::f<2048>> == true);
-  static_assert(std::same_as<::aatk::meta::make_higher_precision_t<::aatk::ieee754_float::d<256>>, ::aatk::ieee754_float::d<512>> == true);
-  static_assert(std::same_as<::aatk::meta::make_higher_precision_t<::aatk::ieee754_float::d<1024>>, ::aatk::ieee754_float::d<2048>> == true);
+  static_assert(std::same_as<make_higher_precision_t<f32>, f64> == true);
+  static_assert(std::same_as<make_higher_precision_t<const f32>, const f64> == true);
+  static_assert(std::same_as<make_higher_precision_t<volatile f32>, volatile f64> == true);
+  static_assert(std::same_as<make_higher_precision_t<const volatile f32>, const volatile f64> == true);
+  static_assert(std::same_as<make_higher_precision_t<f64>, f80> == true);
+  static_assert(std::same_as<make_higher_precision_t<f80>, f128> == true);
+  static_assert(std::same_as<make_higher_precision_t<f128>, ieee754_float::f<256>> == true);
+  static_assert(std::same_as<make_higher_precision_t<ieee754_float::f<256>>, ieee754_float::f<512>> == true);
+  static_assert(std::same_as<make_higher_precision_t<ieee754_float::f<1024>>, ieee754_float::f<2048>> == true);
+  static_assert(std::same_as<make_higher_precision_t<ieee754_float::d<256>>, ieee754_float::d<512>> == true);
+  static_assert(std::same_as<make_higher_precision_t<ieee754_float::d<1024>>, ieee754_float::d<2048>> == true);
 }
 
-} // namespace test::aatk::meta
+} // namespace meta
+
+} // namespace test::aatk
