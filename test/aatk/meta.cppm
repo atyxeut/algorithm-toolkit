@@ -401,4 +401,13 @@ export consteval void does_remove_work() noexcept
   static_assert(std::same_as<::aatk::meta::remove_t<char, type_list_5>, remove_all_char_type_list_of_5>);
 }
 
+export consteval void does_transform_work() noexcept
+{
+  using type_list_1_after_add_const = ::aatk::meta::type_list<const double, const float, const std::vector<int>, const long long>;
+  static_assert(std::same_as<::aatk::meta::transform_t<std::add_const, type_list_1>, type_list_1_after_add_const>);
+
+  using type_list_4_after_make_unsigned = ::aatk::meta::type_list<unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int>;
+  static_assert(std::same_as<::aatk::meta::transform_t<std::make_unsigned, type_list_4>, type_list_4_after_make_unsigned>);
+}
+
 } // namespace test::aatk::meta

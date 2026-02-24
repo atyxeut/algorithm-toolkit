@@ -895,4 +895,18 @@ using remove = filter<bind_front<not_same, T>::template type, U>;
 export template <typename T, list_of_types U>
 using remove_t = remove<T, U>::type;
 
+// apply the given template to every type of the given type list
+// O(1) time complexity
+export template <template <typename> typename T, list_of_types U>
+struct transform;
+
+template <template <typename> typename T, typename... Us>
+struct transform<T, type_list<Us...>>
+{
+  using type = type_list<typename T<Us>::type...>;
+};
+
+export template <template <typename> typename T, list_of_types U>
+using transform_t = transform<T, U>::type;
+
 } // namespace aatk::meta
