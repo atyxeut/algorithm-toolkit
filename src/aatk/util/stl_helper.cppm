@@ -42,7 +42,7 @@ struct array_impl<T, Dim, Dims...>
 } // namespace detail
 
 // aatk::array<int, 3, 5, 2> arr3d {};
-//   same as: std::array<std::array<std::array<int, 2>, 5>, 3> arr3d {};
+// same as: std::array<std::array<std::array<int, 2>, 5>, 3> arr3d {};
 export template <typename T, std::size_t... Dims>
 using array = detail::array_impl<T, Dims...>::type;
 
@@ -69,10 +69,10 @@ constexpr bool is_std_array_v = is_std_array<T>::value;
 
 } // namespace meta
 
+// sets every element of a aatk::array to val
 // aatk::array<int, 3, 5, 2, 10> arr4d;
 // int val = -1;
 // aatk::fill_array(arr4d, val);
-//   set every element of a aatk::array to val
 export template <typename Elem, std::size_t Dim, typename T>
 constexpr void fill_array(std::array<Elem, Dim>& arr, const T& val)
 {
@@ -84,8 +84,7 @@ constexpr void fill_array(std::array<Elem, Dim>& arr, const T& val)
 }
 
 // auto arr4d = aatk::make_array<int, 5, 8, 3, 2>(val);
-//   combines aatk::array<int, 5, 8, 3, 2> arr4d;
-//        and aatk::fill_array(arr4d, val);
+// combines `aatk::array<int, 5, 8, 3, 2> arr4d` and `aatk::fill_array(arr4d, val)`
 export template <typename Elem, std::size_t... Dims, typename T>
 [[nodiscard]] constexpr auto make_array(const T& val)
 {
@@ -150,9 +149,10 @@ public:
 } // namespace detail
 
 // aatk::vector<int> vec1d;
-//   same as: std::vector<int> vec1d;
+// same as: std::vector<int> vec1d;
+//
 // aatk::vector<int, 4> vec4d;
-//   same as: std::vector<std::vector<std::vector<std::vector<int>>>> vec4d;
+// same as: std::vector<std::vector<std::vector<std::vector<int>>>> vec4d;
 export template <typename T, std::size_t DimCnt = 1, typename InnermostDimAllocator = memory::std_allocator_tag, typename... Allocators>
   requires (sizeof...(Allocators) < DimCnt)
 using vector = detail::vector_impl<T, DimCnt, meta::type_list<InnermostDimAllocator, Allocators...>>::type;
@@ -178,15 +178,16 @@ template <typename Elem, typename AllocatorList, typename Dim, typename... Ts>
 } // namespace detail
 
 // auto vec3d = aatk::make_vector<int>(x, y, z, 1);
-//   same as: auto vec3d = std::vector<std::vector<std::vector<int>>>(
-//                           x,
-//                           std::vector<std::vector<int>>(y, std::vector<int>(z, 1))
-//                         );
+// same as: auto vec3d = std::vector<std::vector<std::vector<int>>>(
+//                         x,
+//                         std::vector<std::vector<int>>(y, std::vector<int>(z, 1))
+//                       );
+//
 // constexpr usage example (error if aatk::make_vector is not constexpr):
-//   std::cout << [](const std::vector<int>& vec, int sum = 0) consteval {
-//     std::ranges::for_each(vec, [&sum](int elem) { return sum += elem; });
-//     return sum;
-//   }(aatk::make_vector<int>(10, -1)) << "\n";
+// std::cout << [](const std::vector<int>& vec, int sum = 0) consteval {
+//   std::ranges::for_each(vec, [&sum](int elem) { return sum += elem; });
+//   return sum;
+// }(aatk::make_vector<int>(10, -1)) << "\n";
 export template <typename Elem, typename InnermostDimAllocator = memory::std_allocator_tag, typename... Allocators, std::integral Dim, typename... Ts>
   requires (sizeof(Dim) <= sizeof(std::size_t) && sizeof...(Ts) > 0 && sizeof...(Allocators) < sizeof...(Ts))
 [[nodiscard]] constexpr auto make_vector(Dim first_dim_size, Ts&&... args)

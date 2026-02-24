@@ -27,11 +27,11 @@ namespace tower_of_hanoi {
 //
 // solvability: any valid state with n disks can become a state where all n disks are on one peg
 // proof:
-//   1. n = 1, obviously solvable
-//   2. assume that a valid state with n = k - 1 disks can become a state where all k - 1 disks are on one peg
-//   3. for n = k,
-//        if the biggest disk k is already in position, the k - 1 disks can be on the destination peg later (using the hypothesis), OK
-//        otherwise, smaller k - 1 disks can be on one auxiliary peg, then disk k be on the destination, then the k - 1 disks be on the destination, OK
+// 1. n = 1, obviously solvable
+// 2. assume that a valid state with n = k - 1 disks can become a state where all k - 1 disks are on one peg
+// 3. for n = k,
+//    if the biggest disk k is already in position, the k - 1 disks can be on the destination peg later (using the hypothesis), OK
+//    otherwise, smaller k - 1 disks can be on one auxiliary peg, then disk k be on the destination, then the k - 1 disks be on the destination, OK
 // thus a general form problem guarantees a solution as described above, and any other solution that has the same recursive structure is also valid
 
 using move_cnt_type = std::uintmax_t;
@@ -54,13 +54,13 @@ export [[nodiscard]] constexpr move_cnt_type from_one_to_one_form(u32 disk_cnt) 
   //    on the other hand, T(n - 1) moves are required before moving n, so T(n) >= 2T(n - 1) + 1, then the result is T(n) = 2T(n - 1) + 1 = 2^n - 1
   return (move_cnt_type(1) << disk_cnt) - 1;
 
-  // moreover, let f(i) be the moves of the i-th disk
+  // moreover, let f(i) be the moves of the i-th disk,
   // since the largest disk of a problem only moves once, clearly f(n) = 1,
-  //   and the move count for a general i is the count that the i-th subproblem is called during the recursion,
-  //   draw the recursive tree, we can easily see that f(i) = 2^(n - i):
-  //                       f(n)
-  //          f(n - 1)              f(n - 1)
-  //     f(n - 2)   f(n - 2)   f(n - 2)   f(n - 2)
+  // and the move count for a general i is the count that the i-th subproblem is called during the recursion,
+  // draw the recursive tree, we can easily see that f(i) = 2^(n - i):
+  //                   f(n)
+  //      f(n - 1)              f(n - 1)
+  // f(n - 2)   f(n - 2)   f(n - 2)   f(n - 2)
   //             ...                   ...
 }
 
@@ -107,24 +107,25 @@ export [[nodiscard]] constexpr move_cnt_type from_one_to_different_form(u32 disk
 }
 
 // moving the largest disk n first from peg `from` to peg `aux`, then to `to`, using two steps, is sometimes better, for example:
-//   initial state --> final state
-//     A: 3              A: 2 1
-//     B:                B:
-//     C: 2 1            C: 3
+// initial state --> final state
+//   A: 3              A: 2 1
+//   B:                B:
+//   C: 2 1            C: 3
 // one step strategy (7 moves):
-//   move 1 from C to A
-//   move 2 from C to B
-//   move 1 from A to B
-//   move 3 from A to C (the only one move)
-//   move 1 from B to A
-//   move 2 from B to C
-//   move 1 from A to C
+// move 1 from C to A
+// move 2 from C to B
+// move 1 from A to B
+// move 3 from A to C (the only one move)
+// move 1 from B to A
+// move 2 from B to C
+// move 1 from A to C
+//
 // two step strategy (5 moves, better):
-//   move 3 from A to B (the first move)
-//   move 1 from C to B
-//   move 2 from C to A
-//   move 1 from B to A
-//   move 3 from B to A (the second move)
+// move 3 from A to B (the first move)
+// move 1 from C to B
+// move 2 from C to A
+// move 1 from B to A
+// move 3 from B to A (the second move)
 [[nodiscard]] constexpr move_cnt_type general_form_two_step_strategy(u32 disk_cnt, std::span<const u32> from_list, std::span<const u32> to_list) noexcept(noexcept(from_one_to_one_form(disk_cnt)))
 {
   // 1. clear disks above the largest disk n and on peg `aux`, move them to peg `to[n]`
