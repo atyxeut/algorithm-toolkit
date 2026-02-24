@@ -19,7 +19,7 @@ import std;
 
 import aatk.math.floating_point;
 
-namespace test::aatk::math {
+namespace test::aatk::meta {
 
 consteval void does_make_higher_precision_work()
 {
@@ -36,4 +36,4 @@ consteval void does_make_higher_precision_work()
   static_assert(std::same_as<::aatk::meta::make_higher_precision_t<::aatk::ieee754_float::d<1024>>, ::aatk::ieee754_float::d<2048>> == true);
 }
 
-} // namespace test::aatk::math
+} // namespace test::aatk::meta

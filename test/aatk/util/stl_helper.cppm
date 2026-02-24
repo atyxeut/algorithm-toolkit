@@ -27,7 +27,7 @@ import aatk.util.stl_helper;
 
 namespace test::aatk::util {
 
-export consteval void is_vector_nested_std_vector() noexcept
+export consteval void aatk_vector_should_be_nested_std_vector() noexcept
 {
   using T1 = std::vector<double>;
   using T1_ = ::aatk::vector<double>;
@@ -46,7 +46,7 @@ export consteval void is_vector_nested_std_vector() noexcept
   static_assert(std::same_as<T4, T4_>);
 }
 
-export consteval void do_vector_empty_allocator_template_arguments_default_to_std_allocator() noexcept
+export consteval void every_empty_allocator_template_parameter_of_aatk_vector_defaults_to_std_allocator() noexcept
 {
   using T1 = std::pmr::vector<double>;
   using T1_ = ::aatk::vector<double, 1, std::pmr::polymorphic_allocator<double>>;

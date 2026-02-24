@@ -19,9 +19,9 @@ import std;
 
 import aatk.math.integer;
 
-namespace test::aatk::math {
+namespace test::aatk::meta {
 
-consteval void does_meta_is_boolean_work() noexcept
+consteval void does_is_boolean_work() noexcept
 {
   static_assert(::aatk::meta::is_boolean_v<int> == false);
   static_assert(::aatk::meta::is_boolean_v<bool> == true);
@@ -36,7 +36,7 @@ consteval void does_meta_is_boolean_work() noexcept
   static_assert(::aatk::meta::boolean<const volatile bool> == true);
 }
 
-consteval void does_meta_make_signed_unsigned_work() noexcept
+consteval void does_make_signed_work() noexcept
 {
   static_assert(std::same_as<::aatk::meta::make_signed_t<int>, int> == true);
   static_assert(std::same_as<::aatk::meta::make_signed_t<const int>, const int> == true);
@@ -45,7 +45,10 @@ consteval void does_meta_make_signed_unsigned_work() noexcept
   static_assert(std::same_as<::aatk::meta::make_signed_t<i128>, i128> == true);
   static_assert(std::same_as<::aatk::meta::make_signed_t<u128>, i128> == true);
   static_assert(std::same_as<::aatk::meta::make_signed_t<::aatk::fixed_width_integer::u<1024>>, ::aatk::fixed_width_integer::i<1024>> == true);
+}
 
+consteval void does_make_unsigned_work() noexcept
+{
   static_assert(std::same_as<::aatk::meta::make_unsigned_t<int>, unsigned int> == true);
   static_assert(std::same_as<::aatk::meta::make_unsigned_t<const int>, const unsigned int> == true);
   static_assert(std::same_as<::aatk::meta::make_unsigned_t<const volatile unsigned int>, const volatile unsigned int> == true);
@@ -55,7 +58,7 @@ consteval void does_meta_make_signed_unsigned_work() noexcept
   static_assert(std::same_as<::aatk::meta::make_unsigned_t<::aatk::fixed_width_integer::i<1024>>, ::aatk::fixed_width_integer::u<1024>> == true);
 }
 
-consteval void does_meta_make_larger_width_work() noexcept
+consteval void does_make_larger_width_work() noexcept
 {
   static_assert(std::same_as<::aatk::meta::make_larger_width_t<int>, i64> == true);
   static_assert(std::same_as<::aatk::meta::make_larger_width_t<const int>, const i64> == true);
@@ -67,4 +70,4 @@ consteval void does_meta_make_larger_width_work() noexcept
   static_assert(std::same_as<::aatk::meta::make_larger_width_t<::aatk::fixed_width_integer::i<256>>, ::aatk::fixed_width_integer::i<512>> == true);
 }
 
-} // namespace test::aatk::math
+} // namespace test::aatk::meta

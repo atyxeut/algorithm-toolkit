@@ -21,7 +21,7 @@ import aatk.meta;
 
 namespace test::aatk::meta {
 
-export consteval void does_meta_custom_integer_sequence_helper_work() noexcept
+export consteval void do_custom_integer_sequence_helpers_work() noexcept
 {
   static_assert(std::same_as<::aatk::meta::make_reversed_integer_sequence<int, 8>, std::integer_sequence<int, 7, 6, 5, 4, 3, 2, 1, 0>> == true);
   static_assert(std::same_as<::aatk::meta::make_reversed_index_sequence<8>, std::index_sequence<7, 6, 5, 4, 3, 2, 1, 0>> == true);
@@ -36,16 +36,19 @@ export consteval void does_meta_custom_integer_sequence_helper_work() noexcept
   static_assert(std::same_as<::aatk::meta::shift_index_sequence_t<50, std::index_sequence<1, 2, 3, 4>>, std::index_sequence<51, 52, 53, 54>>);
 }
 
-export consteval void does_meta_is_none_any_of_work() noexcept
+export consteval void does_is_none_of_work() noexcept
 {
   static_assert(::aatk::meta::is_none_of_v<int, double, long double, char, const char, float, std::string, const int> == true);
   static_assert(::aatk::meta::is_none_of_v<int, double, long double, char, const char, int, std::string> == false);
+}
 
+export consteval void does_is_any_of_work() noexcept
+{
   static_assert(::aatk::meta::is_any_of_v<int, double, long double, char, const char, float, std::string, const int> == false);
   static_assert(::aatk::meta::is_any_of_v<int, double, long double, char, const char, int, std::string> == true);
 }
 
-export consteval void does_meta_all_the_same_work() noexcept
+export consteval void does_all_the_same_work() noexcept
 {
   static_assert(::aatk::meta::all_the_same_v<int, int, int, int, int, const char, float, std::string> == false);
   static_assert(::aatk::meta::all_the_same_v<int, int, int, int, int, int, int, int> == true);
@@ -65,20 +68,23 @@ using indexed_type_list_4 = ::aatk::meta::indexed_type_list<std::make_index_sequ
 using indexed_type_list_5 = ::aatk::meta::indexed_type_list<std::make_index_sequence<::aatk::meta::length_v<type_list_5>>, type_list_5>;
 using indexed_type_list_6 = ::aatk::meta::indexed_type_list<std::make_index_sequence<::aatk::meta::length_v<type_list_6>>, type_list_6>;
 
-export consteval void does_meta_has_none_any_work() noexcept
+export consteval void does_has_none_work() noexcept
 {
   static_assert(::aatk::meta::has_none_v<int, type_list_1> == true);
   static_assert(::aatk::meta::has_none_v<int, type_list_3> == false);
   static_assert(::aatk::meta::has_none_v<int, indexed_type_list_1> == true);
   static_assert(::aatk::meta::has_none_v<int, indexed_type_list_3> == false);
+}
 
+export consteval void does_has_any_work() noexcept
+{
   static_assert(::aatk::meta::has_any_v<double, type_list_1> == true);
   static_assert(::aatk::meta::has_any_v<int, type_list_2> == false);
   static_assert(::aatk::meta::has_any_v<double, indexed_type_list_1> == true);
   static_assert(::aatk::meta::has_any_v<int, indexed_type_list_2> == false);
 }
 
-export consteval void does_meta_map_work() noexcept
+export consteval void does_map_work() noexcept
 {
   static_assert(std::same_as<::aatk::meta::map_t<2, indexed_type_list_1>, ::aatk::meta::indexed_type<2, std::vector<int>>>);
   static_assert(std::same_as<::aatk::meta::map_t<0, indexed_type_list_2>, ::aatk::meta::indexed_type<0, std::string>>);
@@ -86,7 +92,7 @@ export consteval void does_meta_map_work() noexcept
   static_assert(std::same_as<::aatk::meta::map_t<::aatk::meta::length_v<indexed_type_list_6> - 1, indexed_type_list_6>, ::aatk::meta::indexed_type<::aatk::meta::length_v<indexed_type_list_6> - 1, const void>>);
 }
 
-export consteval void does_meta_repeat_work() noexcept
+export consteval void does_repeat_work() noexcept
 {
   using repeated_0_time_type_list = ::aatk::meta::empty_type_list;
   static_assert(std::same_as<::aatk::meta::repeat_t<0, void>, repeated_0_time_type_list>);
@@ -106,7 +112,7 @@ struct huge_concat_test_helper<::aatk::meta::type_list<Ts...>> : ::aatk::meta::c
 template <::aatk::meta::list_of_types T>
 using huge_concat_test_helper_t = huge_concat_test_helper<T>::type;
 
-export consteval void does_meta_concat_work() noexcept
+export consteval void does_concat_work() noexcept
 {
   static_assert(std::same_as<::aatk::meta::concat_t<type_list_1>, type_list_1>);
   static_assert(std::same_as<::aatk::meta::concat_t<type_list_2>, type_list_2>);
@@ -128,7 +134,7 @@ export consteval void does_meta_concat_work() noexcept
   static_assert(std::same_as<huge_concat_test_helper_t<huge_concatenation_before>, huge_concatenation_after>);
 }
 
-export consteval void does_meta_reverse_work() noexcept
+export consteval void does_reverse_work() noexcept
 {
   using reversed_empty_type_list = ::aatk::meta::empty_type_list;
   static_assert(std::same_as<::aatk::meta::reverse_t<::aatk::meta::empty_type_list>, reversed_empty_type_list>);
@@ -140,7 +146,7 @@ export consteval void does_meta_reverse_work() noexcept
   static_assert(std::same_as<::aatk::meta::reverse_t<type_list_2>, reversed_type_list_of_2>);
 }
 
-export consteval void does_meta_init_work() noexcept
+export consteval void does_init_work() noexcept
 {
   // force a template substitution to make `requires` work
   auto test_empty_list = []<typename T> consteval noexcept
@@ -156,7 +162,7 @@ export consteval void does_meta_init_work() noexcept
   static_assert(std::same_as<::aatk::meta::init_t<type_list_2>, init_type_list_of_2> == true);
 }
 
-export consteval void does_meta_take_work() noexcept
+export consteval void does_take_work() noexcept
 {
   using take_0_type_list_of_empty = ::aatk::meta::empty_type_list;
   static_assert(std::same_as<::aatk::meta::take_t<0, ::aatk::meta::empty_type_list>, take_0_type_list_of_empty>);
@@ -174,7 +180,7 @@ export consteval void does_meta_take_work() noexcept
   static_assert(std::same_as<::aatk::meta::take_t<6, type_list_5>, take_6_type_list_of_5>);
 }
 
-export consteval void does_meta_take_end_work() noexcept
+export consteval void does_take_end_work() noexcept
 {
   using take_0_type_list_of_empty_from_end = ::aatk::meta::empty_type_list;
   static_assert(std::same_as<::aatk::meta::take_end_t<0, ::aatk::meta::empty_type_list>, take_0_type_list_of_empty_from_end>);
@@ -192,7 +198,7 @@ export consteval void does_meta_take_end_work() noexcept
   static_assert(std::same_as<::aatk::meta::take_end_t<6, type_list_5>, take_6_type_list_of_5_from_end>);
 }
 
-export consteval void does_meta_drop_work() noexcept
+export consteval void does_drop_work() noexcept
 {
   using dropped_0_type_list_of_empty = ::aatk::meta::empty_type_list;
   static_assert(std::same_as<::aatk::meta::drop_t<0, ::aatk::meta::empty_type_list>, dropped_0_type_list_of_empty>);
@@ -210,7 +216,7 @@ export consteval void does_meta_drop_work() noexcept
   static_assert(std::same_as<::aatk::meta::drop_t<3, type_list_2>, dropped_3_type_list_of_2>);
 }
 
-export consteval void does_meta_drop_end_work() noexcept
+export consteval void does_drop_end_work() noexcept
 {
   using dropped_0_type_list_of_empty_from_end = ::aatk::meta::empty_type_list;
   static_assert(std::same_as<::aatk::meta::drop_end_t<0, ::aatk::meta::empty_type_list>, dropped_0_type_list_of_empty_from_end>);
@@ -231,7 +237,7 @@ export consteval void does_meta_drop_end_work() noexcept
   static_assert(std::same_as<::aatk::meta::drop_end_t<2, type_list_3>, dropped_2_type_list_of_3_from_end>);
 }
 
-export consteval void does_meta_is_predicate_work() noexcept
+export consteval void does_is_predicate_work() noexcept
 {
   // test for templates that accept 1 template parameter
   static_assert(::aatk::meta::is_predicate_v<std::is_integral> == true);
@@ -257,7 +263,7 @@ export consteval void does_meta_is_predicate_work() noexcept
   static_assert(::aatk::meta::wrapped_predicate<::aatk::meta::template_wrapper<std::add_const>> == false);
 }
 
-export consteval void does_meta_take_while_work() noexcept
+export consteval void does_take_while_work() noexcept
 {
   using take_while_type_list_of_empty_list = ::aatk::meta::empty_type_list;
   static_assert(std::same_as<::aatk::meta::take_while_t<std::is_integral, ::aatk::meta::empty_type_list>, take_while_type_list_of_empty_list>);
@@ -281,7 +287,7 @@ export consteval void does_meta_take_while_work() noexcept
   static_assert(std::same_as<::aatk::meta::take_while_t<std::is_floating_point, type_list_5>, take_while_type_list_of_5_2>);
 }
 
-export consteval void does_meta_take_while_end_work() noexcept
+export consteval void does_take_while_end_work() noexcept
 {
   using take_while_type_list_of_empty_list_from_end = ::aatk::meta::empty_type_list;
   static_assert(std::same_as<::aatk::meta::take_while_end_t<std::is_integral, ::aatk::meta::empty_type_list>, take_while_type_list_of_empty_list_from_end>);
@@ -305,7 +311,7 @@ export consteval void does_meta_take_while_end_work() noexcept
   static_assert(std::same_as<::aatk::meta::take_while_end_t<std::is_floating_point, type_list_5>, take_while_type_list_of_5_2_from_end>);
 }
 
-export consteval void does_meta_drop_while_work() noexcept
+export consteval void does_drop_while_work() noexcept
 {
   using drop_while_type_list_of_1 = ::aatk::meta::type_list<double, float, std::vector<int>, long long>;
   static_assert(std::same_as<::aatk::meta::drop_while_t<std::is_integral, type_list_1>, drop_while_type_list_of_1>);
@@ -323,7 +329,7 @@ export consteval void does_meta_drop_while_work() noexcept
   static_assert(std::same_as<::aatk::meta::drop_while_t<std::is_floating_point, type_list_5>, drop_while_type_list_of_5>);
 }
 
-export consteval void does_meta_drop_while_end_work() noexcept
+export consteval void does_drop_while_end_work() noexcept
 {
   using drop_while_type_list_of_1_from_end = ::aatk::meta::type_list<double, float, std::vector<int>>;
   static_assert(std::same_as<::aatk::meta::drop_while_end_t<std::is_integral, type_list_1>, drop_while_type_list_of_1_from_end>);
@@ -341,7 +347,7 @@ export consteval void does_meta_drop_while_end_work() noexcept
   static_assert(std::same_as<::aatk::meta::drop_while_end_t<std::is_floating_point, type_list_5>, drop_while_type_list_of_5_from_end>);
 }
 
-export consteval void does_meta_filter_work() noexcept
+export consteval void does_filter_work() noexcept
 {
   using filtered_type_list_of_5_1 = ::aatk::meta::type_list<int, char, volatile unsigned long long, char, unsigned char, signed char, short>;
   static_assert(std::same_as<::aatk::meta::filter_t<std::is_integral, type_list_5>, filtered_type_list_of_5_1>);
