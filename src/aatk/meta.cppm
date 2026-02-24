@@ -693,6 +693,20 @@ struct template_wrapper
   using type = T<Args...>;
 };
 
+export template <template <typename...> typename T, typename... BoundArgs>
+struct bind_front
+{
+  template <typename... CallArgs>
+  using type = T<BoundArgs..., CallArgs...>;
+};
+
+export template <template <typename...> typename T, typename... BoundArgs>
+struct bind_back
+{
+  template <typename... CallArgs>
+  using type = T<CallArgs..., BoundArgs...>;
+};
+
 export template <typename>
 struct is_no_cv_template_wrapper : std::false_type
 {
@@ -700,6 +714,16 @@ struct is_no_cv_template_wrapper : std::false_type
 
 template <template <typename...> typename T>
 struct is_no_cv_template_wrapper<template_wrapper<T>> : std::true_type
+{
+};
+
+template <template <typename...> typename T, typename... BoundArgs>
+struct is_no_cv_template_wrapper<bind_front<T, BoundArgs...>> : std::true_type
+{
+};
+
+template <template <typename...> typename T, typename... BoundArgs>
+struct is_no_cv_template_wrapper<bind_back<T, BoundArgs...>> : std::true_type
 {
 };
 
