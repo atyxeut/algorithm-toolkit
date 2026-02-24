@@ -25,21 +25,25 @@ end
 
 set_config("builddir", "build")
 set_config("runtimes", "c++_shared")
+
 if is_host("windows") then
+  -- recommend mingw llvm binary: https://github.com/mstorsjo/llvm-mingw
+  -- recommend mingw gcc binary: https://gcc-mcf.lhmouse.com/
   set_config("plat", "mingw")
-end
-
--- recommend llvm binary: https://github.com/mstorsjo/llvm-mingw
-if get_config("toolchain") == "llvm" and is_host("macosx") then
-  set_policy("build.c++.modules", true)
-  -- binary from Homebrew: brew install llvm
-  add_ldflags("-L/usr/local/opt/llvm@21/lib/c++")
-end
-
--- recommend gcc binary: https://gcc-mcf.lhmouse.com/
-if get_config("toolchain") == "gcc" and is_host("windows") then
-  -- gcc 16 still requires this on Windows
-  add_syslinks("stdc++exp")
+  if get_config("toolchain") == "gcc" then
+    -- gcc 16 still requires this on Windows
+    add_syslinks("stdc++exp")
+  end
+elseif is_host("macosx") then
+  if get_config("toolchain") == "gcc" then
+    -- gcc-15 from Homebrew
+    set_toolset("cxx", "/usr/local/opt/gcc@15/bin/g++-15") -- `usr` is the username
+    set_toolset("ld", "/usr/local/opt/gcc@15/bin/g++-15")  -- `usr` is the username
+  elseif get_config("toolchain") == "llvm" then
+    set_policy("build.c++.modules", true)
+    -- binary from Homebrew: brew install llvm
+    add_ldflags("-L/usr/local/opt/llvm@21/lib/c++")
+  end
 end
 
 includes("src")
