@@ -86,12 +86,12 @@ export consteval void does_has_any_work() noexcept
   static_assert(has_any_v<int, indexed_type_list_2> == false);
 }
 
-export consteval void does_map_work() noexcept
+export consteval void does_lookup_work() noexcept
 {
-  static_assert(std::same_as<map_t<2, indexed_type_list_1>, indexed_type<2, std::vector<int>>>);
-  static_assert(std::same_as<map_t<0, indexed_type_list_2>, indexed_type<0, std::string>>);
-  static_assert(std::same_as<map_t<1, indexed_type_list_3>, indexed_type<1, char>>);
-  static_assert(std::same_as<map_t<length_v<indexed_type_list_6> - 1, indexed_type_list_6>, indexed_type<length_v<indexed_type_list_6> - 1, const void>>);
+  static_assert(std::same_as<lookup_t<2, indexed_type_list_1>, indexed_type<2, std::vector<int>>>);
+  static_assert(std::same_as<lookup_t<0, indexed_type_list_2>, indexed_type<0, std::string>>);
+  static_assert(std::same_as<lookup_t<1, indexed_type_list_3>, indexed_type<1, char>>);
+  static_assert(std::same_as<lookup_t<length_v<indexed_type_list_6> - 1, indexed_type_list_6>, indexed_type<length_v<indexed_type_list_6> - 1, const void>>);
 }
 
 export consteval void does_repeat_work() noexcept

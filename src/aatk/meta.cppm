@@ -450,20 +450,22 @@ using last_t = last<T>::type;
 namespace detail {
 
 template <std::size_t I, typename T>
-indexed_type<I, T> map_indexed_type_helper(indexed_type<I, T>);
+indexed_type<I, T> lookup_indexed_type_helper(indexed_type<I, T>);
 
 } // namespace detail
 
 // get the corresponding indexed type with a given index
+// O(1) time complexity
+// name after Haskell Data.List lookup
 export template <std::size_t I, typename IndexedTypeList>
   requires is_indexed_type_list_v<IndexedTypeList>
-struct map
+struct lookup
 {
-  using type = decltype(detail::map_indexed_type_helper<I>(std::declval<IndexedTypeList>()));
+  using type = decltype(detail::lookup_indexed_type_helper<I>(std::declval<IndexedTypeList>()));
 };
 
 export template <std::size_t I, typename IndexedTypeList>
-using map_t = map<I, IndexedTypeList>::type;
+using lookup_t = lookup<I, IndexedTypeList>::type;
 
 // get a type list that has one element added to the beginning comparing to the given type list
 // O(1) time complexity
