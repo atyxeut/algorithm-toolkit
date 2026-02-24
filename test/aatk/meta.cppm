@@ -31,6 +31,9 @@ export consteval void does_meta_custom_integer_sequence_helper_work() noexcept
   static_assert(std::same_as<::aatk::meta::make_index_sequence_of_range<3, 10>, std::index_sequence<3, 4, 5, 6, 7, 8, 9, 10>> == true);
   static_assert(std::same_as<::aatk::meta::make_reversed_integer_sequence_of_range<int, 3, 7>, std::integer_sequence<int, 7, 6, 5, 4, 3>> == true);
   static_assert(std::same_as<::aatk::meta::make_reversed_index_sequence_of_range<3, 10>, std::index_sequence<10, 9, 8, 7, 6, 5, 4, 3>> == true);
+
+  static_assert(std::same_as<::aatk::meta::shift_integer_sequence_t<int, 10, std::integer_sequence<int, 1, 2, 3, 4>>, std::integer_sequence<int, 11, 12, 13, 14>>);
+  static_assert(std::same_as<::aatk::meta::shift_index_sequence_t<50, std::index_sequence<1, 2, 3, 4>>, std::index_sequence<51, 52, 53, 54>>);
 }
 
 export consteval void does_meta_is_none_any_of_work() noexcept
