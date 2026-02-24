@@ -365,4 +365,40 @@ export consteval void does_filter_work() noexcept
   static_assert(std::same_as<::aatk::meta::filter_t<std::is_signed, type_list_6>, filtered_type_list_of_6>);
 }
 
+export consteval void does_keep_work() noexcept
+{
+  using keep_only_int_type_list_of_empty = ::aatk::meta::empty_type_list;
+  static_assert(std::same_as<::aatk::meta::keep_t<int, ::aatk::meta::empty_type_list>, keep_only_int_type_list_of_empty>);
+
+  using keep_only_int_type_list_of_1 = ::aatk::meta::empty_type_list;
+  static_assert(std::same_as<::aatk::meta::keep_t<int, type_list_1>, keep_only_int_type_list_of_1>);
+
+  using keep_only_int_type_list_of_3 = ::aatk::meta::type_list<int>;
+  static_assert(std::same_as<::aatk::meta::keep_t<int, type_list_3>, keep_only_int_type_list_of_3>);
+
+  using keep_only_int_type_list_of_4 = ::aatk::meta::type_list<int, int, int, int, int, int, int>;
+  static_assert(std::same_as<::aatk::meta::keep_t<int, type_list_4>, keep_only_int_type_list_of_4>);
+
+  using keep_only_char_type_list_of_5 = ::aatk::meta::type_list<char, char>;
+  static_assert(std::same_as<::aatk::meta::keep_t<char, type_list_5>, keep_only_char_type_list_of_5>);
+}
+
+export consteval void does_remove_work() noexcept
+{
+  using remove_all_int_type_list_of_empty = ::aatk::meta::empty_type_list;
+  static_assert(std::same_as<::aatk::meta::remove_t<int, ::aatk::meta::empty_type_list>, remove_all_int_type_list_of_empty>);
+
+  using remove_all_int_type_list_of_1 = ::aatk::meta::type_list<double, float, std::vector<int>, long long>;
+  static_assert(std::same_as<::aatk::meta::remove_t<int, type_list_1>, remove_all_int_type_list_of_1>);
+
+  using remove_all_int_type_list_of_3 = ::aatk::meta::type_list<char, const int, volatile char>;
+  static_assert(std::same_as<::aatk::meta::remove_t<int, type_list_3>, remove_all_int_type_list_of_3>);
+
+  using remove_all_int_type_list_of_4 = ::aatk::meta::empty_type_list;
+  static_assert(std::same_as<::aatk::meta::remove_t<int, type_list_4>, remove_all_int_type_list_of_4>);
+
+  using remove_all_char_type_list_of_5 = ::aatk::meta::type_list<const float, float, double, int, const double, std::byte, volatile unsigned long long, volatile void, unsigned char, signed char, short, void, const void>;
+  static_assert(std::same_as<::aatk::meta::remove_t<char, type_list_5>, remove_all_char_type_list_of_5>);
+}
+
 } // namespace test::aatk::meta

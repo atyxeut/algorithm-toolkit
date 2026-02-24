@@ -76,6 +76,14 @@ export template <typename From, typename To>
 using claim_cv_t = claim_cv<From, To>::type;
 
 export template <typename T, typename U>
+struct not_same : std::negation<std::is_same<T, U>>
+{
+};
+
+export template <typename T, typename U>
+constexpr bool not_same_v = not_same<T, U>::value;
+
+export template <typename T, typename U>
 concept no_cvref_same_as = std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<U>>;
 
 export template <typename T, typename U>
@@ -870,5 +878,21 @@ struct filter<Pred, type_list<Ts...>> : concat<std::conditional_t<Pred<Ts>::valu
 
 export template <template <typename> typename Pred, typename TypeList>
 using filter_t = filter<Pred, TypeList>::type;
+
+// get a type list that only contains the given type T comparing to the given type list
+// O(log n) time complexity, where n is the length of the given type list
+export template <typename T, list_of_types U>
+using keep = filter<bind_front<std::is_same, T>::template type, U>;
+
+export template <typename T, list_of_types U>
+using keep_t = keep<T, U>::type;
+
+// get a type list that does not contain the given type T comparing to the given type list
+// O(log n) time complexity, where n is the length of the given type list
+export template <typename T, list_of_types U>
+using remove = filter<bind_front<not_same, T>::template type, U>;
+
+export template <typename T, list_of_types U>
+using remove_t = remove<T, U>::type;
 
 } // namespace aatk::meta
