@@ -38,20 +38,29 @@ export consteval void do_custom_integer_sequence_helpers_work() noexcept
   static_assert(std::same_as<shift_index_sequence_t<50, std::index_sequence<1, 2, 3, 4>>, std::index_sequence<51, 52, 53, 54>>);
 }
 
-export consteval void does_is_none_of_work() noexcept
-{
-  static_assert(is_none_of_v<int, double, long double, char, const char, float, std::string, const int> == true);
-  static_assert(is_none_of_v<int, double, long double, char, const char, int, std::string> == false);
-}
-
 export consteval void does_is_any_of_work() noexcept
 {
+  static_assert(is_any_of_v<int> == false);
+  static_assert(is_any_of_v<int, int> == true);
+  static_assert(is_any_of_v<int, double> == false);
   static_assert(is_any_of_v<int, double, long double, char, const char, float, std::string, const int> == false);
   static_assert(is_any_of_v<int, double, long double, char, const char, int, std::string> == true);
 }
 
+export consteval void does_is_none_of_work() noexcept
+{
+  static_assert(is_none_of_v<int> == true);
+  static_assert(is_none_of_v<int, int> == false);
+  static_assert(is_none_of_v<int, double> == true);
+  static_assert(is_none_of_v<int, double, long double, char, const char, float, std::string, const int> == true);
+  static_assert(is_none_of_v<int, double, long double, char, const char, int, std::string> == false);
+}
+
 export consteval void does_all_the_same_work() noexcept
 {
+  static_assert(all_the_same_v<> == true);
+  static_assert(all_the_same_v<int, int> == true);
+  static_assert(all_the_same_v<int, double> == false);
   static_assert(all_the_same_v<int, int, int, int, int, const char, float, std::string> == false);
   static_assert(all_the_same_v<int, int, int, int, int, int, int, int> == true);
 }
@@ -69,22 +78,6 @@ using indexed_type_list_3 = indexed_type_list<std::make_index_sequence<length_v<
 using indexed_type_list_4 = indexed_type_list<std::make_index_sequence<length_v<type_list_4>>, type_list_4>;
 using indexed_type_list_5 = indexed_type_list<std::make_index_sequence<length_v<type_list_5>>, type_list_5>;
 using indexed_type_list_6 = indexed_type_list<std::make_index_sequence<length_v<type_list_6>>, type_list_6>;
-
-export consteval void does_has_none_work() noexcept
-{
-  static_assert(has_none_v<int, type_list_1> == true);
-  static_assert(has_none_v<int, type_list_3> == false);
-  static_assert(has_none_v<int, indexed_type_list_1> == true);
-  static_assert(has_none_v<int, indexed_type_list_3> == false);
-}
-
-export consteval void does_has_any_work() noexcept
-{
-  static_assert(has_any_v<double, type_list_1> == true);
-  static_assert(has_any_v<int, type_list_2> == false);
-  static_assert(has_any_v<double, indexed_type_list_1> == true);
-  static_assert(has_any_v<int, indexed_type_list_2> == false);
-}
 
 export consteval void does_lookup_work() noexcept
 {
@@ -414,6 +407,54 @@ export consteval void does_transform_work() noexcept
 
   using type_list_4_after_make_unsigned = type_list<unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int>;
   static_assert(std::same_as<transform_t<std::make_unsigned, type_list_4>, type_list_4_after_make_unsigned>);
+}
+
+export consteval void does_any_work() noexcept
+{
+  static_assert(any_v<std::is_integral, empty_type_list> == false);
+  static_assert(any_v<std::is_integral, type_list_1> == true);
+  static_assert(any_v<std::is_floating_point, type_list_2> == false);
+  static_assert(any_v<std::is_floating_point, type_list_3> == false);
+  static_assert(any_v<std::is_unsigned, type_list_4> == false);
+  static_assert(any_v<std::is_unsigned, type_list_5> == true);
+}
+
+export consteval void does_none_work() noexcept
+{
+  static_assert(none_v<std::is_integral, empty_type_list> == true);
+  static_assert(none_v<std::is_integral, type_list_1> == false);
+  static_assert(none_v<std::is_floating_point, type_list_2> == true);
+  static_assert(none_v<std::is_floating_point, type_list_3> == true);
+  static_assert(none_v<std::is_unsigned, type_list_4> == true);
+  static_assert(none_v<std::is_unsigned, type_list_5> == false);
+}
+
+export consteval void does_all_work() noexcept
+{
+  static_assert(all_v<std::is_integral, empty_type_list> == false);
+  static_assert(all_v<std::is_integral, type_list_1> == false);
+  static_assert(all_v<std::is_floating_point, type_list_2> == false);
+  static_assert(all_v<std::is_floating_point, type_list_3> == false);
+  static_assert(all_v<std::is_unsigned, type_list_4> == false);
+  static_assert(all_v<std::is_signed, type_list_4> == true);
+}
+
+export consteval void does_has_any_work() noexcept
+{
+  static_assert(has_any_v<double, empty_type_list> == false);
+  static_assert(has_any_v<double, type_list_1> == true);
+  static_assert(has_any_v<int, type_list_2> == false);
+  static_assert(has_any_v<double, indexed_type_list_1> == true);
+  static_assert(has_any_v<int, indexed_type_list_2> == false);
+}
+
+export consteval void does_has_none_work() noexcept
+{
+  static_assert(has_none_v<double, empty_type_list> == true);
+  static_assert(has_none_v<int, type_list_1> == true);
+  static_assert(has_none_v<int, type_list_3> == false);
+  static_assert(has_none_v<int, indexed_type_list_1> == true);
+  static_assert(has_none_v<int, indexed_type_list_3> == false);
 }
 
 } // namespace test::aatk::meta

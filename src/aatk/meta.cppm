@@ -183,43 +183,36 @@ export template <std::size_t Offset, typename IndexSequence>
 using shift_index_sequence_t = shift_index_sequence<Offset, IndexSequence>::type;
 
 export template <typename T, typename... Us>
-  requires (sizeof...(Us) > 0)
-struct is_none_of : std::conjunction<is_none_of<T, Us>...>
+struct is_any_of : std::disjunction<is_any_of<T, Us>...>
 {
 };
 
 template <typename T, typename U>
-struct is_none_of<T, U> : std::bool_constant<!std::same_as<T, U>>
-{
-};
-
-export template <typename T, typename... Us>
-constexpr bool is_none_of_v = is_none_of<T, Us...>::value;
-
-export template <typename T, typename... Us>
-  requires (sizeof...(Us) > 0)
-struct is_any_of : std::negation<is_none_of<T, Us...>>
+struct is_any_of<T, U> : std::bool_constant<std::same_as<T, U>>
 {
 };
 
 export template <typename T, typename... Us>
 constexpr bool is_any_of_v = is_any_of<T, Us...>::value;
 
+export template <typename T, typename... Us>
+using is_none_of = std::negation<is_any_of<T, Us...>>;
+
+export template <typename T, typename... Us>
+constexpr bool is_none_of_v = is_none_of<T, Us...>::value;
+
 export template <typename...>
-struct all_the_same;
-
-template <>
-struct all_the_same<> : std::true_type
+struct all_the_same : std::true_type
 {
 };
 
-template <typename T>
-struct all_the_same<T> : std::true_type
+template <typename T, typename... Us>
+struct all_the_same<T, Us...> : std::conjunction<all_the_same<T, Us>...>
 {
 };
 
-template <typename T0, typename T1, typename... Ts>
-struct all_the_same<T0, T1, Ts...> : std::bool_constant<std::same_as<T0, T1> && all_the_same<T1, Ts...>::value>
+template <typename T, typename U>
+struct all_the_same<T, U> : std::bool_constant<std::same_as<T, U>>
 {
 };
 
@@ -354,40 +347,6 @@ concept empty_list_of_types = is_empty_type_list_v<T> || is_empty_indexed_type_l
 
 export template <typename T>
 concept nonempty_list_of_types = list_of_types<T> && !empty_list_of_types<T>;
-
-export template <typename, typename>
-struct has_none;
-
-template <typename T>
-struct has_none<T, empty_type_list> : std::true_type
-{
-};
-
-template <typename T>
-struct has_none<T, empty_indexed_type_list> : std::true_type
-{
-};
-
-template <typename T, typename... Us>
-struct has_none<T, type_list<Us...>> : is_none_of<T, Us...>
-{
-};
-
-template <typename T, std::size_t... Is, typename... Us>
-struct has_none<T, indexed_type_list<std::index_sequence<Is...>, type_list<Us...>>> : is_none_of<T, Us...>
-{
-};
-
-export template <typename T, typename AnyTypeList>
-constexpr bool has_none_v = has_none<T, AnyTypeList>::value;
-
-export template <typename T, list_of_types U>
-struct has_any : std::negation<has_none<T, U>>
-{
-};
-
-export template <typename T, typename U>
-constexpr bool has_any_v = has_any<T, U>::value;
 
 // get the length of a type list
 // O(1) time complexity
@@ -863,7 +822,7 @@ using drop_while_end_t = drop_while_end<Pred, TypeList>::type;
 // get a type list that contains all the types that satisfy a given predicate
 // O(log n) time complexity, limited by `concat`, where n is the length of the given type list
 // name after Haskell Data.List filter
-export template <template <typename> typename Pred, list_of_types>
+export template <template <typename> typename Pred, typename>
   requires predicate<Pred>
 struct filter;
 
@@ -886,20 +845,20 @@ using filter_t = filter<Pred, TypeList>::type;
 export template <typename T, list_of_types U>
 using keep = filter<bind_front<std::is_same, T>::template type, U>;
 
-export template <typename T, list_of_types U>
-using keep_t = keep<T, U>::type;
+export template <typename T, typename TypeList>
+using keep_t = keep<T, TypeList>::type;
 
 // get a type list that does not contain the given type T comparing to the given type list
 // O(log n) time complexity, where n is the length of the given type list
 export template <typename T, list_of_types U>
 using remove = filter<bind_front<not_same, T>::template type, U>;
 
-export template <typename T, list_of_types U>
-using remove_t = remove<T, U>::type;
+export template <typename T, typename TypeList>
+using remove_t = remove<T, TypeList>::type;
 
 // apply the given template to every type of the given type list
 // O(1) time complexity
-export template <template <typename> typename T, list_of_types U>
+export template <template <typename> typename, typename>
 struct transform;
 
 template <template <typename> typename T, typename... Us>
@@ -908,7 +867,81 @@ struct transform<T, type_list<Us...>>
   using type = type_list<typename T<Us>::type...>;
 };
 
+export template <template <typename> typename T, typename TypeList>
+using transform_t = transform<T, TypeList>::type;
+
+// test if any of the types of the given type list satisfy the given predicate
+// O(k) time complexity, where k is the length of the longest prefix whose types do not satisfy the given predicate
+// name after Haskell Data.List any
+export template <template <typename> typename T, typename>
+  requires predicate<T>
+struct any;
+
+template <template <typename> typename T, typename... Us>
+struct any<T, type_list<Us...>> : std::disjunction<T<Us>...>
+{
+};
+
+export template <template <typename> typename T, typename TypeList>
+constexpr bool any_v = any<T, TypeList>::value;
+
+// test if none of the types of the given type list satisfy the given predicate
 export template <template <typename> typename T, list_of_types U>
-using transform_t = transform<T, U>::type;
+using none = std::negation<any<T, U>>;
+
+export template <template <typename> typename T, typename TypeList>
+constexpr bool none_v = none<T, TypeList>::value;
+
+// test if all of the types of the given type list satisfy the given predicate
+// O(k) time complexity, where k is the length of the longest prefix whose types satisfy the given predicate
+// name after Haskell Data.List all
+export template <template <typename> typename T, typename>
+  requires predicate<T>
+struct all;
+
+template <template <typename> typename T>
+struct all<T, empty_type_list> : std::false_type
+{
+};
+
+template <template <typename> typename T, typename... Us>
+struct all<T, type_list<Us...>> : std::conjunction<T<Us>...>
+{
+};
+
+export template <template <typename> typename T, typename TypeList>
+constexpr bool all_v = all<T, TypeList>::value;
+
+export template <typename, typename>
+struct has_any;
+
+template <typename T>
+struct has_any<T, empty_type_list> : std::false_type
+{
+};
+
+template <typename T>
+struct has_any<T, empty_indexed_type_list> : std::false_type
+{
+};
+
+template <typename T, typename... Us>
+struct has_any<T, type_list<Us...>> : is_any_of<T, Us...>
+{
+};
+
+template <typename T, std::size_t... Is, typename... Us>
+struct has_any<T, indexed_type_list<std::index_sequence<Is...>, type_list<Us...>>> : is_any_of<T, Us...>
+{
+};
+
+export template <typename T, typename AnyTypeList>
+constexpr bool has_any_v = has_any<T, AnyTypeList>::value;
+
+export template <typename T, list_of_types U>
+using has_none = std::negation<has_any<T, U>>;
+
+export template <typename T, typename U>
+constexpr bool has_none_v = has_none<T, U>::value;
 
 } // namespace aatk::meta
