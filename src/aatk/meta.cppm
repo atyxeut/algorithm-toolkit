@@ -253,8 +253,6 @@ struct type_list
 {
 };
 
-export using empty_type_list = type_list<>;
-
 export template <typename>
 struct is_no_cv_type_list : std::false_type
 {
@@ -274,7 +272,9 @@ using is_type_list = is_no_cv_type_list<std::remove_cv_t<T>>;
 export template <typename T>
 constexpr bool is_type_list_v = is_type_list<T>::value;
 
-export template <typename T>
+export using empty_type_list = type_list<>;
+
+export template <typename>
 struct is_no_cv_empty_type_list : std::false_type
 {
 };
@@ -296,29 +296,34 @@ constexpr bool is_empty_type_list_v = is_empty_type_list<T>::value;
 export template <std::size_t I, typename T>
 struct indexed_type
 {
+  static constexpr auto idx = I;
   using type = T;
-  static constexpr auto vaule = I;
 };
+
+export template <std::size_t I, typename T>
+constexpr auto indexed_type_v = indexed_type<I, T>::idx;
 
 export template <std::size_t I, typename T>
 using indexed_type_t = indexed_type<I, T>::type;
 
-export template <std::size_t I, typename T>
-constexpr auto indexed_type_v = indexed_type<I, T>::value;
-
 export template <typename>
-struct unwrap_indexed_type;
-
-template <std::size_t I, typename T>
-struct unwrap_indexed_type<indexed_type<I, T>> : indexed_type<I, T>
+struct is_no_cv_indexed_type : std::false_type
 {
 };
 
-export template <typename IndexedType>
-using unwrap_indexed_type_t = unwrap_indexed_type<IndexedType>::type;
+template <std::size_t I, typename T>
+struct is_no_cv_indexed_type<indexed_type<I, T>> : std::true_type
+{
+};
 
-export template <typename IndexedType>
-constexpr auto unwrap_indexed_type_v = unwrap_indexed_type<IndexedType>::value;
+export template <typename T>
+constexpr bool is_no_cv_indexed_type_v = is_no_cv_indexed_type<T>::value;
+
+export template <typename T>
+using is_indexed_type = is_no_cv_indexed_type<std::remove_cv_t<T>>;
+
+export template <typename T>
+constexpr bool is_indexed_type_v = is_indexed_type<T>::value;
 
 export template <typename, typename>
 struct indexed_type_list;
@@ -326,9 +331,9 @@ struct indexed_type_list;
 template <std::size_t... Is, typename... Ts>
 struct indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>> : indexed_type<Is, Ts>...
 {
+  using indices = std::index_sequence<Is...>;
+  using types = type_list<Ts...>;
 };
-
-export using empty_indexed_type_list = indexed_type_list<std::index_sequence<>, type_list<>>;
 
 export template <typename>
 struct is_no_cv_indexed_type_list : std::false_type
@@ -349,7 +354,9 @@ using is_indexed_type_list = is_no_cv_indexed_type_list<std::remove_cv_t<T>>;
 export template <typename T>
 constexpr bool is_indexed_type_list_v = is_indexed_type_list<T>::value;
 
-export template <typename T>
+export using empty_indexed_type_list = indexed_type_list<std::index_sequence<>, type_list<>>;
+
+export template <typename>
 struct is_no_cv_empty_indexed_type_list : std::false_type
 {
 };
@@ -398,8 +405,7 @@ constexpr std::size_t length_v = length<AnyTypeList>::value;
 
 // get the nth type of a type list, index starts at 0
 // O(1) time complexity, assume C++26 pack indexing has O(1) time complexity
-export template <std::size_t Idx, typename AnyTypeList>
-  requires (Idx < length_v<AnyTypeList>)
+export template <std::size_t, typename>
 struct nth;
 
 template <std::size_t Idx, typename... Ts>
@@ -442,7 +448,7 @@ indexed_type<I, T> lookup_indexed_type_helper(indexed_type<I, T>);
 
 } // namespace detail
 
-// get the corresponding indexed type with a given index
+// get the corresponding indexed type of a indexed_type_list with a given index
 // O(1) time complexity
 // name after Haskell Data.List lookup
 export template <std::size_t I, typename IndexedTypeList>
