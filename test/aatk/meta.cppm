@@ -108,6 +108,43 @@ export consteval void does_lookup_work() noexcept
   static_assert(std::same_as<lookup_t<length_v<indexed_type_list_6> - 1, indexed_type_list_6>, indexed_type<length_v<indexed_type_list_6> - 1, const void>>);
 }
 
+export consteval void does_cons_work() noexcept
+{
+  // cons for meta::type_list
+  static_assert(std::same_as<cons_t<int, type_list_1>, type_list<int, double, float, std::vector<int>, long long>>);
+  static_assert(std::same_as<cons_t<void, type_list_2>, type_list<void, std::string, unsigned, const volatile bool, bool>>);
+  static_assert(std::same_as<cons_t<double, type_list_3>, type_list<double, int, char, const int, volatile char>>);
+
+  // cons for meta::indexed_type_list
+  using indexed_type_list_1_after_cons = indexed_type_list<std::index_sequence<4, 0, 1, 2, 3>, type_list<int, double, float, std::vector<int>, long long>>;
+  static_assert(std::same_as<cons_t<indexed_type<4, int>, indexed_type_list_1>, indexed_type_list_1_after_cons>);
+
+  using indexed_type_list_2_after_cons = indexed_type_list<std::index_sequence<4, 0, 1, 2, 3>, type_list<double, std::string, unsigned, const volatile bool, bool>>;
+  static_assert(std::same_as<cons_t<indexed_type<4, double>, indexed_type_list_2>, indexed_type_list_2_after_cons>);
+
+  using indexed_type_list_3_after_cons = indexed_type_list<std::index_sequence<9, 0, 1, 2, 3>, type_list<void, int, char, const int, volatile char>>;
+  static_assert(std::same_as<cons_t<indexed_type<9, void>, indexed_type_list_3>, indexed_type_list_3_after_cons>);
+}
+
+export consteval void does_snoc_work() noexcept
+{
+
+  // snoc for meta::type_list
+  static_assert(std::same_as<snoc_t<int, type_list_1>, type_list<double, float, std::vector<int>, long long, int>>);
+  static_assert(std::same_as<snoc_t<void, type_list_2>, type_list<std::string, unsigned, const volatile bool, bool, void>>);
+  static_assert(std::same_as<snoc_t<double, type_list_3>, type_list<int, char, const int, volatile char, double>>);
+
+  // snoc for meta::indexed_type_list
+  using indexed_type_list_1_after_snoc = indexed_type_list<std::index_sequence<0, 1, 2, 3, 4>, type_list<double, float, std::vector<int>, long long, int>>;
+  static_assert(std::same_as<snoc_t<indexed_type<4, int>, indexed_type_list_1>, indexed_type_list_1_after_snoc>);
+
+  using indexed_type_list_2_after_snoc = indexed_type_list<std::index_sequence<0, 1, 2, 3, 4>, type_list<std::string, unsigned, const volatile bool, bool, double>>;
+  static_assert(std::same_as<snoc_t<indexed_type<4, double>, indexed_type_list_2>, indexed_type_list_2_after_snoc>);
+
+  using indexed_type_list_3_after_snoc = indexed_type_list<std::index_sequence<0, 1, 2, 3, 9>, type_list<int, char, const int, volatile char, void>>;
+  static_assert(std::same_as<snoc_t<indexed_type<9, void>, indexed_type_list_3>, indexed_type_list_3_after_snoc>);
+}
+
 export consteval void does_replicate_work() noexcept
 {
   using replicateed_0_time_type_list = empty_type_list;

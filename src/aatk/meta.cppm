@@ -462,7 +462,8 @@ export template <std::size_t I, typename IndexedTypeList>
 using lookup_t = lookup<I, IndexedTypeList>::type;
 
 // get a type list that has one element added to the beginning comparing to the given type list
-// O(1) time complexity
+// O(1) time complexity for type_list
+// O(n) time complexity for indexed_type_list (because of the validation for indices), where n is the length of the given type list
 // name after Haskell Data.List : operator (1 : [1, 2] --> [1, 1, 2])
 export template <typename, typename>
 struct cons;
@@ -473,11 +474,19 @@ struct cons<T, type_list<Ts...>>
   using type = type_list<T, Ts...>;
 };
 
+template <typename T, std::size_t... Is, typename... Ts>
+  requires (is_indexed_type_v<T> && ((T::idx != Is) && ...))
+struct cons<T, indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>>
+{
+  using type = indexed_type_list<std::index_sequence<T::idx, Is...>, type_list<typename T::type, Ts...>>;
+};
+
 export template <typename T, typename AnyTypeList>
 using cons_t = cons<T, AnyTypeList>::type;
 
 // get a type list that has one element added to the end comparing to the given type list
-// O(1) time complexity
+// O(1) time complexity for type_list
+// O(n) time complexity for indexed_type_list (because of the validation for indices), where n is the length of the given type list
 export template <typename, typename>
 struct snoc;
 
@@ -485,6 +494,13 @@ template <typename T, typename... Ts>
 struct snoc<T, type_list<Ts...>>
 {
   using type = type_list<Ts..., T>;
+};
+
+template <typename T, std::size_t... Is, typename... Ts>
+  requires (is_indexed_type_v<T> && ((T::idx != Is) && ...))
+struct snoc<T, indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>>
+{
+  using type = indexed_type_list<std::index_sequence<Is..., T::idx>, type_list<Ts..., typename T::type>>;
 };
 
 export template <typename T, typename AnyTypeList>
