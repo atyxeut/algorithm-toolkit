@@ -171,8 +171,11 @@ using huge_concat_test_helper_t = huge_concat_test_helper<T>::type;
 
 export consteval void does_concat_work() noexcept
 {
-  static_assert(std::same_as<concat_t<type_list_1>, type_list_1>);
+  static_assert(std::same_as<concat_t<empty_type_list>, empty_type_list>);
   static_assert(std::same_as<concat_t<type_list_2>, type_list_2>);
+
+  static_assert(std::same_as<concat_t<empty_indexed_type_list>, empty_indexed_type_list>);
+  static_assert(std::same_as<concat_t<indexed_type_list_2>, indexed_type_list_2>);
 
   using concatenation_of_1_2 = type_list<double, float, std::vector<int>, long long, std::string, unsigned, const volatile bool, bool>;
   static_assert(std::same_as<concat_t<type_list_1, type_list_2>, concatenation_of_1_2>);
@@ -189,6 +192,23 @@ export consteval void does_concat_work() noexcept
 
   // test `concat` complexity, 1500 recursion depth (for a O(n) recursive implementation) will make the compiler crash by default
   static_assert(std::same_as<detail::huge_concat_test_helper_t<huge_concatenation_before>, huge_concatenation_after>);
+
+  using list_1 = indexed_type_list<std::index_sequence<0, 1, 2, 3, 4>, type_list<double, float, std::vector<int>, long long, std::string>>;
+  using list_2 = indexed_type_list<std::index_sequence<5, 8, 9>, type_list<unsigned, const volatile bool, bool>>;
+  using list_3 = indexed_type_list<std::index_sequence<0, 1, 2>, type_list<int, bool, void>>;
+
+  using indexed_concatenation_of_1_2 = indexed_type_list<std::index_sequence<0, 1, 2, 3, 4, 5, 8, 9>, type_list<double, float, std::vector<int>, long long, std::string, unsigned, const volatile bool, bool>>;
+  static_assert(std::same_as<concat_t<list_1, list_2>, indexed_concatenation_of_1_2>);
+
+  using indexed_concatenation_of_2_1 = indexed_type_list<std::index_sequence<5, 8, 9, 0, 1, 2, 3, 4>, type_list<unsigned, const volatile bool, bool, double, float, std::vector<int>, long long, std::string>>;
+  static_assert(std::same_as<concat_t<list_2, list_1>, indexed_concatenation_of_2_1>);
+
+  // check SFINAE functionality
+  auto concat_with_duplication_fails = []<typename List1, typename List2> consteval noexcept
+  {
+    return !(requires { typename concat_t<List1, List2>; });
+  };
+  static_assert(concat_with_duplication_fails.operator ()<list_1, list_3>());
 }
 
 export consteval void does_reverse_work() noexcept
@@ -211,12 +231,19 @@ export consteval void does_init_work() noexcept
     return requires { typename init_t<T>; };
   };
   static_assert(test_empty_list.operator ()<empty_type_list>() == false);
+  static_assert(test_empty_list.operator ()<empty_indexed_type_list>() == false);
 
   using init_type_list_of_1 = type_list<double, float, std::vector<int>>;
   static_assert(std::same_as<init_t<type_list_1>, init_type_list_of_1> == true);
 
   using init_type_list_of_2 = type_list<std::string, unsigned, const volatile bool>;
   static_assert(std::same_as<init_t<type_list_2>, init_type_list_of_2> == true);
+
+  using init_indexed_type_list_of_1 = indexed_type_list<std::index_sequence<0, 1, 2>, type_list<double, float, std::vector<int>>>;
+  static_assert(std::same_as<init_t<indexed_type_list_1>, init_indexed_type_list_of_1> == true);
+
+  using init_indexed_type_list_of_2 = indexed_type_list<std::index_sequence<0, 1, 2>, type_list<std::string, unsigned, const volatile bool>>;
+  static_assert(std::same_as<init_t<indexed_type_list_2>, init_indexed_type_list_of_2> == true);
 }
 
 export consteval void does_take_work() noexcept

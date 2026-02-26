@@ -528,60 +528,103 @@ using replicate = detail::replicate_impl<T, std::make_index_sequence<N>>;
 export template <std::size_t N, typename T>
 using replicate_t = replicate<N, T>::type;
 
-// get the concatenation of several type lists
-// O(log n) time complexity, where n is the count of type lists to concatenate
-// name after Haskell Data.List concat
-export template <list_of_types... Ts>
-struct concat
+namespace detail {
+
+template <typename... AnyTypeLists>
+struct concat_impl
 {
 private:
+  static constexpr bool is_indexed_ = is_indexed_type_list_v<AnyTypeLists...[0]>;
+
   // divide and conquer for >= 3 type lists for better time complexity:
   // 1. divide
-  // `divide_helper<BeginIdx, N / 2>` represents the left half
-  // `divide_helper<BeginIdx + N / 2, N - N / 2>` represents the right half
+  // `divide_helper_<BeginIdx, N / 2>` represents the left half
+  // `divide_helper_<BeginIdx + N / 2, N - N / 2>` represents the right half
   // 2. merge
-  // use the 2 lists specialization of `concat` to merge
+  // use the 2 lists specialization of `concat_impl` to merge
   //
   // note: placing this helper inside improves compilation time significantly, since in this way we can avoid the unnecessary copies of pack `Ts...` during the recursion
   template <std::size_t BeginIdx, std::size_t N>
-  struct divide_helper : concat<typename divide_helper<BeginIdx, N / 2>::type, typename divide_helper<BeginIdx + N / 2, N - N / 2>::type>
+  struct divide_helper_ : concat_impl<typename divide_helper_<BeginIdx, N / 2>::type, typename divide_helper_<BeginIdx + N / 2, N - N / 2>::type>
   {
   };
 
   template <std::size_t BeginIdx>
-  struct divide_helper<BeginIdx, 1>
+  struct divide_helper_<BeginIdx, 1>
   {
-    using type = Ts...[BeginIdx];
+    using type = AnyTypeLists...[BeginIdx];
   };
 
   template <std::size_t BeginIdx>
-  struct divide_helper<BeginIdx, 0>
+  struct divide_helper_<BeginIdx, 0>
   {
-    using type = empty_type_list;
+    using type = std::conditional_t<is_indexed_, empty_indexed_type_list, empty_type_list>;
   };
 
 public:
-  using type = divide_helper<0, sizeof...(Ts)>::type;
+  using type = divide_helper_<0, sizeof...(AnyTypeLists)>::type;
 };
 
 template <typename... Ts>
-struct concat<type_list<Ts...>>
+struct concat_impl<type_list<Ts...>>
 {
   using type = type_list<Ts...>;
 };
 
+template <std::size_t... Is, typename... Ts>
+struct concat_impl<indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>>
+{
+  using type = indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>;
+};
+
 template <typename... Ts, typename... Us>
-struct concat<type_list<Ts...>, type_list<Us...>>
+struct concat_impl<type_list<Ts...>, type_list<Us...>>
 {
   using type = type_list<Ts..., Us...>;
 };
 
-export template <typename... TypeLists>
-using concat_t = concat<TypeLists...>::type;
+template <std::size_t... Is, typename... Ts, std::size_t... Js, typename... Us>
+struct concat_impl<indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>, indexed_type_list<std::index_sequence<Js...>, type_list<Us...>>>
+{
+  using type = indexed_type_list<std::index_sequence<Is..., Js...>, type_list<Ts..., Us...>>;
+};
 
-// get a type list that contains types whose indices are in the given `std::index_sequence`
+template <typename Result, bool = is_indexed_type_list_v<Result>>
+struct concat_get_result_helper;
+
+template <typename Result>
+struct concat_get_result_helper<Result, false>
+{
+  using type = Result;
+};
+
+template <typename Result>
+  requires is_no_duplication_integer_sequence_v<typename Result::indices>
+struct concat_get_result_helper<Result, true>
+{
+  using type = Result;
+};
+
+template <typename Result>
+struct concat_get_result_helper<Result, true>
+{
+};
+
+} // namespace detail
+
+// get the concatenation of several type lists
+// O(log n) time complexity for type_list, where n is the count of type lists to concatenate
+// O(Nlog N) time complexity for indexed_type_list (because of the validation for indices), where N is the count of types over all given type lists
+// name after Haskell Data.List concat
+export template <list_of_types... Ts>
+using concat = detail::concat_get_result_helper<typename detail::concat_impl<Ts...>::type>;
+
+export template <typename... AnyTypeLists>
+using concat_t = concat<AnyTypeLists...>::type;
+
+// get a type list that contains types whose real indices are in the given `std::index_sequence`
 // O(1) time complexity
-export template <typename, list_of_types>
+export template <typename, typename>
 struct select_by_index_sequence;
 
 template <std::size_t... Is, typename... Ts>
@@ -590,8 +633,14 @@ struct select_by_index_sequence<std::index_sequence<Is...>, type_list<Ts...>>
   using type = type_list<Ts...[Is]...>;
 };
 
-export template <typename IndexSequence, typename TypeList>
-using select_by_index_sequence_t = select_by_index_sequence<IndexSequence, TypeList>::type;
+template <std::size_t... Is, std::size_t... Idxs, typename... Ts>
+struct select_by_index_sequence<std::index_sequence<Is...>, indexed_type_list<std::index_sequence<Idxs...>, type_list<Ts...>>>
+{
+  using type = indexed_type_list<std::index_sequence<Idxs...[Is]...>, type_list<Ts...[Is]...>>;
+};
+
+export template <typename IndexSequence, typename AnyTypeList>
+using select_by_index_sequence_t = select_by_index_sequence<IndexSequence, AnyTypeList>::type;
 
 // get a type list that is the reverse of the given type list
 // O(1) time complexity
@@ -599,23 +648,17 @@ using select_by_index_sequence_t = select_by_index_sequence<IndexSequence, TypeL
 export template <list_of_types T>
 using reverse = select_by_index_sequence<make_reversed_index_sequence<length_v<T>>, T>;
 
-export template <typename TypeList>
-using reverse_t = reverse<TypeList>::type;
+export template <typename AnyTypeList>
+using reverse_t = reverse<AnyTypeList>::type;
 
 // get a type list with the first type removed comparing to the given type list
 // O(1) time complexity
 // name after Haskell Data.List tail
-export template <nonempty_list_of_types>
-struct tail;
+export template <nonempty_list_of_types T>
+using tail = select_by_index_sequence<make_index_sequence_of_range<1, length_v<T> - 1>, T>;
 
-template <typename T, typename... Ts>
-struct tail<type_list<T, Ts...>>
-{
-  using type = type_list<Ts...>;
-};
-
-export template <typename T>
-using tail_t = tail<T>::type;
+export template <typename AnyTypeList>
+using tail_t = tail<AnyTypeList>::type;
 
 // get a type list with the last type removed comparing to the given type list
 // O(1) time complexity
@@ -623,8 +666,8 @@ using tail_t = tail<T>::type;
 export template <nonempty_list_of_types T>
 using init = select_by_index_sequence<std::make_index_sequence<length_v<T> - 1>, T>;
 
-export template <typename TypeList>
-using init_t = init<TypeList>::type;
+export template <typename AnyTypeList>
+using init_t = init<AnyTypeList>::type;
 
 // get a type list that contains the first N types of the given type list
 // O(1) time complexity
@@ -644,14 +687,22 @@ struct take_end : select_by_index_sequence<make_index_sequence_of_range<length_v
 {
 };
 
-template <typename TypeList>
-struct take_end<0, TypeList>
+template <typename T>
+  requires is_type_list_v<T>
+struct take_end<0, T>
 {
   using type = empty_type_list;
 };
 
-export template <std::size_t N, typename TypeList>
-using take_end_t = take_end<N, TypeList>::type;
+template <typename T>
+  requires is_indexed_type_list_v<T>
+struct take_end<0, T>
+{
+  using type = empty_indexed_type_list;
+};
+
+export template <std::size_t N, typename AnyTypeList>
+using take_end_t = take_end<N, AnyTypeList>::type;
 
 // get a type list with the first N types removed comparing to the given type list
 // O(1) time complexity
@@ -660,8 +711,8 @@ export template <std::size_t N, list_of_types T>
   requires (N <= length_v<T>)
 using drop = take_end<length_v<T> - N, T>;
 
-export template <std::size_t N, typename TypeList>
-using drop_t = drop<N, TypeList>::type;
+export template <std::size_t N, typename AnyTypeList>
+using drop_t = drop<N, AnyTypeList>::type;
 
 // same as drop, but drop from the end
 // O(1) time complexity
@@ -669,8 +720,8 @@ export template <std::size_t N, list_of_types T>
   requires (N <= length_v<T>)
 using drop_end = take<length_v<T> - N, T>;
 
-export template <std::size_t N, typename TypeList>
-using drop_end_t = drop_end<N, TypeList>::type;
+export template <std::size_t N, typename AnyTypeList>
+using drop_end_t = drop_end<N, AnyTypeList>::type;
 
 namespace detail {
 
