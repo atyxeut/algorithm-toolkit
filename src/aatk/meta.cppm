@@ -182,6 +182,35 @@ using shift_index_sequence = shift_integer_sequence<std::size_t, Offset, IndexSe
 export template <std::size_t Offset, typename IndexSequence>
 using shift_index_sequence_t = shift_index_sequence<Offset, IndexSequence>::type;
 
+export template <typename>
+struct is_no_cv_no_duplication_integer_sequence : std::true_type
+{
+};
+
+// O(nlog n) time complexity, where n is the size of the given integer sequence
+template <typename Int, Int... Is>
+struct is_no_cv_no_duplication_integer_sequence<std::integer_sequence<Int, Is...>>
+{
+  static constexpr bool value = [] consteval noexcept
+  {
+    std::array<std::size_t, sizeof...(Is)> I {Is...};
+    std::ranges::sort(I);
+    for (auto i = 1uz; i < I.size(); ++i)
+      if (I[i - 1] == I[i])
+        return false;
+    return true;
+  }();
+};
+
+export template <typename T>
+constexpr bool is_no_cv_no_duplication_integer_sequence_v = is_no_cv_no_duplication_integer_sequence<T>::value;
+
+export template <typename T>
+using is_no_duplication_integer_sequence = is_no_cv_no_duplication_integer_sequence<std::remove_cv_t<T>>;
+
+export template <typename T>
+constexpr bool is_no_duplication_integer_sequence_v = is_no_duplication_integer_sequence<T>::value;
+
 export template <typename T, typename... Us>
 struct is_any_of : std::disjunction<is_any_of<T, Us>...>
 {

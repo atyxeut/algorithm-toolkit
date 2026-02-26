@@ -38,6 +38,27 @@ export consteval void do_custom_integer_sequence_helpers_work() noexcept
   static_assert(std::same_as<shift_index_sequence_t<50, std::index_sequence<1, 2, 3, 4>>, std::index_sequence<51, 52, 53, 54>>);
 }
 
+export consteval void does_is_no_duplication_integer_sequence_work() noexcept
+{
+  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int>> == true);
+  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1>> == true);
+  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1, 2>> == true);
+  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1, 1, 3>> == false);
+  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1, 2, 3, 4, 4, 6>> == false);
+  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1, 2, 3, 4, 5, 6>> == true);
+  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1, 2, 1, 2, 1, 2, 1>> == false);
+  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1, 2, 3, 4, 3, 3, 3>> == false);
+
+  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<>> == true);
+  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1>> == true);
+  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1, 3>> == true);
+  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1, 1, 3>> == false);
+  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1, 2, 3, 4, 4, 6>> == false);
+  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1, 2, 3, 4, 5, 6>> == true);
+  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1, 2, 1, 2, 1, 2, 1>> == false);
+  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1, 2, 3, 4, 3, 3, 3>> == false);
+}
+
 export consteval void does_is_any_of_work() noexcept
 {
   static_assert(is_any_of_v<int> == false);
