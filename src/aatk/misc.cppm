@@ -13,6 +13,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module aatk.util.misc;
+export module aatk.misc;
 
-export import :tower_of_hanoi;
+export import aatk.misc.tower_of_hanoi;

@@ -18,5 +18,5 @@ export module test.aatk;
 export import test.aatk.meta;
 export import test.aatk.math.floating_point;
 export import test.aatk.math.integer;
-export import test.aatk.util.misc;
+export import test.aatk.misc;
 export import test.aatk.util.stl_helper;

@@ -17,7 +17,6 @@ export module aatk.util;
 
 import std;
 
-export import aatk.util.misc;
 export import aatk.util.stl_helper;
 
 namespace aatk {
