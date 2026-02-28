@@ -93,16 +93,18 @@ export template <typename Elem, std::size_t... Dims, typename T>
   return arr;
 }
 
+namespace meta {
+
 // use std::allocator as a default allocator
-template <meta::list_of_types CurAllocatorList, std::size_t DimCnt>
-struct adjust_allocator_type_list : meta::concat<CurAllocatorList, std::conditional_t<(meta::length_v<CurAllocatorList>) < DimCnt, meta::type_list<memory::std_allocator_tag>, meta::empty_type_list>>
+template <list_of_types CurAllocatorList, std::size_t DimCnt>
+struct adjust_allocator_type_list : concat<CurAllocatorList, std::conditional_t<(length_v<CurAllocatorList>) < DimCnt, type_list<memory::std_allocator_tag>, empty_type_list>>
 {
 };
 
 template <typename CurAllocatorList, std::size_t DimCnt>
 using adjust_allocator_type_list_t = adjust_allocator_type_list<CurAllocatorList, DimCnt>::type;
 
-template <typename Elem, meta::nonempty_list_of_types AllocatorList, typename LastAllocator = meta::last_t<AllocatorList>>
+template <typename Elem, nonempty_list_of_types AllocatorList, typename LastAllocator = last_t<AllocatorList>>
 struct cur_dim_allocator
 {
   using type = LastAllocator;
@@ -123,6 +125,8 @@ struct cur_dim_allocator<Elem, AllocatorList, memory::std_pmr_allocator_tag>
 template <typename Elem, typename AllocatorList>
 using cur_dim_allocator_t = cur_dim_allocator<Elem, AllocatorList>::type;
 
+} // namespace meta
+
 namespace detail {
 
 template <typename, std::size_t DimCnt, typename>
@@ -132,18 +136,18 @@ class vector_impl;
 template <typename T, std::size_t DimCnt, typename InnermostDimAllocator, typename... Allocators>
 class vector_impl<T, DimCnt, meta::type_list<InnermostDimAllocator, Allocators...>>
 {
-  using adjusted_allocator_type_list_ = adjust_allocator_type_list_t<meta::type_list<InnermostDimAllocator, Allocators...>, DimCnt>;
+  using adjusted_allocator_type_list_ = meta::adjust_allocator_type_list_t<meta::type_list<InnermostDimAllocator, Allocators...>, DimCnt>;
   using element_type_ = vector_impl<T, DimCnt - 1, meta::init_t<adjusted_allocator_type_list_>>::type;
 
 public:
-  using type = std::vector<element_type_, cur_dim_allocator_t<element_type_, adjusted_allocator_type_list_>>;
+  using type = std::vector<element_type_, meta::cur_dim_allocator_t<element_type_, adjusted_allocator_type_list_>>;
 };
 
 template <typename T, typename Allocator>
 class vector_impl<T, 1, meta::type_list<Allocator>>
 {
 public:
-  using type = std::vector<T, cur_dim_allocator_t<T, meta::type_list<Allocator>>>;
+  using type = std::vector<T, meta::cur_dim_allocator_t<T, meta::type_list<Allocator>>>;
 };
 
 } // namespace detail
@@ -162,15 +166,15 @@ namespace detail {
 template <typename Elem, typename AllocatorList, typename Dim, typename... Ts>
 [[nodiscard]] constexpr auto make_vector_impl(Dim first_dim_size, Ts&&... args)
 {
-  using adjusted_allocator_type_list = adjust_allocator_type_list_t<AllocatorList, sizeof...(Ts)>;
+  using adjusted_allocator_type_list = meta::adjust_allocator_type_list_t<AllocatorList, sizeof...(Ts)>;
   if constexpr (sizeof...(Ts) == 1) {
-    using cur_dim_allocator_type = cur_dim_allocator_t<Elem, adjusted_allocator_type_list>;
+    using cur_dim_allocator_type = meta::cur_dim_allocator_t<Elem, adjusted_allocator_type_list>;
     return vector<Elem, 1, cur_dim_allocator_type>(static_cast<std::size_t>(first_dim_size), static_cast<Elem>(args)...);
   }
   else {
     using inner_allocator_type_list = meta::init_t<adjusted_allocator_type_list>;
     using inner_element_type = vector_impl<Elem, sizeof...(Ts) - 1, inner_allocator_type_list>::type;
-    using cur_dim_allocator_type = cur_dim_allocator_t<inner_element_type, adjusted_allocator_type_list>;
+    using cur_dim_allocator_type = meta::cur_dim_allocator_t<inner_element_type, adjusted_allocator_type_list>;
     return vector<inner_element_type, 1, cur_dim_allocator_type>(static_cast<std::size_t>(first_dim_size), make_vector_impl<Elem, inner_allocator_type_list>(std::forward<Ts>(args)...));
   }
 }
