@@ -19,5 +19,8 @@ import test.aatk;
 
 int main()
 {
+  // test::aatk::math::int128_io_with_std_iostream();
+  // test::aatk::math::int128_io_with_std_format();
+
   test::aatk::util::does_make_vector_work();
 }

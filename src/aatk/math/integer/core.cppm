@@ -20,6 +20,9 @@ module;
 #include <__msvc_int128.hpp>
 #endif
 
+// included for libc++ `_LIBCPP_VERSION` macro
+#include <version>
+
 export module aatk.math.integer.core;
 
 import std;
@@ -156,6 +159,100 @@ using u128 = ::aatk::fixed_width_integer::u<128>;
 
 }
 // clang-format on
+
+export inline auto& operator >>(std::istream& istr, u128& n)
+{
+  std::string buffer;
+  istr >> buffer;
+
+  n = 0;
+  for (auto ch : buffer)
+    n = n * 10 + static_cast<u128>(ch - '0');
+
+  return istr;
+}
+
+export inline auto& operator >>(std::istream& istr, i128& n)
+{
+  std::string buffer;
+  istr >> buffer;
+
+  u128 mag = 0;
+  const int sgn = buffer[0] == '-' ? -1 : 1;
+  for (std::size_t i = sgn < 0; i < buffer.size(); ++i)
+    mag = mag * 10 + static_cast<u128>(buffer[i] - '0');
+  if (mag > std::numeric_limits<i128>::max() || sgn > 0)
+    n = static_cast<i128>(mag);
+  else
+    n = -static_cast<i128>(mag);
+
+  return istr;
+}
+
+export inline auto& operator <<(std::ostream& ostr, u128 n)
+{
+  if (n == 0)
+    return ostr << 0;
+
+  std::string buffer;
+  for (; n; n /= 10)
+    buffer += static_cast<char>(n % 10 + '0');
+  std::ranges::reverse(buffer);
+
+  return ostr << buffer;
+}
+
+export inline auto& operator <<(std::ostream& ostr, i128 n)
+{
+  if (n == std::numeric_limits<i128>::min())
+    return ostr << '-' << static_cast<u128>(n);
+
+  if (n < 0)
+    return ostr << '-' << static_cast<u128>(-n);
+
+  return ostr << static_cast<u128>(n);
+}
+
+// libc++ internally specializes std::formatter for i/u128
+#ifndef _LIBCPP_VERSION
+template <>
+struct std::formatter<u128>
+{
+  constexpr auto parse(auto& parse_ctx) { return parse_ctx.begin(); }
+
+  auto format(u128 n, auto& fmt_ctx) const
+  {
+    std::string buffer;
+    if (n == 0) {
+      buffer += '0';
+    }
+    else {
+      for (; n; n /= 10)
+        buffer += static_cast<char>(n % 10 + '0');
+      std::ranges::reverse(buffer);
+    }
+
+    return std::format_to(fmt_ctx.out(), "{}", buffer);
+  }
+};
+
+template <>
+struct std::formatter<i128>
+{
+  constexpr auto parse(auto& parse_ctx) { return parse_ctx.begin(); }
+
+  auto format(i128 n, auto& fmt_ctx) const
+  {
+    if (n == std::numeric_limits<i128>::min())
+      return std::format_to(fmt_ctx.out(), "-{}", static_cast<u128>(n));
+
+    if (n < 0)
+      return std::format_to(fmt_ctx.out(), "-{}", static_cast<u128>(-n));
+
+    return std::format_to(fmt_ctx.out(), "{}", static_cast<u128>(n));
+  }
+};
+#endif // !_LIBCPP_VERSION
 
 export namespace aatk::meta {
 

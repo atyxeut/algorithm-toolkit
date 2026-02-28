@@ -78,4 +78,26 @@ consteval void does_make_larger_width_work() noexcept
 
 } // namespace meta
 
+namespace math {
+
+export void int128_io_with_std_iostream() noexcept
+{
+  i128 a, b;
+  u128 c, d;
+
+  std::cin >> a >> b >> c >> d;
+  std::cout << a + b << " " << c + d << "\n";
+}
+
+export void int128_io_with_std_format() noexcept
+{
+  i128 a, b;
+  u128 c, d;
+
+  std::cin >> a >> b >> c >> d;
+  std::println("{} {}", a + b, c + d);
+}
+
+} // namespace math
+
 } // namespace test::aatk
