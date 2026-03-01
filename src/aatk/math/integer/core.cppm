@@ -213,46 +213,43 @@ export inline auto& operator <<(std::ostream& ostr, i128 n)
   return ostr << static_cast<u128>(n);
 }
 
-// libc++ internally specializes std::formatter for i/u128
-#ifndef _LIBCPP_VERSION
-template <>
-struct std::formatter<u128>
-{
-  constexpr auto parse(auto& parse_ctx) { return parse_ctx.begin(); }
+// template <>
+// struct std::formatter<u128>
+// {
+//   constexpr auto parse(auto& parse_ctx) { return parse_ctx.begin(); }
 
-  auto format(u128 n, auto& fmt_ctx) const
-  {
-    std::string buffer;
-    if (n == 0) {
-      buffer += '0';
-    }
-    else {
-      for (; n; n /= 10)
-        buffer += static_cast<char>(n % 10 + '0');
-      std::ranges::reverse(buffer);
-    }
+//   auto format(u128 n, auto& fmt_ctx) const
+//   {
+//     std::string buffer;
+//     if (n == 0) {
+//       buffer += '0';
+//     }
+//     else {
+//       for (; n; n /= 10)
+//         buffer += static_cast<char>(n % 10 + '0');
+//       std::ranges::reverse(buffer);
+//     }
 
-    return std::format_to(fmt_ctx.out(), "{}", buffer);
-  }
-};
+//     return std::format_to(fmt_ctx.out(), "{}", buffer);
+//   }
+// };
 
-template <>
-struct std::formatter<i128>
-{
-  constexpr auto parse(auto& parse_ctx) { return parse_ctx.begin(); }
+// template <>
+// struct std::formatter<i128>
+// {
+//   constexpr auto parse(auto& parse_ctx) { return parse_ctx.begin(); }
 
-  auto format(i128 n, auto& fmt_ctx) const
-  {
-    if (n == std::numeric_limits<i128>::min())
-      return std::format_to(fmt_ctx.out(), "-{}", static_cast<u128>(n));
+//   auto format(i128 n, auto& fmt_ctx) const
+//   {
+//     if (n == std::numeric_limits<i128>::min())
+//       return std::format_to(fmt_ctx.out(), "-{}", static_cast<u128>(n));
 
-    if (n < 0)
-      return std::format_to(fmt_ctx.out(), "-{}", static_cast<u128>(-n));
+//     if (n < 0)
+//       return std::format_to(fmt_ctx.out(), "-{}", static_cast<u128>(-n));
 
-    return std::format_to(fmt_ctx.out(), "{}", static_cast<u128>(n));
-  }
-};
-#endif // !_LIBCPP_VERSION
+//     return std::format_to(fmt_ctx.out(), "{}", static_cast<u128>(n));
+//   }
+// };
 
 export namespace aatk::meta {
 

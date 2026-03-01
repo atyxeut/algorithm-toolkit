@@ -95,7 +95,7 @@ export void int128_io_with_std_format() noexcept
   u128 c, d;
 
   std::cin >> a >> b >> c >> d;
-  std::println("{} {}", a + b, c + d);
+  std::println("{:05} {:05}", a + b, c + d);
 }
 
 } // namespace math
