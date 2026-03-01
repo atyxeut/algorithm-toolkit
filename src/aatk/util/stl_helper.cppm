@@ -241,4 +241,39 @@ constexpr bool is_std_duration_v = is_std_duration<T>::value;
 
 } // namespace meta
 
+export template <typename T1, typename T2, std::convertible_to<std::string> Delim>
+void print(std::ostream& ostr, const std::pair<T1, T2>& p, Delim&& delim, bool new_line = false)
+{
+  ostr << p.first << delim << p.second;
+
+  if (new_line)
+    ostr << '\n';
+}
+
+export template <typename... Ts, std::convertible_to<std::string> Delim>
+void print(std::ostream& ostr, const std::tuple<Ts...>& t, Delim&& delim, bool new_line = false)
+{
+  [&]<std::size_t... Is>(std::index_sequence<Is...>)
+  {
+    ((ostr << std::get<Is>(t) << (Is + 1 == sizeof...(Ts) ? std::string {} : delim)), ...);
+  }(std::index_sequence_for<Ts...> {});
+
+  if (new_line)
+    ostr << '\n';
+}
+
 } // namespace aatk
+
+export template <typename T1, typename T2>
+auto& operator <<(std::ostream& ostr, const std::pair<T1, T2>& p)
+{
+  ::aatk::print(ostr, p, std::string(1, ' '));
+  return ostr;
+}
+
+export template <typename... Ts>
+auto& operator <<(std::ostream& ostr, const std::tuple<Ts...>& t)
+{
+  ::aatk::print(ostr, t, std::string(1, ' '));
+  return ostr;
+}

@@ -23,4 +23,7 @@ int main()
   test::aatk::math::int128_output_with_std_ostream_and_std_print();
 
   test::aatk::util::does_make_vector_work();
+
+  test::aatk::util::std_pair_output_with_custom_print_and_std_ostream();
+  test::aatk::util::std_tuple_output_with_custom_print_and_std_ostream();
 }
