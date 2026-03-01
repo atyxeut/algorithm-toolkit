@@ -160,7 +160,7 @@ using u128 = ::aatk::fixed_width_integer::u<128>;
 }
 // clang-format on
 
-export inline auto& operator >>(std::istream& istr, u128& n)
+export auto& operator >>(std::istream& istr, u128& n)
 {
   std::string buffer;
   istr >> buffer;
@@ -172,7 +172,7 @@ export inline auto& operator >>(std::istream& istr, u128& n)
   return istr;
 }
 
-export inline auto& operator >>(std::istream& istr, i128& n)
+export auto& operator >>(std::istream& istr, i128& n)
 {
   std::string buffer;
   istr >> buffer;
@@ -189,7 +189,7 @@ export inline auto& operator >>(std::istream& istr, i128& n)
   return istr;
 }
 
-export inline auto& operator <<(std::ostream& ostr, u128 n)
+export auto& operator <<(std::ostream& ostr, u128 n)
 {
   if (n == 0)
     return ostr << 0;
@@ -202,7 +202,7 @@ export inline auto& operator <<(std::ostream& ostr, u128 n)
   return ostr << buffer;
 }
 
-export inline auto& operator <<(std::ostream& ostr, i128 n)
+export auto& operator <<(std::ostream& ostr, i128 n)
 {
   if (n == std::numeric_limits<i128>::min())
     return ostr << '-' << static_cast<u128>(n);
