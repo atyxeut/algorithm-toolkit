@@ -26,4 +26,7 @@ int main()
 
   test::aatk::util::std_pair_output_with_custom_print_and_std_ostream();
   test::aatk::util::std_tuple_output_with_custom_print_and_std_ostream();
+
+  test::aatk::util::common_ranges_output_with_custom_print_and_std_ostream();
+  test::aatk::util::multidimensional_ranges_output_with_custom_print_and_std_ostream();
 }

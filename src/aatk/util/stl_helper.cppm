@@ -243,11 +243,22 @@ constexpr bool is_std_duration_v = is_std_duration<T>::value;
 export template <typename T1, typename T2, std::convertible_to<std::string> Delim>
 void print(std::ostream& ostr, const std::pair<T1, T2>& p, Delim&& delim, bool new_line = false)
 {
-  ostr << p.first << delim << p.second;
+  ostr << p.first << std::forward<Delim>(delim) << p.second;
 
   if (new_line)
     ostr << '\n';
 }
+
+} // namespace aatk
+
+export template <typename T1, typename T2>
+auto& operator <<(std::ostream& ostr, const std::pair<T1, T2>& p)
+{
+  ::aatk::print(ostr, p, std::string(1, ' '));
+  return ostr;
+}
+
+namespace aatk {
 
 export template <typename... Ts, std::convertible_to<std::string> Delim>
 void print(std::ostream& ostr, const std::tuple<Ts...>& t, Delim&& delim, bool new_line = false)
@@ -263,16 +274,94 @@ void print(std::ostream& ostr, const std::tuple<Ts...>& t, Delim&& delim, bool n
 
 } // namespace aatk
 
-export template <typename T1, typename T2>
-auto& operator <<(std::ostream& ostr, const std::pair<T1, T2>& p)
+export template <typename... Ts>
+std::ostream& operator <<(std::ostream& ostr, const std::tuple<Ts...>& t)
 {
-  ::aatk::print(ostr, p, std::string(1, ' '));
+  ::aatk::print(ostr, t, std::string(1, ' '));
   return ostr;
 }
 
-export template <typename... Ts>
-auto& operator <<(std::ostream& ostr, const std::tuple<Ts...>& t)
+namespace aatk {
+
+namespace meta {
+
+namespace detail {
+
+template <typename, typename = void>
+struct is_std_ostream_interactable_impl : std::false_type
 {
-  ::aatk::print(ostr, t, std::string(1, ' '));
+};
+
+template <typename T>
+struct is_std_ostream_interactable_impl<T, std::void_t<decltype(std::declval<std::ostream&>() << std::declval<T>())>> : std::true_type
+{
+};
+
+} // namespace detail
+
+// check if T has an overload of operator << of std::ostream&
+// to make aatk::meta::is_std_ostream_interactable<...>::value evaluate to true, the candidate overload must be already defined above it
+export template <typename T>
+using is_std_ostream_interactable = detail::is_std_ostream_interactable_impl<T>;
+
+export template <typename T>
+constexpr bool is_std_ostream_interactable_v = is_std_ostream_interactable<T>::value;
+
+} // namespace meta
+
+// for a range whose elements can be printed by std::ostream by default
+// e.g. std::vector<std::string>
+export template <std::ranges::input_range Range, std::convertible_to<std::string> Delim>
+  requires meta::is_std_ostream_interactable_v<std::ranges::range_value_t<Range>>
+int print(std::ostream& ostr, Range&& range, Delim&& delim, bool new_line = false, bool never_second_case = true)
+{
+  const auto cur_delim = never_second_case ? delim : std::string(1, ' ');
+  for (auto it = std::ranges::begin(range), it_end = std::ranges::end(range); it != it_end; ++it)
+    ostr << *it << (std::ranges::next(it) == it_end ? std::string {} : cur_delim);
+
+  if (new_line)
+    ostr << '\n';
+
+  return 1;
+}
+
+// for a range whose elements can not be printed by std::ostream by default
+// e.g. std::vector<std::array<int, 4>>, std::vector<std::pair<int, int>>
+export template <std::ranges::input_range Range, std::convertible_to<std::string> Delim>
+  requires (std::ranges::input_range<std::ranges::range_value_t<Range>> && !meta::is_std_ostream_interactable_v<std::ranges::range_value_t<Range>>)
+int print(std::ostream& ostr, Range&& range, Delim&& delim, bool new_line = false, bool = false)
+{
+  int reverse_dep = 0;
+
+  for (auto it = std::ranges::begin(range), it_end = std::ranges::end(range); it != it_end; ++it) {
+    reverse_dep = print(ostr, *it, std::forward<Delim>(delim), new_line, false);
+    const auto cur_delim = std::string(reverse_dep, *std::begin(delim));
+    ostr << (std::ranges::next(it) == it_end ? std::string {} : cur_delim);
+  }
+
+  if (new_line)
+    ostr << '\n';
+
+  return reverse_dep + 1;
+}
+
+} // namespace aatk
+
+// SFINAE here to avoid ambiguous overloads when Range is std::string&, const char(&)[N], ...
+// note that we cannot use requires here, since it sees the defining function template,
+//   causing infinitely recursive constraint (maybe clang's bug? version: 21.1.0, gcc and msvc don't have this issue)
+export template <std::ranges::input_range Range, typename = std::enable_if_t<!::aatk::meta::is_std_ostream_interactable_v<Range>>>
+auto& operator <<(std::ostream& ostr, Range&& range)
+{
+  ::aatk::print(ostr, std::forward<Range>(range), std::string(1, ::aatk::meta::is_std_ostream_interactable_v<std::ranges::range_value_t<Range>> ? ' ' : '\n'));
+  return ostr;
+}
+
+// C-style arrays can be output directly as a pointer by default, thus need a specific overload
+export template <typename T, std::size_t N>
+  requires (!std::same_as<T, char>)
+auto& operator <<(std::ostream& ostr, const T (&arr)[N])
+{
+  ::aatk::print(ostr, arr, std::string(1, ' '));
   return ostr;
 }

@@ -124,4 +124,68 @@ export void std_tuple_output_with_custom_print_and_std_ostream() noexcept
   std::cout << '\n';
 }
 
+export void common_ranges_output_with_custom_print_and_std_ostream() noexcept
+{
+  int arr1[] {1, 2, 3, 4, 5, 6, 7};
+  print(std::cout, arr1, " | ", true);
+  std::cout << arr1 << '\n';
+
+  std::cout << '\n';
+
+  std::pair<std::string, int> arr2[] {
+    {"abc", 1},
+    {"def", 2},
+    {"ghi", 3},
+    {"jkl", 4},
+    {"mno", 5}
+  };
+  print(std::cout, arr2, " | ", true);
+  std::cout << arr2 << '\n';
+
+  std::cout << '\n';
+
+  std::vector<std::string> vec1 {"ABC", "BCD", "CDE", "DEF", "EFG"};
+  print(std::cout, vec1, " | ", true);
+  std::cout << vec1 << '\n';
+
+  std::cout << '\n';
+
+  std::vector<std::tuple<int, std::string, char>> vec2 {
+    {1, "ABC", 'X'},
+    {2, "BCD", 'Y'},
+    {3, "CDE", 'Z'}
+  };
+  print(std::cout, vec2, " | ", true);
+  std::cout << vec2 << '\n';
+
+  std::cout << '\n';
+
+  std::list<std::tuple<int, std::pair<int, std::string>, char>> list1 {
+    {1, {2, "abc"}, 'a'},
+    {2, {4, "def"}, 'd'},
+    {3, {6, "ghi"}, 'g'},
+    {4, {8, "jkl"}, 'j'},
+  };
+  print(std::cout, list1, " | ", true);
+  std::cout << list1 << '\n';
+
+  std::cout << '\n';
+
+  std::map<std::string, char> map1 {
+    {"abc", 'A'},
+    {"def", 'B'},
+    {"ghi", 'C'},
+    {"ABC", 'a'}
+  };
+  print(std::cout, map1, " | ", true);
+  std::cout << map1 << '\n';
+
+  std::cout << '\n';
+}
+
+export void multidimensional_ranges_output_with_custom_print_and_std_ostream() noexcept
+{
+  
+}
+
 } // namespace test::aatk::util
