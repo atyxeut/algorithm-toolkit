@@ -130,6 +130,12 @@ export void common_ranges_output_with_custom_print_and_std_ostream() noexcept
 
   std::cout << '\n';
 
+  char ca[] {'1', '2', '3', '4'};
+  print(std::cout, ca, " | ", true);
+  std::cout << ca << '\n';
+
+  std::cout << '\n';
+
   std::pair<std::string, int> arr2[] {
     {"abc", 1},
     {"def", 2},
@@ -181,6 +187,60 @@ export void common_ranges_output_with_custom_print_and_std_ostream() noexcept
   std::cout << '\n';
 }
 
-export void multidimensional_ranges_output_with_custom_print_and_std_ostream() noexcept {}
+export void multidimensional_ranges_output_with_custom_print_and_std_ostream() noexcept
+{
+
+  auto vec2d = make_vector<double>(3, 4, 3.14);
+  print(std::cout, vec2d, " | ", true);
+  std::cout << vec2d << '\n';
+
+  std::cout << '\n';
+
+  std::vector<std::list<int>> vl {
+    {1, 2, 3,  4},
+    {2, 4, 6,  8},
+    {3, 6, 9, 12}
+  };
+  print(std::cout, vl, " | ", true);
+  std::cout << vl << '\n';
+
+  std::cout << '\n';
+
+  auto vec3d = make_vector<double>(3, 4, 4, 1.2345);
+  print(std::cout, vec3d, " | ", true);
+  std::cout << vec3d << '\n';
+
+  std::cout << '\n';
+
+  auto arr4d = make_array<int, 2, 2, 3, 3>(-7);
+  print(std::cout, arr4d, " | ", true);
+  std::cout << arr4d << '\n';
+
+  std::cout << '\n';
+
+  int a[5][4] {
+    {1, 2, 3, 4},
+    {1, 2, 3, 4},
+    {1, 2, 3, 4},
+    {1, 2, 3, 4},
+    {1, 2, 3, 4}
+  };
+  print(std::cout, a, " | ", true);
+  std::cout << a << '\n';
+
+  std::cout << '\n';
+
+  char b[5][4] {
+    {'*', '+', '-', '/'},
+    {'*', '+', '-', '/'},
+    {'*', '+', '-', '/'},
+    {'*', '+', '-', '/'},
+    {'*', '+', '-', '/'}
+  };
+  print(std::cout, b, " == ", true);
+  std::cout << b << '\n';
+
+  std::cout << '\n';
+}
 
 } // namespace test::aatk::util

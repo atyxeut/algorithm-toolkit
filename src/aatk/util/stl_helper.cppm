@@ -92,7 +92,7 @@ template <typename Elem, std::size_t... Dims, typename T>
 [[nodiscard]] constexpr auto make_array(const T& val)
 {
   array<Elem, Dims...> arr;
-  fill(arr, static_cast<Elem>(val));
+  fill_array(arr, static_cast<Elem>(val));
   return arr;
 }
 
@@ -252,8 +252,8 @@ constexpr bool is_std_duration_v = is_std_duration<T>::value;
 
 export namespace aatk {
 
-template <typename T1, typename T2, std::convertible_to<std::string> Delim>
-void print(std::ostream& ostr, const std::pair<T1, T2>& p, Delim&& delim, bool new_line = false)
+template <typename T1, typename T2, std::convertible_to<std::string> Delim = std::string>
+void print(std::ostream& ostr, const std::pair<T1, T2>& p, Delim&& delim = std::string(1, ' '), bool new_line = false)
 {
   ostr << p.first << std::forward<Delim>(delim) << p.second;
 
@@ -266,14 +266,14 @@ void print(std::ostream& ostr, const std::pair<T1, T2>& p, Delim&& delim, bool n
 export template <typename T1, typename T2>
 auto& operator <<(std::ostream& ostr, const std::pair<T1, T2>& p)
 {
-  ::aatk::print(ostr, p, std::string(1, ' '));
+  ::aatk::print(ostr, p);
   return ostr;
 }
 
 export namespace aatk {
 
-template <typename... Ts, std::convertible_to<std::string> Delim>
-void print(std::ostream& ostr, const std::tuple<Ts...>& t, Delim&& delim, bool new_line = false)
+template <typename... Ts, std::convertible_to<std::string> Delim = std::string>
+void print(std::ostream& ostr, const std::tuple<Ts...>& t, Delim&& delim = std::string(1, ' '), bool new_line = false)
 {
   [&]<std::size_t... Is>(std::index_sequence<Is...>) {
     ((ostr << std::get<Is>(t) << (Is + 1 == sizeof...(Ts) ? std::string {} : delim)), ...);
@@ -288,7 +288,7 @@ void print(std::ostream& ostr, const std::tuple<Ts...>& t, Delim&& delim, bool n
 export template <typename... Ts>
 std::ostream& operator <<(std::ostream& ostr, const std::tuple<Ts...>& t)
 {
-  ::aatk::print(ostr, t, std::string(1, ' '));
+  ::aatk::print(ostr, t);
   return ostr;
 }
 
@@ -318,17 +318,23 @@ constexpr bool is_std_ostream_interactable_v = is_std_ostream_interactable<T>::v
 
 } // namespace aatk::meta
 
+export namespace aatk::meta {
+
+template <typename T>
+concept multidimentional_cstyle_array = std::rank_v<std::remove_cvref_t<T>> > 1;
+
+} // namespace aatk::meta
+
 namespace aatk {
 
 // for a range whose elements can be printed by std::ostream by default
-// e.g. std::vector<std::string>
-export template <std::ranges::input_range Range, std::convertible_to<std::string> Delim>
-  requires meta::is_std_ostream_interactable_v<std::ranges::range_value_t<Range>>
-int print(std::ostream& ostr, Range&& range, Delim&& delim, bool new_line = false, bool never_second_case = true)
+// e.g. std::vector<int>, std::vector<std::string>
+export template <std::ranges::input_range Range, std::convertible_to<std::string> Delim = std::string, typename Elem = std::ranges::range_value_t<Range>>
+  requires (meta::is_std_ostream_interactable_v<Elem> && !std::is_array_v<Elem>)
+std::size_t print(std::ostream& ostr, Range&& range, Delim&& delim = std::string(1, ' '), bool new_line = false)
 {
-  const auto cur_delim = never_second_case ? delim : std::string(1, ' ');
   for (auto it = std::ranges::begin(range), it_end = std::ranges::end(range); it != it_end; ++it)
-    ostr << *it << (std::ranges::next(it) == it_end ? std::string {} : cur_delim);
+    ostr << *it << (std::ranges::next(it) == it_end ? std::string {} : delim);
 
   if (new_line)
     ostr << '\n';
@@ -338,41 +344,54 @@ int print(std::ostream& ostr, Range&& range, Delim&& delim, bool new_line = fals
 
 // for a range whose elements can not be printed by std::ostream by default
 // e.g. std::vector<std::array<int, 4>>, std::vector<std::pair<int, int>>
-export template <std::ranges::input_range Range, std::convertible_to<std::string> Delim>
-  requires (std::ranges::input_range<std::ranges::range_value_t<Range>> && !meta::is_std_ostream_interactable_v<std::ranges::range_value_t<Range>>)
-int print(std::ostream& ostr, Range&& range, Delim&& delim, bool new_line = false, bool = false)
+export template <std::ranges::input_range Range, std::convertible_to<std::string> Delim = std::string, typename Elem = std::ranges::range_value_t<Range>>
+  requires (!meta::is_std_ostream_interactable_v<Elem> && std::ranges::input_range<Elem>)
+std::size_t print(std::ostream& ostr, Range&& range, Delim&& delim = std::string(1, ' '), bool new_line = false)
 {
-  int reverse_dep = 0;
-
+  std::size_t cur_dim = 0;
   for (auto it = std::ranges::begin(range), it_end = std::ranges::end(range); it != it_end; ++it) {
-    reverse_dep = print(ostr, *it, std::forward<Delim>(delim), new_line, false);
-    const auto cur_delim = std::string(reverse_dep, *std::begin(delim));
-    ostr << (std::ranges::next(it) == it_end ? std::string {} : cur_delim);
+    cur_dim = print(ostr, *it, std::forward<Delim>(delim), false);
+
+    const auto dimension_delim = std::string(cur_dim, '\n');
+    ostr << (std::ranges::next(it) == it_end ? std::string {} : dimension_delim);
   }
 
   if (new_line)
     ostr << '\n';
 
-  return reverse_dep + 1;
+  return cur_dim + 1;
+}
+
+export template <meta::multidimentional_cstyle_array T, std::convertible_to<std::string> Delim = std::string>
+void print(std::ostream& ostr, const T& arr, Delim&& delim = std::string(1, ' '), bool new_line = false)
+{
+  for (auto it = std::begin(arr), it_end = std::end(arr); it != it_end; ++it) {
+    print(ostr, *it, std::forward<Delim>(delim), false);
+
+    constexpr auto dimension_delim = std::string(std::rank_v<std::remove_cvref_t<T>> - 1, '\n');
+    ostr << (std::next(it) == it_end ? std::string {} : dimension_delim);
+  }
+
+  if (new_line)
+    ostr << '\n';
 }
 
 } // namespace aatk
 
-// SFINAE here to avoid ambiguous overloads when Range is std::string&, const char(&)[N], ...
-// note that we cannot use requires here, since it sees the defining function template,
-//   causing infinitely recursive constraint (maybe clang's bug? version: 21.1.0, gcc and msvc don't have this issue)
+// avoid ambiguous overloads when Range is std::string&, int[2][3], ...
+// some how we cannot use requires here, for clang 21.1.0, this is an infinitely recursive constraint (maybe clang's bug? gcc and msvc don't have this issue)
 export template <std::ranges::input_range Range, typename = std::enable_if_t<!::aatk::meta::is_std_ostream_interactable_v<Range>>>
 auto& operator <<(std::ostream& ostr, Range&& range)
 {
-  ::aatk::print(ostr, std::forward<Range>(range), std::string(1, ::aatk::meta::is_std_ostream_interactable_v<std::ranges::range_value_t<Range>> ? ' ' : '\n'));
+  ::aatk::print(ostr, std::forward<Range>(range));
   return ostr;
 }
 
-// C-style arrays can be output directly as a pointer by default, thus need a specific overload
+// C-style arrays can decay and be output directly as a pointer, thus need a specific overload
+// this overload covers multidimentional arrays
 export template <typename T, std::size_t N>
-  requires (!std::same_as<T, char>)
 auto& operator <<(std::ostream& ostr, const T (&arr)[N])
 {
-  ::aatk::print(ostr, arr, std::string(1, ' '));
+  ::aatk::print(ostr, arr);
   return ostr;
 }
