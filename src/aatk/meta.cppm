@@ -88,6 +88,9 @@ template <typename T, typename U>
 constexpr bool not_same_v = not_same<T, U>::value;
 
 template <typename T, typename U>
+concept not_same_as = !std::same_as<T, U>;
+
+template <typename T, typename U>
 concept no_cvref_same_as = std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<U>>;
 
 template <typename T, typename U>
