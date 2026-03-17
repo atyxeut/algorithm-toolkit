@@ -102,6 +102,7 @@ export template <typename Fn, typename... Args>
 
 export class stopwatch
 {
+private:
   using time_point_type_ = std::chrono::steady_clock::time_point;
 
   time_point_type_ begin_time_point_;

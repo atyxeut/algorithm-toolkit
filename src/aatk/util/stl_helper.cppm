@@ -143,6 +143,7 @@ class vector_impl;
 template <typename T, std::size_t DimCnt, typename InnermostDimAllocator, typename... Allocators>
 class vector_impl<T, DimCnt, meta::type_list<InnermostDimAllocator, Allocators...>>
 {
+private:
   using adjusted_allocator_type_list_ = meta::adjust_allocator_type_list_t<meta::type_list<InnermostDimAllocator, Allocators...>, DimCnt>;
   using element_type_ = vector_impl<T, DimCnt - 1, meta::init_t<adjusted_allocator_type_list_>>::type;
 
