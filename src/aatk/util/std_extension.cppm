@@ -15,10 +15,11 @@
 
 export module aatk.util.std_extension;
 
+export import aatk.util.std_extension.meta;
+
 import std;
 
 import aatk.memory.core;
-import aatk.meta;
 
 namespace aatk {
 

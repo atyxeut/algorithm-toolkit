@@ -13,216 +13,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-// general template metaprogramming utilities
-export module aatk.meta;
+export module aatk.util.std_extension.meta.type_list;
 
 import std;
 
-namespace aatk::meta {
-
-export template <typename T>
-struct has_cv : std::bool_constant<std::is_const_v<T> || std::is_volatile_v<T>>
-{
-};
-
-export template <typename T>
-constexpr bool has_cv_v = has_cv<T>::value;
-
-export template <typename T>
-struct is_cv : std::bool_constant<std::is_const_v<T> && std::is_volatile_v<T>>
-{
-};
-
-export template <typename T>
-constexpr bool is_cv_v = is_cv<T>::value;
-
-namespace detail {
-
-template <typename From, typename To, bool = std::is_const_v<From>, bool = std::is_volatile_v<From>>
-struct claim_cv_selector;
-
-// branch 1: has both cv qualifiers
-template <typename From, typename To>
-struct claim_cv_selector<From, To, true, true> : std::add_cv<To>
-{
-};
-
-// branch 2: has only const qualifier
-template <typename From, typename To>
-struct claim_cv_selector<From, To, true, false> : std::add_const<To>
-{
-};
-
-// branch 3: has only volatile qualifier
-template <typename From, typename To>
-struct claim_cv_selector<From, To, false, true> : std::add_volatile<To>
-{
-};
-
-// branch 4: has no cv qualifiers
-template <typename From, typename To>
-struct claim_cv_selector<From, To, false, false>
-{
-  using type = To;
-};
-
-} // namespace detail
-
-// extract the cv-qualifiers of From and apply them to To
-export template <typename From, typename To>
-using claim_cv = detail::claim_cv_selector<From, To>;
-
-export template <typename From, typename To>
-using claim_cv_t = claim_cv<From, To>::type;
-
-} // namespace aatk::meta
-
-export namespace aatk::meta {
-
-template <typename T, typename U>
-struct not_same : std::negation<std::is_same<T, U>>
-{
-};
-
-template <typename T, typename U>
-constexpr bool not_same_v = not_same<T, U>::value;
-
-template <typename T, typename U>
-concept not_same_as = !std::same_as<T, U>;
-
-template <typename T, typename U>
-concept no_cvref_same_as = std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<U>>;
-
-template <typename T, typename U>
-concept no_cvref_not_same_as = !no_cvref_same_as<T, U>;
-
-} // namespace aatk::meta
-
-namespace aatk::meta {
-
-export template <std::size_t N>
-using index_constant = std::integral_constant<std::size_t, N>;
-
-namespace detail {
-
-template <typename>
-struct make_reversed_integer_sequence_impl;
-
-template <typename Int, Int... Is>
-struct make_reversed_integer_sequence_impl<std::integer_sequence<Int, Is...>>
-{
-  using type = std::integer_sequence<Int, (sizeof...(Is) - 1 - Is)...>;
-};
-
-} // namespace detail
-
-// generate a sequence of integers of type T in [0, N) in a reversed order
-// O(1) time complexity, assume `std::make_integer_sequence` will be optimized by compiler intrinsics, i.e. not a naive recursive implementation
-export template <std::integral T, T N>
-using make_reversed_integer_sequence = detail::make_reversed_integer_sequence_impl<std::make_integer_sequence<T, N>>::type;
-
-export template <std::size_t N>
-using make_reversed_index_sequence = make_reversed_integer_sequence<std::size_t, N>;
-
-export template <typename... Ts>
-using reversed_index_sequence_for = make_reversed_index_sequence<sizeof...(Ts)>;
-
-namespace detail {
-
-template <typename Int, Int, typename>
-struct make_integer_sequence_of_range_impl;
-
-template <typename Int, Int Begin, Int... Is>
-struct make_integer_sequence_of_range_impl<Int, Begin, std::integer_sequence<Int, Is...>>
-{
-  using type = std::integer_sequence<Int, (Begin + Is)...>;
-};
-
-} // namespace detail
-
-// generate a sequence of integers of type T in [Begin, End]
-// O(1) time complexity, assume `std::make_integer_sequence` will be optimized by compiler intrinsics, i.e. not a naive recursive implementation
-export template <std::integral T, T Begin, T End>
-  requires (Begin <= End)
-using make_integer_sequence_of_range = detail::make_integer_sequence_of_range_impl<T, Begin, std::make_integer_sequence<T, End - Begin + 1>>::type;
-
-export template <std::size_t Begin, std::size_t End>
-using make_index_sequence_of_range = make_integer_sequence_of_range<std::size_t, Begin, End>;
-
-namespace detail {
-
-template <typename Int, Int, typename>
-struct make_reversed_integer_sequence_of_range_impl;
-
-template <typename Int, Int End, Int... Is>
-struct make_reversed_integer_sequence_of_range_impl<Int, End, std::integer_sequence<Int, Is...>>
-{
-  using type = std::integer_sequence<Int, (End - Is)...>;
-};
-
-} // namespace detail
-
-// generate a sequence of integers of type T in [Begin, End] in a reversed order
-// O(1) time complexity, assume `std::make_integer_sequence` will be optimized by compiler intrinsics, i.e. not a naive recursive implementation
-export template <std::integral T, T Begin, T End>
-  requires (Begin <= End)
-using make_reversed_integer_sequence_of_range = detail::make_reversed_integer_sequence_of_range_impl<T, End, std::make_integer_sequence<T, End - Begin + 1>>::type;
-
-export template <std::size_t Begin, std::size_t End>
-using make_reversed_index_sequence_of_range = make_reversed_integer_sequence_of_range<std::size_t, Begin, End>;
-
-// add an offset to all the integers in the given `std::integer_sequence`
-// O(1) time complexity
-export template <std::integral T, T, typename>
-struct shift_integer_sequence;
-
-template <typename Int, Int Offset, Int... Is>
-struct shift_integer_sequence<Int, Offset, std::integer_sequence<Int, Is...>>
-{
-  using type = std::integer_sequence<Int, (Is + Offset)...>;
-};
-
-export template <typename Int, Int Offset, typename IntegerSequence>
-using shift_integer_sequence_t = shift_integer_sequence<Int, Offset, IntegerSequence>::type;
-
-// add an offset to all indices in the given `std::index_sequence`
-// O(1) time complexity
-export template <std::size_t Offset, typename IndexSequence>
-using shift_index_sequence = shift_integer_sequence<std::size_t, Offset, IndexSequence>;
-
-export template <std::size_t Offset, typename IndexSequence>
-using shift_index_sequence_t = shift_index_sequence<Offset, IndexSequence>::type;
-
-export template <typename>
-struct is_no_cv_no_duplication_integer_sequence : std::true_type
-{
-};
-
-// O(nlog n) time complexity, where n is the size of the given integer sequence
-template <typename Int, Int... Is>
-struct is_no_cv_no_duplication_integer_sequence<std::integer_sequence<Int, Is...>>
-{
-  static constexpr bool value = [] consteval noexcept {
-    std::array<std::size_t, sizeof...(Is)> I {Is...};
-    std::ranges::sort(I);
-    for (auto i = 1uz; i < I.size(); ++i) {
-      if (I[i - 1] == I[i])
-        return false;
-    }
-    return true;
-  }();
-};
-
-export template <typename T>
-constexpr bool is_no_cv_no_duplication_integer_sequence_v = is_no_cv_no_duplication_integer_sequence<T>::value;
-
-export template <typename T>
-using is_no_duplication_integer_sequence = is_no_cv_no_duplication_integer_sequence<std::remove_cv_t<T>>;
-
-export template <typename T>
-constexpr bool is_no_duplication_integer_sequence_v = is_no_duplication_integer_sequence<T>::value;
-
-} // namespace aatk::meta
+import aatk.util.std_extension.meta.core;
 
 export namespace aatk::meta {
 
@@ -267,7 +62,7 @@ constexpr bool all_the_same_v = all_the_same<Ts...>::value;
 
 namespace aatk::meta {
 
-export template <typename... Ts>
+export template <typename...>
 struct type_list
 {
 };
@@ -547,6 +342,117 @@ using replicate = detail::replicate_impl<T, std::make_index_sequence<N>>;
 export template <std::size_t N, typename T>
 using replicate_t = replicate<N, T>::type;
 
+} // namespace aatk::meta
+
+export namespace aatk::meta {
+
+template <template <typename...> typename T, typename... BoundArgs>
+struct bind_front
+{
+  template <typename... CallArgs>
+  using type = T<BoundArgs..., CallArgs...>;
+};
+
+template <template <typename...> typename T, typename... BoundArgs>
+struct bind_back
+{
+  template <typename... CallArgs>
+  using type = T<CallArgs..., BoundArgs...>;
+};
+
+template <template <typename...> typename T>
+struct template_wrapper
+{
+  template <typename... Args>
+  using type = T<Args...>;
+};
+
+template <typename>
+struct is_no_cv_template_wrapper : std::false_type
+{
+};
+
+template <template <typename...> typename T>
+struct is_no_cv_template_wrapper<template_wrapper<T>> : std::true_type
+{
+};
+
+template <template <typename...> typename T, typename... BoundArgs>
+struct is_no_cv_template_wrapper<bind_front<T, BoundArgs...>> : std::true_type
+{
+};
+
+template <template <typename...> typename T, typename... BoundArgs>
+struct is_no_cv_template_wrapper<bind_back<T, BoundArgs...>> : std::true_type
+{
+};
+
+template <typename T>
+constexpr bool is_no_cv_template_wrapper_v = is_no_cv_template_wrapper<T>::value;
+
+template <typename T>
+using is_template_wrapper = is_no_cv_template_wrapper<std::remove_cv_t<T>>;
+
+template <typename T>
+constexpr bool is_template_wrapper_v = is_template_wrapper<T>::value;
+
+template <typename T>
+concept wrapped_template = is_template_wrapper_v<T>;
+
+template <wrapped_template T, typename... Args>
+using invoke = T::template type<Args...>;
+
+template <typename WrappedTemplate, typename... Args>
+using invoke_t = invoke<WrappedTemplate, Args...>::type;
+
+template <typename WrappedTemplate, typename... Args>
+constexpr auto invoke_v = invoke<WrappedTemplate, Args...>::value;
+
+} // namespace aatk::meta
+
+namespace aatk::meta {
+
+namespace detail {
+
+template <template <typename...> typename, typename>
+struct is_predicate_tester;
+
+// clang-format off
+template <template <typename...> typename T, typename... Ts>
+struct is_predicate_tester<T, type_list<Ts...>> : std::bool_constant<requires { { T<Ts...>::value } -> no_cvref_same_as<bool>; }>
+{
+};
+// clang-format on
+
+template <template <typename...> typename, typename>
+struct is_predicate_impl;
+
+template <template <typename...> typename T, std::size_t... Is>
+struct is_predicate_impl<T, std::index_sequence<Is...>> : std::disjunction<is_predicate_tester<T, replicate_t<Is + 1, void>>...>
+{
+};
+
+} // namespace detail
+
+export template <template <typename...> typename T, std::size_t ArityLimit = 5>
+  requires (ArityLimit > 0)
+struct is_predicate : detail::is_predicate_impl<T, std::make_index_sequence<ArityLimit>>
+{
+};
+
+export template <template <typename...> typename T, std::size_t ArityLimit = 5>
+constexpr bool is_predicate_v = is_predicate<T, ArityLimit>::value;
+
+export template <template <typename...> typename T>
+concept predicate = is_predicate_v<T>;
+
+export template <typename T>
+concept wrapped_predicate = wrapped_template<T> && predicate<T::template type>;
+
+} // namespace aatk::meta
+
+namespace aatk::meta {
+
 namespace detail {
 
 template <typename... AnyTypeLists>
@@ -741,105 +647,6 @@ using drop_end = take<length_v<T> - N, T>;
 
 export template <std::size_t N, typename AnyTypeList>
 using drop_end_t = drop_end<N, AnyTypeList>::type;
-
-namespace detail {
-
-template <template <typename...> typename, typename>
-struct is_predicate_tester;
-
-// clang-format off
-template <template <typename...> typename T, typename... Ts>
-struct is_predicate_tester<T, type_list<Ts...>> : std::bool_constant<requires { { T<Ts...>::value } -> no_cvref_same_as<bool>; }>
-{
-};
-// clang-format on
-
-template <template <typename...> typename, typename>
-struct is_predicate_impl;
-
-template <template <typename...> typename T, std::size_t... Is>
-struct is_predicate_impl<T, std::index_sequence<Is...>> : std::disjunction<is_predicate_tester<T, replicate_t<Is + 1, void>>...>
-{
-};
-
-} // namespace detail
-
-export template <template <typename...> typename T, std::size_t ArityLimit = 5>
-  requires (ArityLimit > 0)
-struct is_predicate : detail::is_predicate_impl<T, std::make_index_sequence<ArityLimit>>
-{
-};
-
-export template <template <typename...> typename T, std::size_t ArityLimit = 5>
-constexpr bool is_predicate_v = is_predicate<T, ArityLimit>::value;
-
-export template <template <typename...> typename T>
-concept predicate = is_predicate_v<T>;
-
-export template <template <typename...> typename T>
-struct template_wrapper
-{
-  template <typename... Args>
-  using type = T<Args...>;
-};
-
-export template <template <typename...> typename T, typename... BoundArgs>
-struct bind_front
-{
-  template <typename... CallArgs>
-  using type = T<BoundArgs..., CallArgs...>;
-};
-
-export template <template <typename...> typename T, typename... BoundArgs>
-struct bind_back
-{
-  template <typename... CallArgs>
-  using type = T<CallArgs..., BoundArgs...>;
-};
-
-export template <typename>
-struct is_no_cv_template_wrapper : std::false_type
-{
-};
-
-template <template <typename...> typename T>
-struct is_no_cv_template_wrapper<template_wrapper<T>> : std::true_type
-{
-};
-
-template <template <typename...> typename T, typename... BoundArgs>
-struct is_no_cv_template_wrapper<bind_front<T, BoundArgs...>> : std::true_type
-{
-};
-
-template <template <typename...> typename T, typename... BoundArgs>
-struct is_no_cv_template_wrapper<bind_back<T, BoundArgs...>> : std::true_type
-{
-};
-
-export template <typename T>
-constexpr bool is_no_cv_template_wrapper_v = is_no_cv_template_wrapper<T>::value;
-
-export template <typename T>
-using is_template_wrapper = is_no_cv_template_wrapper<std::remove_cv_t<T>>;
-
-export template <typename T>
-constexpr bool is_template_wrapper_v = is_template_wrapper<T>::value;
-
-export template <typename T>
-concept wrapped_template = is_template_wrapper_v<T>;
-
-export template <typename T>
-concept wrapped_predicate = wrapped_template<T> && predicate<T::template type>;
-
-export template <wrapped_template T, typename... Args>
-using invoke = T::template type<Args...>;
-
-export template <typename WrappedTemplate, typename... Args>
-using invoke_t = invoke<WrappedTemplate, Args...>::type;
-
-export template <typename WrappedTemplate, typename... Args>
-constexpr auto invoke_v = invoke<WrappedTemplate, Args...>::value;
 
 namespace detail {
 
@@ -1064,27 +871,5 @@ using has_none = std::negation<has_any<T, U>>;
 
 export template <typename T, typename U>
 constexpr bool has_none_v = has_none<T, U>::value;
-
-} // namespace aatk::meta
-
-export namespace aatk::meta {
-
-template <typename T, typename U>
-concept range_of = std::ranges::range<T> && std::same_as<U, std::ranges::range_value_t<T>>;
-
-template <typename T, typename U>
-concept input_range_of = std::ranges::input_range<T> && std::same_as<U, std::ranges::range_value_t<T>>;
-
-template <typename T, typename U>
-concept forward_range_of = std::ranges::forward_range<T> && std::same_as<U, std::ranges::range_value_t<T>>;
-
-template <typename T, typename U>
-concept bidirectional_range_of = std::ranges::bidirectional_range<T> && std::same_as<U, std::ranges::range_value_t<T>>;
-
-template <typename T, typename U>
-concept random_access_range_of = std::ranges::random_access_range<T> && std::same_as<U, std::ranges::range_value_t<T>>;
-
-template <typename T, typename U>
-concept contiguous_range_of = std::ranges::contiguous_range<T> && std::same_as<U, std::ranges::range_value_t<T>>;
 
 } // namespace aatk::meta

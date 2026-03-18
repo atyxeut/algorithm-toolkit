@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export module test.aatk;
+export module test.aatk.util.std_extension.meta;
 
-export import test.aatk.math;
-export import test.aatk.util;
+export import test.aatk.util.std_extension.meta.core;
+export import test.aatk.util.std_extension.meta.type_list;

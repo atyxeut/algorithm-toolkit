@@ -13,53 +13,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export module test.aatk.meta;
+export module test.aatk.util.std_extension.meta.type_list;
 
 import std;
 
-import aatk.meta;
+import aatk.util.std_extension.meta.core;
+import aatk.util.std_extension.meta.type_list;
 
 namespace test::aatk::meta {
 
 using namespace ::aatk::meta;
 
-export consteval void do_custom_integer_sequence_helpers_work() noexcept
-{
-  static_assert(std::same_as<make_reversed_integer_sequence<int, 8>, std::integer_sequence<int, 7, 6, 5, 4, 3, 2, 1, 0>> == true);
-  static_assert(std::same_as<make_reversed_index_sequence<8>, std::index_sequence<7, 6, 5, 4, 3, 2, 1, 0>> == true);
-  static_assert(std::same_as<reversed_index_sequence_for<int, int, int, int, int>, std::index_sequence<4, 3, 2, 1, 0>> == true);
+} // namespace test::aatk::meta
 
-  static_assert(std::same_as<make_integer_sequence_of_range<int, 3, 7>, std::integer_sequence<int, 3, 4, 5, 6, 7>> == true);
-  static_assert(std::same_as<make_index_sequence_of_range<3, 10>, std::index_sequence<3, 4, 5, 6, 7, 8, 9, 10>> == true);
-  static_assert(std::same_as<make_reversed_integer_sequence_of_range<int, 3, 7>, std::integer_sequence<int, 7, 6, 5, 4, 3>> == true);
-  static_assert(std::same_as<make_reversed_index_sequence_of_range<3, 10>, std::index_sequence<10, 9, 8, 7, 6, 5, 4, 3>> == true);
+export namespace test::aatk::meta {
 
-  static_assert(std::same_as<shift_integer_sequence_t<int, 10, std::integer_sequence<int, 1, 2, 3, 4>>, std::integer_sequence<int, 11, 12, 13, 14>>);
-  static_assert(std::same_as<shift_index_sequence_t<50, std::index_sequence<1, 2, 3, 4>>, std::index_sequence<51, 52, 53, 54>>);
-}
-
-export consteval void does_is_no_duplication_integer_sequence_work() noexcept
-{
-  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int>> == true);
-  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1>> == true);
-  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1, 2>> == true);
-  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1, 1, 3>> == false);
-  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1, 2, 3, 4, 4, 6>> == false);
-  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1, 2, 3, 4, 5, 6>> == true);
-  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1, 2, 1, 2, 1, 2, 1>> == false);
-  static_assert(is_no_duplication_integer_sequence_v<std::integer_sequence<int, 1, 2, 3, 4, 3, 3, 3>> == false);
-
-  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<>> == true);
-  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1>> == true);
-  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1, 3>> == true);
-  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1, 1, 3>> == false);
-  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1, 2, 3, 4, 4, 6>> == false);
-  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1, 2, 3, 4, 5, 6>> == true);
-  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1, 2, 1, 2, 1, 2, 1>> == false);
-  static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1, 2, 3, 4, 3, 3, 3>> == false);
-}
-
-export consteval void does_is_any_of_work() noexcept
+consteval void does_is_any_of_work() noexcept
 {
   static_assert(is_any_of_v<int> == false);
   static_assert(is_any_of_v<int, int> == true);
@@ -68,7 +37,7 @@ export consteval void does_is_any_of_work() noexcept
   static_assert(is_any_of_v<int, double, long double, char, const char, int, std::string> == true);
 }
 
-export consteval void does_is_none_of_work() noexcept
+consteval void does_is_none_of_work() noexcept
 {
   static_assert(is_none_of_v<int> == true);
   static_assert(is_none_of_v<int, int> == false);
@@ -77,7 +46,7 @@ export consteval void does_is_none_of_work() noexcept
   static_assert(is_none_of_v<int, double, long double, char, const char, int, std::string> == false);
 }
 
-export consteval void does_all_the_same_work() noexcept
+consteval void does_all_the_same_work() noexcept
 {
   static_assert(all_the_same_v<> == true);
   static_assert(all_the_same_v<int, int> == true);
@@ -85,6 +54,10 @@ export consteval void does_all_the_same_work() noexcept
   static_assert(all_the_same_v<int, int, int, int, int, const char, float, std::string> == false);
   static_assert(all_the_same_v<int, int, int, int, int, int, int, int> == true);
 }
+
+} // namespace test::aatk::meta
+
+namespace test::aatk::meta {
 
 using type_list_1 = type_list<double, float, std::vector<int>, long long>;
 using type_list_2 = type_list<std::string, unsigned, const volatile bool, bool>;
@@ -319,32 +292,6 @@ export consteval void does_drop_end_work() noexcept
   static_assert(std::same_as<drop_end_t<2, type_list_3>, dropped_2_type_list_of_3_from_end>);
 }
 
-export consteval void does_is_predicate_work() noexcept
-{
-  // test for templates that accept 1 template parameter
-  static_assert(is_predicate_v<std::is_integral> == true);
-
-  // test for templates that accept more than 1 (but fixed) template parameter
-  static_assert(is_predicate_v<std::is_same> == true);
-
-  // test for templates that accept variadic template parameters
-  static_assert(is_predicate_v<std::is_constructible> == true);
-
-  // test for templates whose `value` member does not have type bool
-  static_assert(is_predicate_v<std::tuple_size> == false);
-
-  // test for templates that do not have a `value` member
-  static_assert(is_predicate_v<std::add_const> == false);
-
-  // test if `wrapped_predicate` concept works
-  static_assert(predicate<std::is_integral> == true);
-  static_assert(wrapped_predicate<template_wrapper<std::is_integral>> == true);
-  static_assert(predicate<std::is_same> == true);
-  static_assert(wrapped_predicate<template_wrapper<std::is_same>> == true);
-  static_assert(predicate<std::add_const> == false);
-  static_assert(wrapped_predicate<template_wrapper<std::add_const>> == false);
-}
-
 export consteval void does_take_while_work() noexcept
 {
   using take_while_type_list_of_empty_list = empty_type_list;
@@ -538,6 +485,36 @@ export consteval void does_has_none_work() noexcept
   static_assert(has_none_v<int, type_list_3> == false);
   static_assert(has_none_v<int, indexed_type_list_1> == true);
   static_assert(has_none_v<int, indexed_type_list_3> == false);
+}
+
+} // namespace test::aatk::meta
+
+export namespace test::aatk::meta {
+
+consteval void does_is_predicate_work() noexcept
+{
+  // test for templates that accept 1 template parameter
+  static_assert(is_predicate_v<std::is_integral> == true);
+
+  // test for templates that accept more than 1 (but fixed) template parameter
+  static_assert(is_predicate_v<std::is_same> == true);
+
+  // test for templates that accept variadic template parameters
+  static_assert(is_predicate_v<std::is_constructible> == true);
+
+  // test for templates whose `value` member does not have type bool
+  static_assert(is_predicate_v<std::tuple_size> == false);
+
+  // test for templates that do not have a `value` member
+  static_assert(is_predicate_v<std::add_const> == false);
+
+  // test if `wrapped_predicate` concept works
+  static_assert(predicate<std::is_integral> == true);
+  static_assert(wrapped_predicate<template_wrapper<std::is_integral>> == true);
+  static_assert(predicate<std::is_same> == true);
+  static_assert(wrapped_predicate<template_wrapper<std::is_same>> == true);
+  static_assert(predicate<std::add_const> == false);
+  static_assert(wrapped_predicate<template_wrapper<std::add_const>> == false);
 }
 
 } // namespace test::aatk::meta

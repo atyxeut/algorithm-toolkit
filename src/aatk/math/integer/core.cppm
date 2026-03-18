@@ -24,7 +24,7 @@ export module aatk.math.integer.core;
 
 import std;
 
-import aatk.meta;
+import aatk.util.std_extension.meta;
 
 // clang-format off
 export {

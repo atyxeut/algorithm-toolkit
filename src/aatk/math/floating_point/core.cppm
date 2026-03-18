@@ -18,7 +18,7 @@ export module aatk.math.floating_point.core;
 import std;
 
 import aatk.math.integer.core;
-import aatk.meta;
+import aatk.util.std_extension.meta;
 
 // clang-format off
 export {

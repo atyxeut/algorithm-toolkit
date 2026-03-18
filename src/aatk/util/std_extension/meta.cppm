@@ -13,12 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module aatk;
+// general metaprogramming utilities
+export module aatk.util.std_extension.meta;
 
-export import aatk.data_structure;
-export import aatk.debug;
-export import aatk.math;
-export import aatk.memory;
-export import aatk.random;
-export import aatk.simd;
-export import aatk.util;
+export import aatk.util.std_extension.meta.core;
+export import aatk.util.std_extension.meta.cv_qualifier;
+export import aatk.util.std_extension.meta.type_list;

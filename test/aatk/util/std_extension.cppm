@@ -19,10 +19,11 @@ module;
 
 export module test.aatk.util.std_extension;
 
+export import test.aatk.util.std_extension.meta;
+
 import std;
 
 import aatk.memory.core;
-import aatk.meta;
 import aatk.util.std_extension;
 
 namespace test::aatk::util {
