@@ -16,3 +16,4 @@
 export module fmia.memory;
 
 export import fmia.memory.core;
+export import fmia.memory.storage_base;

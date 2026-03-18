@@ -76,10 +76,6 @@ using adjust_allocator_type_list_t = adjust_allocator_type_list<CurAllocatorList
 
 export namespace fmia {
 
-template <meta::size_integral T>
-constexpr T dynamic_capacity = static_cast<T>(-1);
-
-enum class resource_location { inplace, heap };
 enum class exception_safety { basic, strong };
 
 } // export namespace fmia
