@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.math.core;
+export module fmia.math.op;
 
 import std;
 
@@ -49,33 +49,37 @@ export namespace fmia {
 
 enum class operator_property { none = 0, associative = 1, commutative = 1 << 1 };
 
+} // namespace fmia
+
+export namespace fmia::meta {
+
 template <>
 struct is_enum_flag<operator_property> : std::true_type
 {
 };
 
-} // namespace fmia
+} // namespace fmia::meta
 
-[[nodiscard]] constexpr auto operator &(operator_property a, operator_property b) noexcept
+[[nodiscard]] constexpr auto operator &(::fmia::operator_property a, ::fmia::operator_property b) noexcept
 {
-  return static_cast<operator_property>(std::to_underlying(a) & std::to_underlying(b));
+  return static_cast<::fmia::operator_property>(std::to_underlying(a) & std::to_underlying(b));
 };
 
-constexpr auto& operator &=(operator_property& a, operator_property b) noexcept { return a = a & b; };
+constexpr auto& operator &=(::fmia::operator_property& a, ::fmia::operator_property b) noexcept { return a = a & b; };
 
-[[nodiscard]] constexpr auto operator ^(operator_property a, operator_property b) noexcept
+[[nodiscard]] constexpr auto operator ^(::fmia::operator_property a, ::fmia::operator_property b) noexcept
 {
-  return static_cast<operator_property>(std::to_underlying(a) ^ std::to_underlying(b));
+  return static_cast<::fmia::operator_property>(std::to_underlying(a) ^ std::to_underlying(b));
 };
 
-constexpr auto& operator ^=(operator_property& a, operator_property b) noexcept { return a = a ^ b; };
+constexpr auto& operator ^=(::fmia::operator_property& a, ::fmia::operator_property b) noexcept { return a = a ^ b; };
 
-[[nodiscard]] constexpr auto operator |(operator_property a, operator_property b) noexcept
+[[nodiscard]] constexpr auto operator |(::fmia::operator_property a, ::fmia::operator_property b) noexcept
 {
-  return static_cast<operator_property>(std::to_underlying(a) | std::to_underlying(b));
+  return static_cast<::fmia::operator_property>(std::to_underlying(a) | std::to_underlying(b));
 };
 
-constexpr auto& operator |=(operator_property& a, operator_property b) noexcept { return a = a | b; };
+constexpr auto& operator |=(::fmia::operator_property& a, ::fmia::operator_property b) noexcept { return a = a | b; };
 
 export namespace fmia::meta {
 
@@ -83,7 +87,7 @@ template <typename T>
 concept multipliable = requires(T a, T b) {
   { a * b } -> std::same_as<T>;
   { a *= b } -> std::same_as<T&>;
-  { T(op::neutral_element_tag<element_for_operator::mul> {}) } -> std::same_as<T>;
+  { T(neutral_element_tag<element_for_operator::mul> {}) } -> std::same_as<T>;
 };
 
 } // namespace fmia::meta
