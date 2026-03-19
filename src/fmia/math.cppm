@@ -22,4 +22,5 @@ export import fmia.math.fraction;
 export import fmia.math.geometry;
 export import fmia.math.integer;
 export import fmia.math.op;
+export import fmia.math.quaternion;
 export import fmia.math.rational_number;
