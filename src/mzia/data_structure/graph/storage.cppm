@@ -56,6 +56,43 @@ struct edge : weight<Weight>
 
 }; // namespace mzia::graph
 
+export namespace mzia::meta {
+
+template <typename T>
+struct is_no_cv_unweighted_graph : std::false_type
+{
+};
+
+template <typename T>
+constexpr bool is_no_cv_unweighted_graph_v = is_no_cv_unweighted_graph<T>::value;
+
+template <typename T>
+concept unweighted_graph = is_no_cv_unweighted_graph_v<std::remove_cvref_t<T>>;
+
+template <typename T>
+struct is_no_cv_weighted_graph : std::false_type
+{
+};
+
+template <typename T>
+constexpr bool is_no_cv_weighted_graph_v = is_no_cv_weighted_graph<T>::value;
+
+template <typename T>
+concept weighted_graph = is_no_cv_weighted_graph_v<std::remove_cvref_t<T>>;
+
+template <typename T>
+struct is_no_cv_graph : std::disjunction<is_no_cv_unweighted_graph<T>, is_no_cv_weighted_graph<T>>
+{
+};
+
+template <typename T>
+constexpr bool is_no_cv_graph_v = is_no_cv_graph<T>::value;
+
+template <typename T>
+concept graph = is_no_cv_graph_v<std::remove_cvref_t<T>>;
+
+} // namespace mzia::meta
+
 namespace mzia::graph {
 
 namespace detail {
@@ -99,3 +136,17 @@ public:
 };
 
 } // namespace mzia::graph
+
+export namespace mzia::meta {
+
+template <typename Vertex>
+struct is_no_cv_unweighted_graph<graph::unweighted_edge_list<Vertex>> : std::true_type
+{
+};
+
+template <typename Vertex, typename Weight>
+struct is_no_cv_weighted_graph<graph::weighted_edge_list<Vertex, Weight>> : std::true_type
+{
+};
+
+} // namespace mzia::meta
