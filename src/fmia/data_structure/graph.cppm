@@ -83,7 +83,15 @@ export template <typename Vertex, typename Weight>
   return detail::bellman_ford_naive_impl(edges, source, edges.vertex_size(), inf);
 }
 
-// does not affect asymptotic time complexity
+// optimization: for every round, only check edges whose vertexes was relaxed in the last round (does not affect the worst case asymptotic time complexity)
+//
+// for correctness, any container can be used to mark the information,
+// however, FIFO containers (e.g. queue) are significantly better than FILO containers (e.g. stack),
+// because with an FIFO container, vertexes that are closer to the source vertex are prioritized,
+// which is always better, as they are naturally more optimal than farther vertexes
+//
+// moreover, introducing an FILO container can cause even worse performance than the naive version,
+// because useless sub-optimal results can be repeatedly propagated very much
 export template <meta::graph T, std::same_as<typename T::vertex_type> Vertex, typename Weight = T::weight_type>
 [[nodiscard]] constexpr auto bellman_ford_queue_optimized(const T& g, Vertex source, const Weight& inf = graph::default_weight_infinity<Weight>) -> std::expected<std::vector<Weight>, error>
 {
