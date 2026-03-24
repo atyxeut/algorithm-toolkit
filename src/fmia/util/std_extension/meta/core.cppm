@@ -57,9 +57,12 @@ struct make_reversed_integer_sequence_impl<std::integer_sequence<Int, Is...>>
 } // namespace detail
 
 // generate a sequence of integers of type T in [0, N) in a reversed order
-// O(1) time complexity, assume `std::make_integer_sequence` will be optimized by compiler intrinsics, i.e. not a naive recursive implementation
+//
+// O(1) time complexity, assume `std::make_integer_sequence` will be optimized by compiler intrinsics, i.e. not a naive
+// recursive implementation
 export template <std::integral T, T N>
-using make_reversed_integer_sequence = detail::make_reversed_integer_sequence_impl<std::make_integer_sequence<T, N>>::type;
+using make_reversed_integer_sequence =
+  detail::make_reversed_integer_sequence_impl<std::make_integer_sequence<T, N>>::type;
 
 export template <std::size_t N>
 using make_reversed_index_sequence = make_reversed_integer_sequence<std::size_t, N>;
@@ -81,10 +84,13 @@ struct make_integer_sequence_of_range_impl<Int, Begin, std::integer_sequence<Int
 } // namespace detail
 
 // generate a sequence of integers of type T in [Begin, End]
-// O(1) time complexity, assume `std::make_integer_sequence` will be optimized by compiler intrinsics, i.e. not a naive recursive implementation
+//
+// O(1) time complexity, assume `std::make_integer_sequence` will be optimized by compiler intrinsics, i.e. not a naive
+// recursive implementation
 export template <std::integral T, T Begin, T End>
   requires (Begin <= End)
-using make_integer_sequence_of_range = detail::make_integer_sequence_of_range_impl<T, Begin, std::make_integer_sequence<T, End - Begin + 1>>::type;
+using make_integer_sequence_of_range =
+  detail::make_integer_sequence_of_range_impl<T, Begin, std::make_integer_sequence<T, End - Begin + 1>>::type;
 
 export template <std::size_t Begin, std::size_t End>
 using make_index_sequence_of_range = make_integer_sequence_of_range<std::size_t, Begin, End>;
@@ -103,15 +109,19 @@ struct make_reversed_integer_sequence_of_range_impl<Int, End, std::integer_seque
 } // namespace detail
 
 // generate a sequence of integers of type T in [Begin, End] in a reversed order
-// O(1) time complexity, assume `std::make_integer_sequence` will be optimized by compiler intrinsics, i.e. not a naive recursive implementation
+//
+// O(1) time complexity, assume `std::make_integer_sequence` will be optimized by compiler intrinsics, i.e. not a naive
+// recursive implementation
 export template <std::integral T, T Begin, T End>
   requires (Begin <= End)
-using make_reversed_integer_sequence_of_range = detail::make_reversed_integer_sequence_of_range_impl<T, End, std::make_integer_sequence<T, End - Begin + 1>>::type;
+using make_reversed_integer_sequence_of_range =
+  detail::make_reversed_integer_sequence_of_range_impl<T, End, std::make_integer_sequence<T, End - Begin + 1>>::type;
 
 export template <std::size_t Begin, std::size_t End>
 using make_reversed_index_sequence_of_range = make_reversed_integer_sequence_of_range<std::size_t, Begin, End>;
 
 // add an offset to all the integers in the given `std::integer_sequence`
+//
 // O(1) time complexity
 export template <std::integral T, T, typename>
 struct shift_integer_sequence;
@@ -126,6 +136,7 @@ export template <typename Int, Int Offset, typename IntegerSequence>
 using shift_integer_sequence_t = shift_integer_sequence<Int, Offset, IntegerSequence>::type;
 
 // add an offset to all indices in the given `std::index_sequence`
+//
 // O(1) time complexity
 export template <std::size_t Offset, typename IndexSequence>
 using shift_index_sequence = shift_integer_sequence<std::size_t, Offset, IndexSequence>;
@@ -145,7 +156,8 @@ struct is_no_cv_no_duplication_integer_sequence<std::integer_sequence<Int, Is...
   static constexpr bool value = [] consteval noexcept {
     std::array<std::size_t, sizeof...(Is)> I {Is...};
     std::ranges::sort(I);
-    for (auto i = 1uz; i < I.size(); ++i) {
+    for (auto i = 1uz; i < I.size(); ++i)
+    {
       if (I[i - 1] == I[i])
         return false;
     }

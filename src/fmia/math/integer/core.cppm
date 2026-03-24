@@ -27,6 +27,7 @@ import std;
 import fmia.util.std_extension.meta;
 
 // clang-format off
+
 export {
 
 using i8  = std::int8_t;
@@ -42,6 +43,7 @@ using isize = std::ptrdiff_t;
 using usize = std::size_t;
 
 }
+
 // clang-format on
 
 export namespace fmia::meta {
@@ -129,7 +131,8 @@ struct is_no_cv_custom_fixed_width_unsigned_integral<fixed_width_integer::u<Widt
 };
 
 template <typename T>
-constexpr bool is_no_cv_custom_fixed_width_unsigned_integral_v = is_no_cv_custom_fixed_width_unsigned_integral<T>::value;
+constexpr bool is_no_cv_custom_fixed_width_unsigned_integral_v =
+  is_no_cv_custom_fixed_width_unsigned_integral<T>::value;
 
 template <typename T>
 using is_custom_fixed_width_unsigned_integral = is_no_cv_custom_fixed_width_unsigned_integral<std::remove_cv_t<T>>;
@@ -140,6 +143,7 @@ constexpr bool is_custom_fixed_width_unsigned_integral_v = is_custom_fixed_width
 } // namespace fmia::meta
 
 // clang-format off
+
 export {
 
 #ifdef __SIZEOF_INT128__
@@ -155,6 +159,7 @@ using u128 = ::fmia::fixed_width_integer::u<128>;
 #endif
 
 }
+
 // clang-format on
 
 export auto& operator >>(std::istream& istr, u128& n)
@@ -190,15 +195,15 @@ export auto& operator >>(std::istream& istr, i128& n)
 
 export auto& operator <<(std::ostream& ostr, u128 n)
 {
-  if (n == 0) {
+  if (n == 0)
+  {
     ostr << '0';
     return ostr;
   }
 
   std::string buffer;
-  for (; n; n /= 10) {
+  for (; n; n /= 10)
     buffer += static_cast<char>(n % 10 + '0');
-  }
   std::reverse(buffer.begin(), buffer.end());
   ostr << buffer;
   return ostr;
@@ -219,10 +224,12 @@ export auto& operator <<(std::ostream& ostr, i128 n)
 export namespace fmia::meta {
 
 template <typename T>
-concept fixed_width_signed_integral = std::signed_integral<T> || std::same_as<std::remove_cv_t<T>, i128> || is_custom_fixed_width_signed_integral_v<T>;
+concept fixed_width_signed_integral =
+  std::signed_integral<T> || std::same_as<std::remove_cv_t<T>, i128> || is_custom_fixed_width_signed_integral_v<T>;
 
 template <typename T>
-concept fixed_width_unsigned_integral = std::unsigned_integral<T> || std::same_as<std::remove_cv_t<T>, u128> || is_custom_fixed_width_unsigned_integral_v<T>;
+concept fixed_width_unsigned_integral =
+  std::unsigned_integral<T> || std::same_as<std::remove_cv_t<T>, u128> || is_custom_fixed_width_unsigned_integral_v<T>;
 
 template <typename T>
 concept nonbool_fixed_width_unsigned_integral = fixed_width_unsigned_integral<T> && !boolean<T>;
@@ -344,28 +351,35 @@ template <typename T, usize TypeSize>
 struct make_larger_width_selector_for_standard_impl;
 
 template <typename T>
-struct make_larger_width_selector_for_standard_impl<T, 0> : std::conditional<std::signed_integral<T>, claim_cv_t<T, i32>, claim_cv_t<T, u32>>
+struct make_larger_width_selector_for_standard_impl<T, 0>
+  : std::conditional<std::signed_integral<T>, claim_cv_t<T, i32>, claim_cv_t<T, u32>>
 {
 };
 
 template <typename T>
-struct make_larger_width_selector_for_standard_impl<T, sizeof(i32)> : std::conditional<std::signed_integral<T>, claim_cv_t<T, i64>, claim_cv_t<T, u64>>
+struct make_larger_width_selector_for_standard_impl<T, sizeof(i32)>
+  : std::conditional<std::signed_integral<T>, claim_cv_t<T, i64>, claim_cv_t<T, u64>>
 {
 };
 
 template <typename T>
-struct make_larger_width_selector_for_standard_impl<T, sizeof(i64)> : std::conditional<std::signed_integral<T>, claim_cv_t<T, i128>, claim_cv_t<T, u128>>
+struct make_larger_width_selector_for_standard_impl<T, sizeof(i64)>
+  : std::conditional<std::signed_integral<T>, claim_cv_t<T, i128>, claim_cv_t<T, u128>>
 {
 };
 
 // in case std::integral treats i/u128 as standard integer type (e.g. -std=gnu++ mode)
 template <typename T>
-struct make_larger_width_selector_for_standard_impl<T, sizeof(i128)> : std::conditional<signed_integral<T>, claim_cv_t<T, fixed_width_integer::i<256>>, claim_cv_t<T, fixed_width_integer::u<256>>>
+struct make_larger_width_selector_for_standard_impl<T, sizeof(i128)>
+  : std::conditional<
+      signed_integral<T>, claim_cv_t<T, fixed_width_integer::i<256>>, claim_cv_t<T, fixed_width_integer::u<256>>
+    >
 {
 };
 
 template <typename T>
-struct make_larger_width_selector_for_standard : make_larger_width_selector_for_standard_impl<T, sizeof(T) < sizeof(i32) ? 0 : sizeof(T)>
+struct make_larger_width_selector_for_standard
+  : make_larger_width_selector_for_standard_impl<T, sizeof(T) < sizeof(i32) ? 0 : sizeof(T)>
 {
 };
 
@@ -383,12 +397,14 @@ struct make_larger_width_selector_for_custom<T, u128, false> : claim_cv<T, fixed
 };
 
 template <typename T, usize WidthBits>
-struct make_larger_width_selector_for_custom<T, fixed_width_integer::i<WidthBits>, false> : claim_cv<T, fixed_width_integer::i<WidthBits * 2>>
+struct make_larger_width_selector_for_custom<T, fixed_width_integer::i<WidthBits>, false>
+  : claim_cv<T, fixed_width_integer::i<WidthBits * 2>>
 {
 };
 
 template <typename T, usize WidthBits>
-struct make_larger_width_selector_for_custom<T, fixed_width_integer::u<WidthBits>, false> : claim_cv<T, fixed_width_integer::u<WidthBits * 2>>
+struct make_larger_width_selector_for_custom<T, fixed_width_integer::u<WidthBits>, false>
+  : claim_cv<T, fixed_width_integer::u<WidthBits * 2>>
 {
 };
 
@@ -400,11 +416,14 @@ struct make_larger_width_selector_for_custom<T, std::remove_cv_t<T>, true>
 
 } // namespace detail
 
-// for the given fixed-width integer type: obtain i/u32 if its width is smaller than 32 bits, otherwise obtain a fixed-width integer type with double width
+// for the given fixed-width integer type: obtain i/u32 if its width is smaller than 32 bits, otherwise obtain a
+// fixed-width integer type with double width
 // if the given type is a big integer type: obtain itself
 // cv-qualifiers and signedness are kept
 export template <integral T>
-using make_larger_width = std::conditional_t<std::integral<T>, detail::make_larger_width_selector_for_standard<T>, detail::make_larger_width_selector_for_custom<T>>;
+using make_larger_width = std::conditional_t<
+  std::integral<T>, detail::make_larger_width_selector_for_standard<T>, detail::make_larger_width_selector_for_custom<T>
+>;
 
 export template <typename T>
 using make_larger_width_t = make_larger_width<T>::type;

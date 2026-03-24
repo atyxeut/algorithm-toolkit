@@ -25,7 +25,7 @@ namespace fmia {
 
 namespace detail {
 
-template <typename Char, typename HashMap, exception_safety ExceptionSafety>
+template <typename Char, typename HashMap, exception_safety E>
 class trie_base
 {
 private:
@@ -43,10 +43,12 @@ public:
 
   constexpr trie_base(const trie_base& other)
   {
-    try {
+    try
+    {
       copy_tree_(other.root_, root_);
     }
-    catch (...) {
+    catch (...)
+    {
       destroy_tree_(root_);
       throw;
     }
@@ -54,9 +56,8 @@ public:
 
   constexpr trie_base& operator =(const trie_base& other)
   {
-    if (this != std::addressof(other)) {
+    if (this != std::addressof(other))
       *this = trie_base(other);
-    }
     return *this;
   };
 
@@ -64,7 +65,8 @@ public:
 
   constexpr trie_base& operator =(trie_base&& other) noexcept
   {
-    if (this != std::addressof(other)) {
+    if (this != std::addressof(other))
+    {
       destroy_tree_(root_);
       root_ = std::exchange(other.root_, nullptr);
     }
@@ -74,8 +76,10 @@ public:
 private:
   constexpr void copy_tree_(node_* from, node_*& to)
   {
-    if (!from) {
-      if (to) {
+    if (!from)
+    {
+      if (to)
+      {
         destroy_tree_(to);
         to = nullptr;
       }
@@ -85,7 +89,8 @@ private:
     to = new node_;
     to->pass = from->pass;
     to->end = from->end;
-    from->next.for_each_invoke([this](node_* child_from, node_*& child_to) { copy_tree_(child_from, child_to); }, to->next);
+    from->next
+      .for_each_invoke([this](node_* child_from, node_*& child_to) { copy_tree_(child_from, child_to); }, to->next);
   }
 
   constexpr void destroy_tree_recursive_(node_* root) noexcept
@@ -104,7 +109,8 @@ private:
       return;
 
     std::vector<node_*> stack {root};
-    while (!stack.empty()) {
+    while (!stack.empty())
+    {
       auto cur = stack.back();
       stack.pop_back();
       cur->next.for_each_invoke([&stack](node_* ptr) {
@@ -136,11 +142,11 @@ public:
     // pending strong exception safety implementation
     ++root_->pass;
     auto cur = root_;
-    for (auto&& ch : str) {
+    for (auto&& ch : str)
+    {
       auto& next = cur->next[ch];
-      if (!next) {
+      if (!next)
         next = new node_;
-      }
       cur = next;
       ++cur->pass;
     }
@@ -148,10 +154,7 @@ public:
   }
 
 private:
-  enum class count_type_ {
-    full_string,
-    prefix
-  };
+  enum class count_type_ { full_string, prefix };
 
   template <count_type_ CountType, typename T>
   constexpr usize count_impl_(T&& str) const noexcept
@@ -160,11 +163,11 @@ private:
       return 0;
 
     auto cur = root_;
-    for (auto&& ch : str) {
+    for (auto&& ch : str)
+    {
       auto next = cur->next[ch];
-      if (!next) {
+      if (!next)
         return 0;
-      }
       cur = next;
     }
 
@@ -193,15 +196,18 @@ public:
     if (!root_ || count(str) == 0)
       return;
 
-    if (--root_->pass == 0) {
+    if (--root_->pass == 0)
+    {
       clear();
       return;
     }
 
     auto cur = root_;
-    for (auto&& ch : str) {
+    for (auto&& ch : str)
+    {
       auto& next = cur->next[ch];
-      if (--next->pass == 0) {
+      if (--next->pass == 0)
+      {
         destroy_tree_(next);
         next = nullptr;
         return;
@@ -216,8 +222,9 @@ public:
 
 namespace detail {
 
-// HashFn must map the given character to [0, DistinctCharCount) without any collisions, otherwise the behavior is undefined
-template <typename Char, usize DistinctCharCount, typename HashFn>
+// Hash must map the given character to [0, DistinctCharCount) without any collisions, otherwise the behavior is
+// undefined
+template <typename Char, usize DistinctCharCount, typename Hash>
 struct trie_default_hash_map
 {
   template <typename NodePtr>
@@ -225,7 +232,7 @@ struct trie_default_hash_map
   {
   private:
     std::array<NodePtr, DistinctCharCount> map_ {};
-    [[no_unique_address]] HashFn hash_;
+    [[no_unique_address]] Hash hash_;
 
   public:
     constexpr auto size() const noexcept { return DistinctCharCount; }
@@ -236,7 +243,8 @@ struct trie_default_hash_map
     template <typename Fn>
     constexpr void for_each_invoke(Fn&& f) noexcept
     {
-      for (auto child : map_) {
+      for (auto child : map_)
+      {
         if (child)
           f(child);
       }
@@ -251,14 +259,14 @@ struct trie_default_hash_map
   };
 };
 
-template <typename Char, typename HashFn, template <typename...> typename HashMap>
+template <typename Char, typename Hash, template <typename...> typename HashMap>
 struct trie_normal_hash_map
 {
   template <typename NodePtr>
   class type
   {
   private:
-    HashMap<Char, NodePtr, HashFn> map_;
+    HashMap<Char, NodePtr, Hash> map_;
 
   public:
     constexpr auto size() const noexcept { return map_.size(); }
@@ -269,7 +277,8 @@ struct trie_normal_hash_map
     template <typename Fn>
     constexpr void for_each_invoke(Fn&& f) noexcept
     {
-      for (auto [_, child] : map_) {
+      for (auto [_, child] : map_)
+      {
         if (child)
           f(child);
       }
@@ -278,7 +287,8 @@ struct trie_normal_hash_map
     template <typename Fn>
     constexpr void for_each_invoke(Fn&& f, type& to) const
     {
-      for (auto [ch, child] : map_) {
+      for (auto [ch, child] : map_)
+      {
         if (child)
           f(child, to[ch]);
       }
@@ -288,14 +298,17 @@ struct trie_normal_hash_map
 
 } // namespace detail
 
-export template <typename Char, usize DistinctCharCount, std::regular_invocable<Char> HashFn, exception_safety ExceptionSafety = exception_safety::strong>
-using trie = detail::trie_base<Char, detail::trie_default_hash_map<Char, DistinctCharCount, HashFn>, ExceptionSafety>;
+export template <
+  typename Char, usize DistinctCharCount, std::regular_invocable<Char> Hash,
+  exception_safety E = exception_safety::strong
+>
+using trie = detail::trie_base<Char, detail::trie_default_hash_map<Char, DistinctCharCount, Hash>, E>;
 
 export using binary_trie = trie<int, 2, decltype([](int x) constexpr noexcept { return x; })>;
 export using lower_char_trie = trie<char, 26, decltype([](char ch) constexpr noexcept { return ch - 'a'; })>;
 export using upper_char_trie = trie<char, 26, decltype([](char ch) constexpr noexcept { return ch - 'A'; })>;
 
-export template <typename Char, std::regular_invocable<Char> HashFn, exception_safety ExceptionSafety = exception_safety::strong>
-using hash_trie = detail::trie_base<Char, detail::trie_normal_hash_map<Char, HashFn, std::unordered_map>, ExceptionSafety>;
+export template <typename Char, std::regular_invocable<Char> Hash, exception_safety E = exception_safety::strong>
+using hash_trie = detail::trie_base<Char, detail::trie_normal_hash_map<Char, Hash, std::unordered_map>, E>;
 
 } // namespace fmia

@@ -199,8 +199,10 @@ export template <typename T>
 concept nonempty_list_of_types = list_of_types<T> && !empty_list_of_types<T>;
 
 // get the length of a type list
-// O(1) time complexity
+//
 // name after Haskell Data.List length
+//
+// O(1) time complexity
 export template <typename>
 struct length;
 
@@ -218,6 +220,7 @@ export template <typename AnyTypeList>
 constexpr std::size_t length_v = length<AnyTypeList>::value;
 
 // get the nth type of a type list, index starts at 0
+//
 // O(1) time complexity, assume C++26 pack indexing has O(1) time complexity
 export template <std::size_t, typename>
 struct nth;
@@ -238,8 +241,10 @@ export template <std::size_t Idx, typename AnyTypeList>
 using nth_t = nth<Idx, AnyTypeList>::type;
 
 // get the first type of a type list
-// O(1) time complexity
+//
 // name after Haskell Data.List head
+//
+// O(1) time complexity
 export template <nonempty_list_of_types T>
 using head = nth<0, T>;
 
@@ -247,8 +252,10 @@ export template <typename T>
 using head_t = head<T>::type;
 
 // get the last type of a type list
-// O(1) time complexity
+//
 // name after Haskell Data.List last
+//
+// O(1) time complexity
 export template <nonempty_list_of_types T>
 using last = nth<length_v<T> - 1, T>;
 
@@ -263,8 +270,10 @@ indexed_type<I, T> lookup_indexed_type_helper(indexed_type<I, T>);
 } // namespace detail
 
 // get the corresponding indexed type of a indexed_type_list with a given index
-// O(1) time complexity
+//
 // name after Haskell Data.List lookup
+//
+// O(1) time complexity
 export template <std::size_t I, typename IndexedTypeList>
   requires is_indexed_type_list_v<IndexedTypeList>
 struct lookup
@@ -276,9 +285,12 @@ export template <std::size_t I, typename IndexedTypeList>
 using lookup_t = lookup<I, IndexedTypeList>::type;
 
 // get a type list that has one element added to the beginning comparing to the given type list
-// O(1) time complexity for type_list
-// O(n) time complexity for indexed_type_list (because of the validation for indices), where n is the length of the given type list
+//
 // name after Haskell Data.List : operator (1 : [1, 2] --> [1, 1, 2])
+//
+// O(1) time complexity for type_list
+// O(n) time complexity for indexed_type_list (because of the validation for indices), where n is the length of the
+// given type list
 export template <typename, typename>
 struct cons;
 
@@ -299,8 +311,10 @@ export template <typename T, typename AnyTypeList>
 using cons_t = cons<T, AnyTypeList>::type;
 
 // get a type list that has one element added to the end comparing to the given type list
+//
 // O(1) time complexity for type_list
-// O(n) time complexity for indexed_type_list (because of the validation for indices), where n is the length of the given type list
+// O(n) time complexity for indexed_type_list (because of the validation for indices), where n is the length of the
+// given type list
 export template <typename, typename>
 struct snoc;
 
@@ -334,8 +348,10 @@ struct replicate_impl<T, std::index_sequence<Is...>>
 } // namespace detail
 
 // get a type list that contains N identical types
-// O(1) time complexity
+//
 // name after Haskell Data.List replicate
+//
+// O(1) time complexity
 export template <std::size_t N, typename T>
 using replicate = detail::replicate_impl<T, std::make_index_sequence<N>>;
 
@@ -418,17 +434,21 @@ template <template <typename...> typename, typename>
 struct is_predicate_tester;
 
 // clang-format off
+ 
 template <template <typename...> typename T, typename... Ts>
-struct is_predicate_tester<T, type_list<Ts...>> : std::bool_constant<requires { { T<Ts...>::value } -> no_cvref_same_as<bool>; }>
+struct is_predicate_tester<T, type_list<Ts...>>
+  : std::bool_constant<requires { { T<Ts...>::value } -> no_cvref_same_as<bool>; }>
 {
 };
+
 // clang-format on
 
 template <template <typename...> typename, typename>
 struct is_predicate_impl;
 
 template <template <typename...> typename T, std::size_t... Is>
-struct is_predicate_impl<T, std::index_sequence<Is...>> : std::disjunction<is_predicate_tester<T, replicate_t<Is + 1, void>>...>
+struct is_predicate_impl<T, std::index_sequence<Is...>>
+  : std::disjunction<is_predicate_tester<T, replicate_t<Is + 1, void>>...>
 {
 };
 
@@ -468,9 +488,13 @@ private:
   // 2. merge
   // use the 2 lists specialization of `concat_impl` to merge
   //
-  // note: placing this helper inside improves compilation time significantly, since in this way we can avoid the unnecessary copies of pack `Ts...` during the recursion
+  // placing this helper inside `concat_impl` improves compilation time significantly, since in this way we can avoid
+  // the unnecessary copies of pack `Ts...` during the recursion
   template <std::size_t BeginIdx, std::size_t N>
-  struct divide_helper_ : concat_impl<typename divide_helper_<BeginIdx, N / 2>::type, typename divide_helper_<BeginIdx + N / 2, N - N / 2>::type>
+  struct divide_helper_
+    : concat_impl<
+        typename divide_helper_<BeginIdx, N / 2>::type, typename divide_helper_<BeginIdx + N / 2, N - N / 2>::type
+      >
   {
   };
 
@@ -509,7 +533,10 @@ struct concat_impl<type_list<Ts...>, type_list<Us...>>
 };
 
 template <std::size_t... Is, typename... Ts, std::size_t... Js, typename... Us>
-struct concat_impl<indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>, indexed_type_list<std::index_sequence<Js...>, type_list<Us...>>>
+struct concat_impl<
+  indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>,
+  indexed_type_list<std::index_sequence<Js...>, type_list<Us...>>
+>
 {
   using type = indexed_type_list<std::index_sequence<Is..., Js...>, type_list<Ts..., Us...>>;
 };
@@ -538,9 +565,12 @@ struct concat_get_result_helper<Result, true>
 } // namespace detail
 
 // get the concatenation of several type lists
-// O(log n) time complexity for type_list, where n is the count of type lists to concatenate
-// O(Nlog N) time complexity for indexed_type_list (because of the validation for indices), where N is the count of types over all given type lists
+//
 // name after Haskell Data.List concat
+//
+// O(log n) time complexity for type_list, where n is the count of type lists to concatenate
+// O(Nlog N) time complexity for indexed_type_list (because of the validation for indices), where N is the count of
+// types over all given type lists
 export template <list_of_types... Ts>
 using concat = detail::concat_get_result_helper<typename detail::concat_impl<Ts...>::type>;
 
@@ -548,6 +578,7 @@ export template <typename... AnyTypeLists>
 using concat_t = concat<AnyTypeLists...>::type;
 
 // get a type list that contains types whose real indices are in the given `std::index_sequence`
+//
 // O(1) time complexity
 export template <typename, typename>
 struct select_by_index_sequence;
@@ -559,7 +590,9 @@ struct select_by_index_sequence<std::index_sequence<Is...>, type_list<Ts...>>
 };
 
 template <std::size_t... Is, std::size_t... Idxs, typename... Ts>
-struct select_by_index_sequence<std::index_sequence<Is...>, indexed_type_list<std::index_sequence<Idxs...>, type_list<Ts...>>>
+struct select_by_index_sequence<
+  std::index_sequence<Is...>, indexed_type_list<std::index_sequence<Idxs...>, type_list<Ts...>>
+>
 {
   using type = indexed_type_list<std::index_sequence<Idxs...[Is]...>, type_list<Ts...[Is]...>>;
 };
@@ -568,8 +601,10 @@ export template <typename IndexSequence, typename AnyTypeList>
 using select_by_index_sequence_t = select_by_index_sequence<IndexSequence, AnyTypeList>::type;
 
 // get a type list that is the reverse of the given type list
-// O(1) time complexity
+//
 // name after Haskell Data.List reverse
+//
+// O(1) time complexity
 export template <list_of_types T>
 using reverse = select_by_index_sequence<make_reversed_index_sequence<length_v<T>>, T>;
 
@@ -577,8 +612,10 @@ export template <typename AnyTypeList>
 using reverse_t = reverse<AnyTypeList>::type;
 
 // get a type list with the first type removed comparing to the given type list
-// O(1) time complexity
+//
 // name after Haskell Data.List tail
+//
+// O(1) time complexity
 export template <nonempty_list_of_types T>
 using tail = select_by_index_sequence<make_index_sequence_of_range<1, length_v<T> - 1>, T>;
 
@@ -586,8 +623,10 @@ export template <typename AnyTypeList>
 using tail_t = tail<AnyTypeList>::type;
 
 // get a type list with the last type removed comparing to the given type list
-// O(1) time complexity
+//
 // name after Haskell Data.List init
+//
+// O(1) time complexity
 export template <nonempty_list_of_types T>
 using init = select_by_index_sequence<std::make_index_sequence<length_v<T> - 1>, T>;
 
@@ -595,8 +634,10 @@ export template <typename AnyTypeList>
 using init_t = init<AnyTypeList>::type;
 
 // get a type list that contains the first N types of the given type list
-// O(1) time complexity
+//
 // name after Haskell Data.List take
+//
+// O(1) time complexity
 export template <std::size_t N, list_of_types T>
   requires (N <= length_v<T>)
 using take = select_by_index_sequence<std::make_index_sequence<N>, T>;
@@ -605,6 +646,7 @@ export template <std::size_t N, typename TypeList>
 using take_t = take<N, TypeList>::type;
 
 // same as take, but take from the end
+//
 // O(1) time complexity
 export template <std::size_t N, list_of_types T>
   requires (N <= length_v<T>)
@@ -630,8 +672,10 @@ export template <std::size_t N, typename AnyTypeList>
 using take_end_t = take_end<N, AnyTypeList>::type;
 
 // get a type list with the first N types removed comparing to the given type list
-// O(1) time complexity
+//
 // name after Haskell Data.List drop
+//
+// O(1) time complexity
 export template <std::size_t N, list_of_types T>
   requires (N <= length_v<T>)
 using drop = take_end<length_v<T> - N, T>;
@@ -640,6 +684,7 @@ export template <std::size_t N, typename AnyTypeList>
 using drop_t = drop<N, AnyTypeList>::type;
 
 // same as drop, but drop from the end
+//
 // O(1) time complexity
 export template <std::size_t N, list_of_types T>
   requires (N <= length_v<T>)
@@ -670,15 +715,21 @@ struct take_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>, type_li
 };
 
 template <template <typename> typename Pred, typename T, typename... Ts, typename... Taken>
-struct take_while_impl<Pred, type_list<T, Ts...>, type_list<Taken...>> : std::conditional_t<Pred<T>::value, take_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>, type_list<Taken...>>, std::type_identity<type_list<Taken...>>>
+struct take_while_impl<Pred, type_list<T, Ts...>, type_list<Taken...>>
+  : std::conditional_t<
+      Pred<T>::value, take_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>, type_list<Taken...>>,
+      std::type_identity<type_list<Taken...>>
+    >
 {
 };
 
 } // namespace detail
 
 // get the longest prefix type list whose types all satisfy a given predicate
-// O(k) time complexity, where k is the length of the longest prefix
+//
 // name after Haskell Data.List takeWhile
+//
+// O(k) time complexity, where k is the length of the longest prefix
 export template <template <typename> typename Pred, list_of_types T>
   requires predicate<Pred>
 using take_while = detail::take_while_impl<Pred, T>;
@@ -687,6 +738,7 @@ export template <template <typename> typename Pred, typename TypeList>
 using take_while_t = take_while<Pred, TypeList>::type;
 
 // get the longest suffix type list whose types all satisfy a given predicate
+//
 // O(k) time complexity, where k is the length of the longest suffix
 export template <template <typename> typename Pred, list_of_types T>
   requires predicate<Pred>
@@ -719,15 +771,21 @@ struct drop_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>>
 };
 
 template <template <typename> typename Pred, typename T, typename... Ts>
-struct drop_while_impl<Pred, type_list<T, Ts...>> : std::conditional_t<Pred<T>::value, drop_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>>, std::type_identity<type_list<T, Ts...>>>
+struct drop_while_impl<Pred, type_list<T, Ts...>>
+  : std::conditional_t<
+      Pred<T>::value, drop_while_impl_lazy_evaluation_helper<Pred, type_list<T, Ts...>>,
+      std::type_identity<type_list<T, Ts...>>
+    >
 {
 };
 
 } // namespace detail
 
 // get a type list with a longest prefix type list removed, whose types all satisfy a given predicate
-// O(k) time complexity, where k is the longest dropped prefix
+//
 // name after Haskell Data.List dropWhile
+//
+// O(k) time complexity, where k is the longest dropped prefix
 export template <template <typename> typename Pred, list_of_types T>
   requires predicate<Pred>
 using drop_while = detail::drop_while_impl<Pred, T>;
@@ -736,8 +794,10 @@ export template <template <typename> typename Pred, typename TypeList>
 using drop_while_t = drop_while<Pred, TypeList>::type;
 
 // get a type list with a longest suffix type list removed, whose types all satisfy a given predicate
-// O(k) time complexity, where k is the length of the longest dropped suffix
+//
 // name after Haskell Data.List dropWhileEnd
+//
+// O(k) time complexity, where k is the length of the longest dropped suffix
 export template <template <typename> typename Pred, list_of_types T>
   requires predicate<Pred>
 struct drop_while_end : reverse<drop_while_t<Pred, reverse_t<T>>>
@@ -748,8 +808,10 @@ export template <template <typename> typename Pred, typename TypeList>
 using drop_while_end_t = drop_while_end<Pred, TypeList>::type;
 
 // get a type list that contains all the types that satisfy a given predicate
-// O(log n) time complexity, limited by `concat`, where n is the length of the given type list
+//
 // name after Haskell Data.List filter
+//
+// O(log n) time complexity, limited by `concat`, where n is the length of the given type list
 export template <template <typename> typename Pred, typename>
   requires predicate<Pred>
 struct filter;
@@ -769,6 +831,7 @@ export template <template <typename> typename Pred, typename TypeList>
 using filter_t = filter<Pred, TypeList>::type;
 
 // get a type list that only contains the given type T comparing to the given type list
+//
 // O(log n) time complexity, where n is the length of the given type list
 export template <typename T, list_of_types U>
 using keep = filter<bind_front<std::is_same, T>::template type, U>;
@@ -777,6 +840,7 @@ export template <typename T, typename TypeList>
 using keep_t = keep<T, TypeList>::type;
 
 // get a type list that does not contain the given type T comparing to the given type list
+//
 // O(log n) time complexity, where n is the length of the given type list
 export template <typename T, list_of_types U>
 using remove = filter<bind_front<not_same, T>::template type, U>;
@@ -785,6 +849,7 @@ export template <typename T, typename TypeList>
 using remove_t = remove<T, TypeList>::type;
 
 // apply the given template to every type of the given type list
+//
 // O(1) time complexity
 export template <template <typename> typename, typename>
 struct transform;
@@ -799,8 +864,10 @@ export template <template <typename> typename T, typename TypeList>
 using transform_t = transform<T, TypeList>::type;
 
 // test if any of the types of the given type list satisfy the given predicate
-// O(k) time complexity, where k is the length of the longest prefix whose types do not satisfy the given predicate
+//
 // name after Haskell Data.List any
+//
+// O(k) time complexity, where k is the length of the longest prefix whose types do not satisfy the given predicate
 export template <template <typename> typename T, typename>
   requires predicate<T>
 struct any;
@@ -821,8 +888,10 @@ export template <template <typename> typename T, typename TypeList>
 constexpr bool none_v = none<T, TypeList>::value;
 
 // test if all of the types of the given type list satisfy the given predicate
-// O(k) time complexity, where k is the length of the longest prefix whose types satisfy the given predicate
+//
 // name after Haskell Data.List all
+//
+// O(k) time complexity, where k is the length of the longest prefix whose types satisfy the given predicate
 export template <template <typename> typename T, typename>
   requires predicate<T>
 struct all;

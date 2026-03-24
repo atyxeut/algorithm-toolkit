@@ -49,7 +49,11 @@ template <typename T, typename Engine = std::mt19937>
 
 } // namespace fmia::random
 
-namespace fmia::random::generate::detail { constexpr char decimal_digit_character[10] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}; } // namespace fmia::random::generate::detail
+namespace fmia::random::generate::detail {
+
+constexpr char decimal_digit_character[10] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
+} // namespace fmia::random::generate::detail
 
 export namespace fmia::random::generate {
 
@@ -95,7 +99,8 @@ template <bool FlowerGraph = false, std::integral T>
   graph::basic_unweighted_edge_list<T> data;
   data.reserve(edge_cnt);
 
-  for (auto v = 1uz; v <= edge_cnt; ++v) {
+  for (auto v = 1uz; v <= edge_cnt; ++v)
+  {
     if constexpr (FlowerGraph)
       data.add_edge(p[0], p[v]);
     else
@@ -122,7 +127,8 @@ template <bool FlowerGraph = false, std::integral Vertex, std::integral Weight>
   data.reserve(edge_cnt);
 
   auto w_dist = uniform_dist(weight_begin, weight_end);
-  for (auto v = 1uz; v <= edge_cnt; ++v) {
+  for (auto v = 1uz; v <= edge_cnt; ++v)
+  {
     if constexpr (FlowerGraph)
       data.add_edge(p[0], p[v], w_dist(mt19937_engine));
     else

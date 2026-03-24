@@ -19,7 +19,11 @@ import std;
 
 import fmia.math.integer;
 
-namespace test::fmia { using namespace ::fmia; } // namespace test::fmia
+namespace test::fmia {
+
+using namespace ::fmia;
+
+} // namespace test::fmia
 
 namespace test::fmia::meta {
 

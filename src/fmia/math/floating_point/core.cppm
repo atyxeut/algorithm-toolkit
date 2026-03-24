@@ -21,6 +21,7 @@ import fmia.math.integer.core;
 import fmia.util.std_extension.meta;
 
 // clang-format off
+
 export {
 
 using f32 = float;       // precision: 6 to 9 decimal places
@@ -28,6 +29,7 @@ using f64 = double;      // precision: 15 to 17 decimal places
 using f80 = long double; // precision: 18 to 20 decimal places (probably, on MSVC long double is double)
 
 }
+
 // clang-format on
 
 // forward declaration
@@ -58,7 +60,8 @@ struct is_no_cv_custom_ieee754_binary_floating_point<ieee754_float::f<PrecisionB
 };
 
 template <typename T>
-constexpr bool is_no_cv_custom_ieee754_binary_floating_point_v = is_no_cv_custom_ieee754_binary_floating_point<T>::value;
+constexpr bool is_no_cv_custom_ieee754_binary_floating_point_v =
+  is_no_cv_custom_ieee754_binary_floating_point<T>::value;
 
 template <typename T>
 using is_custom_ieee754_binary_floating_point = is_no_cv_custom_ieee754_binary_floating_point<std::remove_cv_t<T>>;
@@ -77,7 +80,8 @@ struct is_no_cv_custom_ieee754_decimal_floating_point<ieee754_float::d<Precision
 };
 
 template <typename T>
-constexpr bool is_no_cv_custom_ieee754_decimal_floating_point_v = is_no_cv_custom_ieee754_decimal_floating_point<T>::value;
+constexpr bool is_no_cv_custom_ieee754_decimal_floating_point_v =
+  is_no_cv_custom_ieee754_decimal_floating_point<T>::value;
 
 template <typename T>
 using is_custom_ieee754_decimal_floating_point = is_no_cv_custom_ieee754_decimal_floating_point<std::remove_cv_t<T>>;
@@ -88,6 +92,7 @@ constexpr bool is_custom_ieee754_decimal_floating_point_v = is_custom_ieee754_de
 } // namespace fmia::meta
 
 // clang-format off
+
 export {
 
 // f128 precision: 33 to 35 decimal places
@@ -99,12 +104,14 @@ using f128 = ::fmia::ieee754_float::f<128>;
 #endif
 
 }
+
 // clang-format on
 
 export namespace fmia::meta {
 
 template <typename T>
-concept ieee754_binary_floating_point = std::floating_point<T> || std::same_as<std::remove_cv_t<T>, f128> || is_custom_ieee754_binary_floating_point_v<T>;
+concept ieee754_binary_floating_point =
+  std::floating_point<T> || std::same_as<std::remove_cv_t<T>, f128> || is_custom_ieee754_binary_floating_point_v<T>;
 
 template <typename T>
 concept ieee754_decimal_floating_point = is_custom_ieee754_decimal_floating_point_v<T>;
@@ -159,12 +166,14 @@ struct make_higher_precision_selector<T, f128, false> : claim_cv<T, ieee754_floa
 };
 
 template <typename T, usize PrecisionBits>
-struct make_higher_precision_selector<T, ieee754_float::f<PrecisionBits>, false> : claim_cv<T, ieee754_float::f<PrecisionBits * 2>>
+struct make_higher_precision_selector<T, ieee754_float::f<PrecisionBits>, false>
+  : claim_cv<T, ieee754_float::f<PrecisionBits * 2>>
 {
 };
 
 template <typename T, usize PrecisionBits>
-struct make_higher_precision_selector<T, ieee754_float::d<PrecisionBits>, false> : claim_cv<T, ieee754_float::d<PrecisionBits * 2>>
+struct make_higher_precision_selector<T, ieee754_float::d<PrecisionBits>, false>
+  : claim_cv<T, ieee754_float::d<PrecisionBits * 2>>
 {
 };
 

@@ -58,9 +58,14 @@ struct cur_dim_allocator<Elem, AllocatorList, std_pmr_allocator_tag>
 template <typename Elem, typename AllocatorList>
 using cur_dim_allocator_t = cur_dim_allocator<Elem, AllocatorList>::type;
 
-// used in recursion, add a std::allocator as the default allocator, if the length of the allocator type list < dim count
+// used in recursion, add a std::allocator as the default allocator, if the length of the allocator type list
+// < dim count
 template <list_of_types CurAllocatorList, std::size_t DimCnt>
-struct adjust_allocator_type_list : concat<CurAllocatorList, std::conditional_t<(length_v<CurAllocatorList>) < DimCnt, type_list<std_allocator_tag>, empty_type_list>>
+struct adjust_allocator_type_list
+  : concat<
+      CurAllocatorList,
+      std::conditional_t<(length_v<CurAllocatorList>) < DimCnt, type_list<std_allocator_tag>, empty_type_list>
+    >
 {
 };
 
@@ -74,14 +79,7 @@ export namespace fmia {
 template <meta::for_size_integral T>
 constexpr T dynamic_capacity = static_cast<T>(-1);
 
-enum class resource_location {
-  inplace,
-  heap
-};
-
-enum class exception_safety {
-  basic,
-  strong
-};
+enum class resource_location { inplace, heap };
+enum class exception_safety { basic, strong };
 
 } // namespace fmia

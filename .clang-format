@@ -3,7 +3,7 @@
 # misc settings
 Language: Cpp
 Standard: Latest
-ColumnLimit: 240
+ColumnLimit: 120
 IndentWidth: 2
 ContinuationIndentWidth: 2
 UseTab: Never
@@ -18,9 +18,9 @@ BreakAdjacentStringLiterals: true
 SortUsingDeclarations: Never
 
 # penalty, higher penalty = less priority
-PenaltyExcessCharacter: 600
-PenaltyBreakAssignment: 20
-PenaltyBreakBeforeFirstCallParameter: 100
+PenaltyExcessCharacter: 300
+PenaltyBreakAssignment: 50
+PenaltyBreakBeforeFirstCallParameter: 10
 PenaltyBreakBeforeMemberAccess: 5
 PenaltyBreakComment: 0
 PenaltyBreakFirstLessLess: 30
@@ -59,9 +59,11 @@ AlignConsecutiveAssignments:
   PadOperators: true
 IntegerLiteralSeparator:
   Decimal: 3
-  DecimalMinDigits: 6
+  DecimalMinDigitsInsert: 10
   Binary: 4
+  BinaryMinDigitsInsert: 8
   Hex: 2
+  HexMinDigitsInsert: 4
 PointerAlignment: Left
 ReferenceAlignment: Left
 AlignArrayOfStructures: Right
@@ -77,10 +79,12 @@ AllowShortBlocksOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: Never
 IndentCaseLabels: true
 IndentCaseBlocks: false
-AllowShortCaseLabelsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: true
 AlignConsecutiveShortCaseStatements:
-  Enabled: false
-  AlignCaseColons: true
+  Enabled: true
+  AlignCaseColons: false
+  AcrossEmptyLines: false
+  AcrossComments: false
 AllowShortLoopsOnASingleLine: false
 IndentGotoLabels: false
 
@@ -112,7 +116,7 @@ AlignConsecutiveBitFields:
   Enabled: true
   AcrossComments: true
 BitFieldColonSpacing: Both
-AllowShortEnumsOnASingleLine: false
+AllowShortEnumsOnASingleLine: true
 
 #namespace / extern / export
 IndentExternBlock: false
@@ -122,7 +126,7 @@ NamespaceIndentation: None
 IndentExportBlock: false
 CompactNamespaces: true
 WrapNamespaceBodyWithEmptyLines: Always
-AllowShortNamespacesOnASingleLine: true
+AllowShortNamespacesOnASingleLine: false
 
 # template
 SpaceAfterTemplateKeyword: true
@@ -137,7 +141,7 @@ RequiresClausePosition: OwnLine
 # parentheses / brace
 BreakBeforeBraces: Custom
 BraceWrapping:
-  AfterControlStatement: Never
+  AfterControlStatement: Always
   AfterExternBlock: false
   AfterFunction: true
   AfterClass: true
@@ -147,7 +151,7 @@ BraceWrapping:
   BeforeLambdaBody: false
   BeforeElse: true
   BeforeCatch: true
-  SplitEmptyFunction: true
+  SplitEmptyFunction: false
   SplitEmptyRecord: true
   SplitEmptyNamespace: false
 Cpp11BracedListStyle: true

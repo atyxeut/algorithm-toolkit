@@ -71,14 +71,16 @@ struct is_std_ostream_interactable_impl : std::false_type
 };
 
 template <typename T>
-struct is_std_ostream_interactable_impl<T, std::void_t<decltype(std::declval<std::ostream&>() << std::declval<T>())>> : std::true_type
+struct is_std_ostream_interactable_impl<T, std::void_t<decltype(std::declval<std::ostream&>() << std::declval<T>())>>
+  : std::true_type
 {
 };
 
 } // namespace detail
 
 // check if T has an overload of operator << of std::ostream&
-// to make fmia::meta::is_std_ostream_interactable<...>::value evaluate to true, the candidate overload must be already defined above it
+// to make fmia::meta::is_std_ostream_interactable<...>::value evaluate to true, the candidate overload must be already
+// defined above it
 export template <typename T>
 using is_std_ostream_interactable = detail::is_std_ostream_interactable_impl<T>;
 
@@ -91,7 +93,10 @@ namespace fmia {
 
 // for a range whose elements can be printed by std::ostream by default
 // e.g. std::vector<int>, std::vector<std::string>
-export template <std::ranges::input_range Range, std::convertible_to<std::string> Delim = std::string, typename Elem = std::ranges::range_value_t<Range>>
+export template <
+  std::ranges::input_range Range, std::convertible_to<std::string> Delim = std::string,
+  typename Elem = std::ranges::range_value_t<Range>
+>
   requires (meta::is_std_ostream_interactable_v<Elem> && !std::is_array_v<Elem>)
 std::size_t print(std::ostream& ostr, Range&& range, Delim&& delim = std::string(1, ' '), bool new_line = false)
 {
@@ -106,12 +111,16 @@ std::size_t print(std::ostream& ostr, Range&& range, Delim&& delim = std::string
 
 // for a range whose elements can not be printed by std::ostream by default
 // e.g. std::vector<std::array<int, 4>>, std::vector<std::pair<int, int>>
-export template <std::ranges::input_range Range, std::convertible_to<std::string> Delim = std::string, typename Elem = std::ranges::range_value_t<Range>>
+export template <
+  std::ranges::input_range Range, std::convertible_to<std::string> Delim = std::string,
+  typename Elem = std::ranges::range_value_t<Range>
+>
   requires (!meta::is_std_ostream_interactable_v<Elem> && std::ranges::input_range<Elem>)
 std::size_t print(std::ostream& ostr, Range&& range, Delim&& delim = std::string(1, ' '), bool new_line = false)
 {
   std::size_t cur_dim = 0;
-  for (auto it = std::ranges::begin(range), it_end = std::ranges::end(range); it != it_end; ++it) {
+  for (auto it = std::ranges::begin(range), it_end = std::ranges::end(range); it != it_end; ++it)
+  {
     cur_dim = print(ostr, *it, std::forward<Delim>(delim), false);
 
     const auto dimension_delim = std::string(cur_dim, '\n');
@@ -127,7 +136,8 @@ std::size_t print(std::ostream& ostr, Range&& range, Delim&& delim = std::string
 export template <meta::multidimentional_cstyle_array T, std::convertible_to<std::string> Delim = std::string>
 void print(std::ostream& ostr, const T& arr, Delim&& delim = std::string(1, ' '), bool new_line = false)
 {
-  for (auto it = std::begin(arr), it_end = std::end(arr); it != it_end; ++it) {
+  for (auto it = std::begin(arr), it_end = std::end(arr); it != it_end; ++it)
+  {
     print(ostr, *it, std::forward<Delim>(delim), false);
 
     const auto dimension_delim = std::string(std::rank_v<std::remove_cvref_t<T>> - 1, '\n');
@@ -141,8 +151,11 @@ void print(std::ostream& ostr, const T& arr, Delim&& delim = std::string(1, ' ')
 } // namespace fmia
 
 // avoid ambiguous overloads when Range is std::string&, int[2][3], ...
-// some how we cannot use requires here, for clang 21.1.0, this is an infinitely recursive constraint (maybe clang's bug? gcc and msvc don't have this issue)
-export template <std::ranges::input_range Range, typename = std::enable_if_t<!::fmia::meta::is_std_ostream_interactable_v<Range>>>
+// some how we cannot use requires here, for clang 21.1.0, this is an infinitely recursive constraint (maybe clang's
+// bug? gcc and msvc don't have this issue)
+export template <
+  std::ranges::input_range Range, typename = std::enable_if_t<!::fmia::meta::is_std_ostream_interactable_v<Range>>
+>
 auto& operator <<(std::ostream& ostr, Range&& range)
 {
   ::fmia::print(ostr, std::forward<Range>(range));

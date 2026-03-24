@@ -23,10 +23,7 @@ import fmia.math;
 
 namespace fmia::graph::shortest_path {
 
-export enum class error : std::uint8_t {
-  empty_graph,
-  negative_cycle
-};
+export enum class error : std::uint8_t { empty_graph, negative_cycle };
 
 namespace detail {
 
@@ -38,28 +35,32 @@ namespace detail {
 //
 // time complexity: O(VE)
 template <typename EdgeList, typename Vertex, typename Weight = EdgeList::weight_type>
-constexpr auto bellman_ford_impl(const EdgeList& edges, Vertex vertex_cnt, Vertex source) -> std::expected<std::vector<Weight>, error>
+constexpr auto bellman_ford_impl(const EdgeList& edges, Vertex vertex_count, Vertex source)
+  -> std::expected<std::vector<Weight>, error>
 {
   if (edges.empty())
     return std::unexpected(error::empty_graph);
 
-  std::vector<Weight> distance(vertex_cnt, Weight::infinity);
+  std::vector<Weight> distance(vertex_count, Weight::infinity);
   distance[source] = 0;
 
   bool relaxation_happened;
-  do {
+  do
+  {
     // works as a round counter
-    if (vertex_cnt-- == 0)
+    if (vertex_count-- == 0)
       return std::unexpected(error::negative_cycle);
 
     relaxation_happened = false;
-    for (const auto& [u, v, w] : edges) {
+    for (const auto& [u, v, w] : edges)
+    {
       // 1. prevent fake paths from the source vertex
       // 2. avoid addition overflow
       if (distance[u] == Weight::infinity)
         continue;
 
-      if (const auto new_distance = distance[u] + w; new_distance < distance[v]) {
+      if (const auto new_distance = distance[u] + w; new_distance < distance[v])
+      {
         distance[v] = new_distance;
         relaxation_happened = true;
       }
@@ -72,9 +73,11 @@ constexpr auto bellman_ford_impl(const EdgeList& edges, Vertex vertex_cnt, Verte
 } // namespace detail
 
 export template <typename Vertex, typename Weight>
-[[nodiscard]] constexpr auto bellman_ford(const basic_weighted_edge_list<Vertex, Weight>& edges, Vertex vertex_cnt, Vertex source)
+[[nodiscard]] constexpr auto bellman_ford(
+  const basic_weighted_edge_list<Vertex, Weight>& edges, Vertex vertex_count, Vertex source
+)
 {
-  return detail::bellman_ford_impl(edges, vertex_cnt, source);
+  return detail::bellman_ford_impl(edges, vertex_count, source);
 }
 
 export template <typename Vertex, typename Weight>
@@ -94,24 +97,26 @@ export template <typename Vertex, typename Weight>
 // this implementation uses a queue to hold the vertices, guarantees not worse than the vanilla bellman-ford, and is
 // faster in average cases
 export template <meta::graph T, typename Vertex = T::vertex_type, typename Weight = T::weight_type>
-[[nodiscard]] constexpr auto bellman_ford_queue_optimized(const T& g, Vertex source) -> std::expected<std::vector<Weight>, error>
+[[nodiscard]] constexpr auto bellman_ford_queue_optimized(const T& g, Vertex source)
+  -> std::expected<std::vector<Weight>, error>
 {
   if (g.empty())
     return std::unexpected(error::empty_graph);
 
-  const auto vertex_cnt = g.vertex_size();
+  const auto vertex_count = g.vertex_size();
 
-  std::vector<Weight> distance(vertex_cnt, Weight::infinity);
+  std::vector<Weight> distance(vertex_count, Weight::infinity);
   distance[source] = 0;
 
   // path_length[i] < 0: vertex i is in the queue
   // path_length[i] >= 0: vertex i is not in the queue
   // abs(path_length[i]): (edge size of the shortest path from the souce vertex to vertex i) + 1
-  auto path_length = std::vector<meta::make_signed_t<Vertex>>(vertex_cnt);
+  auto path_length = std::vector<meta::make_signed_t<Vertex>>(vertex_count);
   path_length[source] = -1;
 
   std::deque<Vertex> q {source};
-  while (!q.empty()) {
+  while (!q.empty())
+  {
     const auto u = q.front();
     q.pop_front();
 
@@ -121,12 +126,14 @@ export template <meta::graph T, typename Vertex = T::vertex_type, typename Weigh
     // in this pure queue optimized version, an enqueue_count array also works for detecting negative cycles, since
     // it doesn't break the breadth first nature of the bellman-ford algorithm, however, the performance would be
     // worse, because the algorithm may have to traverse the cycle multiple times to get enough information
-    if (static_cast<Vertex>(cur_length) > vertex_cnt)
+    if (static_cast<Vertex>(cur_length) > vertex_count)
       return std::unexpected(error::negative_cycle);
 
-    for (const auto& [v, w] : g[u].neighbors()) {
+    for (const auto& [v, w] : g.neighbors(u))
+    {
       // distance[u] never equals to infinity, since only relaxed vertices are added to the queue
-      if (const auto new_distance = distance[u] + w; new_distance < distance[v]) {
+      if (const auto new_distance = distance[u] + w; new_distance < distance[v])
+      {
         distance[v] = new_distance;
         if (path_length[v] >= 0)
           q.emplace_back(v);

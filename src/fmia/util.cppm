@@ -46,7 +46,8 @@ export template <std::ranges::input_range Range>
   const auto n = std::ranges::size(range);
   std::vector<std::pair<std::ranges::range_value_t<Range>, std::size_t>> tmp;
   tmp.reserve(n);
-  for (auto i = 0uz; auto&& elem : range) {
+  for (auto i = 0uz; auto&& elem : range)
+  {
     if constexpr (std::is_rvalue_reference_v<Range>)
       tmp.emplace_back(std::move(elem), i++);
     else

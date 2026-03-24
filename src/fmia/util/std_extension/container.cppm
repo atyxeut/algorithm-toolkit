@@ -110,7 +110,8 @@ template <typename T, std::size_t DimCnt, typename InnermostDimAllocator, typena
 class vector_impl<T, DimCnt, meta::type_list<InnermostDimAllocator, Allocators...>>
 {
 private:
-  using adjusted_allocator_type_list_ = meta::adjust_allocator_type_list_t<meta::type_list<InnermostDimAllocator, Allocators...>, DimCnt>;
+  using adjusted_allocator_type_list_ =
+    meta::adjust_allocator_type_list_t<meta::type_list<InnermostDimAllocator, Allocators...>, DimCnt>;
   using element_type_ = vector_impl<T, DimCnt - 1, meta::init_t<adjusted_allocator_type_list_>>::type;
 
 public:
@@ -131,7 +132,9 @@ public:
 //
 // fmia::vector<int, 4> vec4d;
 // same as: std::vector<std::vector<std::vector<std::vector<int>>>> vec4d;
-export template <typename T, std::size_t DimCnt = 1, typename InnermostDimAllocator = std_allocator_tag, typename... Allocators>
+export template <
+  typename T, std::size_t DimCnt = 1, typename InnermostDimAllocator = std_allocator_tag, typename... Allocators
+>
   requires (sizeof...(Allocators) < DimCnt)
 using vector = detail::vector_impl<T, DimCnt, meta::type_list<InnermostDimAllocator, Allocators...>>::type;
 
@@ -141,15 +144,22 @@ template <typename Elem, typename AllocatorList, typename Dim, typename... Ts>
 [[nodiscard]] constexpr auto make_vector_impl(Dim first_dim_size, Ts&&... args)
 {
   using adjusted_allocator_type_list = meta::adjust_allocator_type_list_t<AllocatorList, sizeof...(Ts)>;
-  if constexpr (sizeof...(Ts) == 1) {
+  if constexpr (sizeof...(Ts) == 1)
+  {
     using cur_dim_allocator_type = meta::cur_dim_allocator_t<Elem, adjusted_allocator_type_list>;
-    return vector<Elem, 1, cur_dim_allocator_type>(static_cast<std::size_t>(first_dim_size), static_cast<Elem>(args)...);
+    return vector<Elem, 1, cur_dim_allocator_type>(
+      static_cast<std::size_t>(first_dim_size), static_cast<Elem>(args)...
+    );
   }
-  else {
+  else
+  {
     using inner_allocator_type_list = meta::init_t<adjusted_allocator_type_list>;
     using inner_element_type = vector_impl<Elem, sizeof...(Ts) - 1, inner_allocator_type_list>::type;
     using cur_dim_allocator_type = meta::cur_dim_allocator_t<inner_element_type, adjusted_allocator_type_list>;
-    return vector<inner_element_type, 1, cur_dim_allocator_type>(static_cast<std::size_t>(first_dim_size), make_vector_impl<Elem, inner_allocator_type_list>(std::forward<Ts>(args)...));
+    return vector<inner_element_type, 1, cur_dim_allocator_type>(
+      static_cast<std::size_t>(first_dim_size),
+      make_vector_impl<Elem, inner_allocator_type_list>(std::forward<Ts>(args)...)
+    );
   }
 }
 
@@ -166,11 +176,16 @@ template <typename Elem, typename AllocatorList, typename Dim, typename... Ts>
 //   std::ranges::for_each(vec, [&sum](int elem) { return sum += elem; });
 //   return sum;
 // }(fmia::make_vector<int>(10, -1)) << "\n";
-export template <typename Elem, typename InnermostDimAllocator = std_allocator_tag, typename... Allocators, std::integral Dim, typename... Ts>
+export template <
+  typename Elem, typename InnermostDimAllocator = std_allocator_tag, typename... Allocators, std::integral Dim,
+  typename... Ts
+>
   requires (sizeof(Dim) <= sizeof(std::size_t) && sizeof...(Ts) > 0 && sizeof...(Allocators) < sizeof...(Ts))
 [[nodiscard]] constexpr auto make_vector(Dim first_dim_size, Ts&&... args)
 {
-  return detail::make_vector_impl<Elem, meta::type_list<InnermostDimAllocator, Allocators...>>(first_dim_size, std::forward<Ts>(args)...);
+  return detail::make_vector_impl<Elem, meta::type_list<InnermostDimAllocator, Allocators...>>(
+    first_dim_size, std::forward<Ts>(args)...
+  );
 }
 
 } // namespace fmia
