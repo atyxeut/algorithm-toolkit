@@ -14,8 +14,8 @@
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
 // general metaprogramming utilities
-export module fmia.util.std_extension.meta;
+export module fmia.meta;
 
-export import fmia.util.std_extension.meta.core;
-export import fmia.util.std_extension.meta.cv_qualifier;
-export import fmia.util.std_extension.meta.type_list;
+export import fmia.meta.core;
+export import fmia.meta.cv_qualifier;
+export import fmia.meta.type_list;

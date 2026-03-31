@@ -18,7 +18,7 @@ export module fmia.memory.core;
 import std;
 
 import fmia.math.integer.core;
-import fmia.util.std_extension.meta;
+import fmia.meta;
 
 export namespace fmia {
 

@@ -13,12 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export module test.fmia.util.std_extension.meta.type_list;
+export module test.fmia.meta.type_list;
 
 import std;
 
-import fmia.util.std_extension.meta.core;
-import fmia.util.std_extension.meta.type_list;
+import fmia.meta.core;
+import fmia.meta.type_list;
 
 namespace test::fmia::meta {
 

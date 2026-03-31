@@ -18,7 +18,7 @@ export module fmia.math.floating_point.core;
 import std;
 
 import fmia.math.integer.core;
-import fmia.util.std_extension.meta;
+import fmia.meta;
 
 // clang-format off
 

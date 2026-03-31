@@ -24,7 +24,7 @@ export module fmia.math.integer.core;
 
 import std;
 
-import fmia.util.std_extension.meta;
+import fmia.meta;
 
 // clang-format off
 

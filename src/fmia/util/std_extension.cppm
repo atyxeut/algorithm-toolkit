@@ -17,7 +17,6 @@ export module fmia.util.std_extension;
 
 export import fmia.util.std_extension.container;
 export import fmia.util.std_extension.io;
-export import fmia.util.std_extension.meta;
 
 import std;
 

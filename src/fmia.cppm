@@ -19,6 +19,7 @@ export import fmia.data_structure;
 export import fmia.debug;
 export import fmia.math;
 export import fmia.memory;
+export import fmia.meta;
 export import fmia.random;
 export import fmia.simd;
 export import fmia.util;

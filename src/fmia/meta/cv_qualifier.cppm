@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.util.std_extension.meta.cv_qualifier;
+export module fmia.meta.cv_qualifier;
 
 import std;
 

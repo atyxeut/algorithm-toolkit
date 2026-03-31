@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.util.std_extension.meta.type_list;
+export module fmia.meta.type_list;
 
 import std;
 
-import fmia.util.std_extension.meta.core;
+import fmia.meta.core;
 
 export namespace fmia::meta {
 
