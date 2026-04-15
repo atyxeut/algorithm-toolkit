@@ -212,6 +212,7 @@ auto& operator <<(std::ostream& ostr, Range&& range)
 // C-style arrays can decay and be output directly as a pointer, thus need a specific overload
 // this overload covers multidimentional arrays
 export template <typename T, std::size_t N>
+  requires (!std::same_as<std::remove_cv_t<T>, char>)
 auto& operator <<(std::ostream& ostr, const T (&arr)[N])
 {
   ::fmia::print(ostr, arr);

@@ -59,6 +59,18 @@ void std_tuple_output_with_custom_print_and_std_ostream() noexcept
   std::cout << '\n';
 }
 
+void cstyle_string_literal_output_no_ambiguous_overloads() noexcept
+{
+  print(std::cout, "hello", "", true);
+  print(std::cout, "hello", " | ", true);
+
+  std::cout << '\n';
+
+  std::cout << "hello\n";
+
+  std::cout << '\n';
+}
+
 void common_ranges_output_with_custom_print_and_std_ostream() noexcept
 {
   int arr1[] {1, 2, 3, 4, 5, 6, 7};

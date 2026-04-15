@@ -27,6 +27,7 @@ int main()
   test::fmia::util::std_pair_output_with_custom_print_and_std_ostream();
   test::fmia::util::std_tuple_output_with_custom_print_and_std_ostream();
 
+  test::fmia::util::cstyle_string_literal_output_no_ambiguous_overloads();
   test::fmia::util::common_ranges_output_with_custom_print_and_std_ostream();
   test::fmia::util::multidimensional_ranges_output_with_custom_print_and_std_ostream();
 }
