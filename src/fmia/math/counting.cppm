@@ -17,11 +17,11 @@ module;
 
 #include <cassert>
 
-export module fmia.math.integer.counting;
+export module fmia.math.counting;
 
 import std;
 
-import fmia.math.integer.core;
+import fmia.math.core;
 
 namespace fmia {
 
