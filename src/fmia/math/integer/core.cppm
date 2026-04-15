@@ -72,7 +72,7 @@ template <typename T>
 concept nonbool_standard_integral = std::integral<T> && !boolean<T>;
 
 template <typename T>
-concept for_size_integral = std::same_as<T, u32> || std::same_as<T, usize>;
+concept size_integral = std::same_as<T, u32> || std::same_as<T, usize>;
 
 } // namespace fmia::meta
 
