@@ -17,7 +17,7 @@ export module fmia.data_structure.trie.vanilla;
 
 import std;
 
-import fmia.math.integer.core;
+import fmia.math.core;
 import fmia.memory.core;
 import fmia.meta;
 

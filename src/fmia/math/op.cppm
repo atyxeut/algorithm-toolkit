@@ -17,7 +17,7 @@ export module fmia.math.op;
 
 import std;
 
-import fmia.math.floating_point.core;
+import fmia.math.core;
 import fmia.meta;
 
 export namespace fmia {

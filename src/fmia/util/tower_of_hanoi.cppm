@@ -17,7 +17,7 @@ export module fmia.util.tower_of_hanoi;
 
 import std;
 
-import fmia.math.integer;
+import fmia.math.core;
 
 namespace fmia::tower_of_hanoi {
 

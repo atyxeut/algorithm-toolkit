@@ -33,7 +33,7 @@ template <typename T>
 [[nodiscard]] constexpr auto count_digit_occurrence_impl(const T& n, int x)
 {
   // the answer will easily exceed n, for example: for n = 2147483647, all answers for x in [0, 9] exceed 2147483647
-  meta::make_larger_width_t<T> ans = 0;
+  meta::make_higher_precision_t<T> ans = 0;
 
   for (T n_ = n, coeff = 1; n_ != 0; n_ /= 10, coeff *= 10) {
     // divide the number into 3 parts: high mid low, then count how many times does x occur at mid
@@ -70,7 +70,7 @@ template <typename T>
 
 } // namespace detail
 
-export template <meta::fixed_width_integral T>
+export template <meta::fixed_precision_integral T>
 [[nodiscard]] constexpr auto count_digit_occurrence(const T& l, const T& r, int x)
 {
   assert(0 <= l && l <= r && 0 <= x && x <= 9);
@@ -83,7 +83,7 @@ export template <meta::fixed_width_integral T>
 
 // count occurrences of digit x in n
 // time complexity: O(log n)
-export template <meta::fixed_width_integral T>
+export template <meta::fixed_precision_integral T>
 [[nodiscard]] constexpr auto count_digit_occurrence(T n, int x) noexcept
 {
   assert(n >= 0 && 0 <= x && x <= 9);

@@ -18,7 +18,7 @@ export module fmia.random;
 import std;
 
 import fmia.data_structure.graph.storage;
-import fmia.math.integer;
+import fmia.math.core;
 
 export namespace fmia::random {
 

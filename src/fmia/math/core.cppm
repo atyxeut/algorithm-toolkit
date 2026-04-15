@@ -276,7 +276,7 @@ struct make_signed_selector<T, fixed_precision_integer::u<Bits>> : claim_cv<T, f
 
 } // namespace detail
 
-export template <fixed_precision T>
+export template <fixed_precision_integral T>
 using make_signed = detail::make_signed_selector<T>;
 
 export template <typename T>
@@ -311,7 +311,7 @@ struct make_unsigned_selector<T, fixed_precision_integer::u<Bits>> : claim_cv<T,
 
 } // namespace detail
 
-export template <fixed_precision T>
+export template <fixed_precision_integral T>
 using make_unsigned = detail::make_unsigned_selector<T>;
 
 export template <typename T>
@@ -418,20 +418,15 @@ struct make_higher_precision_selector_for_custom_integral<T, std::remove_cv_t<T>
   using type = T;
 };
 
-template <typename T>
-struct make_higher_precision_selector_for_integral
-  : std::conditional<
-      std::integral<T>, make_higher_precision_selector_for_standard_integral<T>,
-      make_higher_precision_selector_for_custom_integral<T>
-    >
-{
-};
-
 template <typename>
 struct make_higher_precision_selector;
 
 template <integral T>
-struct make_higher_precision_selector<T> : make_higher_precision_selector_for_integral<T>
+struct make_higher_precision_selector<T>
+  : std::conditional_t<
+      std::integral<T>, make_higher_precision_selector_for_standard_integral<T>,
+      make_higher_precision_selector_for_custom_integral<T>
+    >
 {
 };
 
