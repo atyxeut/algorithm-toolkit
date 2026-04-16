@@ -17,6 +17,7 @@ export module fmia.util;
 
 import std;
 
+export import fmia.util.binary_search;
 export import fmia.util.sort;
 export import fmia.util.std_extension;
 export import fmia.util.tower_of_hanoi;
