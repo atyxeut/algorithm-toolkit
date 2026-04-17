@@ -84,15 +84,7 @@ template <typename T>
 concept weighted_graph = is_no_cv_weighted_graph_v<std::remove_cvref_t<T>>;
 
 template <typename T>
-struct is_no_cv_graph : std::disjunction<is_no_cv_unweighted_graph<T>, is_no_cv_weighted_graph<T>>
-{
-};
-
-template <typename T>
-constexpr bool is_no_cv_graph_v = is_no_cv_graph<T>::value;
-
-template <typename T>
-concept graph = is_no_cv_graph_v<std::remove_cvref_t<T>>;
+concept graph = unweighted_graph<T> || weighted_graph<T>;
 
 } // namespace fmia::meta
 
