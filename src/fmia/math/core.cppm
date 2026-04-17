@@ -15,6 +15,8 @@
 
 module;
 
+#include <cassert>
+
 // https://stackoverflow.com/a/76440171
 #if _MSC_VER >= 1934
 #include <__msvc_int128.hpp>
