@@ -40,10 +40,9 @@ namespace detail {
 enum class toposort_order : u8 { none, lexicographical };
 enum class toposort_error : u8 { has_cycle };
 
-template <typename T, typename Vertex>
-concept in_degree_info = requires(T info, Vertex u) {
-  --info[u];
-  { info[u] == 0 } -> std::convertible_to<bool>;
+template <typename T, typename Graph>
+concept degree_info_of = requires(T info, typename Graph::vertex_type u) {
+  { info[u] } -> std::same_as<typename Graph::degree_type&>;
 };
 
 template <toposort_order Order, typename Graph, typename Info, typename Fn>
@@ -99,7 +98,7 @@ export template <meta::graph T, typename Fn>
   return detail::toposort_impl<detail::toposort_order::none>(g, get_in_degree_info(g), std::forward<Fn>(fn));
 }
 
-export template <meta::graph T, detail::in_degree_info<typename T::vertex_type> U, typename Fn>
+export template <meta::graph T, detail::degree_info_of<T> U, typename Fn>
 [[nodiscard]] constexpr auto toposort(const T& g, U in_degree, Fn&& fn)
 {
   return detail::toposort_impl<detail::toposort_order::none>(g, std::move(in_degree), std::forward<Fn>(fn));
@@ -111,7 +110,7 @@ export template <meta::graph T, typename Fn>
   return detail::toposort_impl<detail::toposort_order::lexicographical>(g, get_in_degree_info(g), std::forward<Fn>(fn));
 }
 
-export template <meta::graph T, detail::in_degree_info<typename T::vertex_type> U, typename Fn>
+export template <meta::graph T, detail::degree_info_of<T> U, typename Fn>
 [[nodiscard]] constexpr auto toposort_lexicographical_order(const T& g, U in_degree, Fn&& fn)
 {
   return detail::toposort_impl<detail::toposort_order::lexicographical>(g, std::move(in_degree), std::forward<Fn>(fn));
