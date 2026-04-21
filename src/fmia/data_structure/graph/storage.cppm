@@ -34,9 +34,7 @@ struct unweighted_edge_to
 };
 
 template <std::integral Vertex>
-struct unweighted_edge
-  : unweighted_edge_from<Vertex>
-  , unweighted_edge_to<Vertex>
+struct unweighted_edge : unweighted_edge_from<Vertex>, unweighted_edge_to<Vertex>
 {
 };
 
@@ -59,23 +57,17 @@ struct weight<T>
 };
 
 template <std::integral Vertex, typename Weight>
-struct weighted_edge_from
-  : unweighted_edge_from<Vertex>
-  , weight<Weight>
+struct weighted_edge_from : unweighted_edge_from<Vertex>, weight<Weight>
 {
 };
 
 template <std::integral Vertex, typename Weight>
-struct weighted_edge_to
-  : unweighted_edge_to<Vertex>
-  , weight<Weight>
+struct weighted_edge_to : unweighted_edge_to<Vertex>, weight<Weight>
 {
 };
 
 template <std::integral Vertex, typename Weight>
-struct weighted_edge
-  : unweighted_edge<Vertex>
-  , weight<Weight>
+struct weighted_edge : unweighted_edge<Vertex>, weight<Weight>
 {
 };
 

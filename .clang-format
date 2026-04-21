@@ -112,7 +112,7 @@ ConstructorInitializerIndentWidth: 2
 PackConstructorInitializers: BinPack
 BreakConstructorInitializers: BeforeColon
 SpaceBeforeCtorInitializerColon: true
-BreakInheritanceList: BeforeComma
+BreakInheritanceList: BeforeColon
 SpaceBeforeInheritanceColon: true
 AlignConsecutiveBitFields:
   Enabled: true
