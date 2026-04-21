@@ -16,7 +16,6 @@
 module;
 
 #include <cassert>
-#include <climits>
 
 // https://stackoverflow.com/a/76440171
 #if _MSC_VER >= 1934
@@ -25,7 +24,7 @@ module;
 
 export module fmia.math.core;
 
-// core arithmetic types and metaprogramming utils
+// core arithmetic types, functions and metaprogramming utils
 
 import std;
 
