@@ -287,6 +287,16 @@ template <meta::graph T>
 
 export namespace fmia::graph {
 
+// Hamiltonian path: a path that visits each vertex exactly once
+// if a graph has a Hamiltonian path, then it is called a semi-Hamiltonian graph
+//
+// Hamiltonian cycle: a closed Hamiltonian path
+// if a graph has a Hamiltonian cycle, then it is called a Hamiltonian graph
+
+} // namespace fmia::graph
+
+export namespace fmia::graph {
+
 enum class toposort_error : u8 { has_cycle };
 enum class toposort_tag : u8 { none, lexicographical };
 
