@@ -18,6 +18,7 @@ export module fmia.data_structure.graph.traverse;
 import std;
 
 import fmia.data_structure.graph.storage;
+import fmia.math;
 
 namespace fmia::graph {
 

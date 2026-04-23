@@ -688,6 +688,24 @@ template <typename T, typename U>
   requires precision_comparable<T, U>
 constexpr int compare_precision_v = compare_precision<T, U>::value;
 
+template <typename T, typename U>
+concept precision_eq = compare_precision_v<T, U> == 0;
+
+template <typename T, typename U>
+concept precision_neq = compare_precision_v<T, U> != 0;
+
+template <typename T, typename U>
+concept precision_lt = compare_precision_v<T, U> < 0;
+
+template <typename T, typename U>
+concept precision_lteq = compare_precision_v<T, U> <= 0;
+
+template <typename T, typename U>
+concept precision_gt = compare_precision_v<T, U> > 0;
+
+template <typename T, typename U>
+concept precision_gteq = compare_precision_v<T, U> >= 0;
+
 } // namespace fmia::meta
 
 export namespace fmia::big_integer::naive {
