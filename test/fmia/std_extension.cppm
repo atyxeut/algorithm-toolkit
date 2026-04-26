@@ -21,7 +21,7 @@ export module test.fmia.std_extension;
 
 import std;
 
-import fmia.memory.core;
+import fmia.memory.allocator;
 import fmia.std_extension;
 
 using namespace fmia;

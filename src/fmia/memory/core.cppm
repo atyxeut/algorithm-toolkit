@@ -15,65 +15,6 @@
 
 export module fmia.memory.core;
 
-import std;
-
-import fmia.math.core;
-import fmia.meta;
-
-export namespace fmia {
-
-// represent std::allocator<T>
-struct std_allocator_tag
-{
-};
-
-// represent std::pmr::polymorphic_allocator<T>
-struct std_pmr_allocator_tag
-{
-};
-
-} // export namespace fmia
-
-export namespace fmia::meta {
-
-// allocator type order: dim_n, dim_(n - 1), ..., dim_1
-template <typename Elem, nonempty_list_of_types AllocatorList, typename LastAllocator = last_t<AllocatorList>>
-struct cur_dim_allocator
-{
-  using type = LastAllocator;
-};
-
-template <typename Elem, typename AllocatorList>
-struct cur_dim_allocator<Elem, AllocatorList, std_allocator_tag>
-{
-  using type = std::allocator<Elem>;
-};
-
-template <typename Elem, typename AllocatorList>
-struct cur_dim_allocator<Elem, AllocatorList, std_pmr_allocator_tag>
-{
-  using type = std::pmr::polymorphic_allocator<Elem>;
-};
-
-template <typename Elem, typename AllocatorList>
-using cur_dim_allocator_t = cur_dim_allocator<Elem, AllocatorList>::type;
-
-// used in recursion, add a std::allocator as the default allocator, if the length of the allocator type list
-// < dim count
-template <list_of_types CurAllocatorList, std::size_t DimCnt>
-struct adjust_allocator_type_list
-  : concat<
-      CurAllocatorList,
-      std::conditional_t<(length_v<CurAllocatorList>) < DimCnt, type_list<std_allocator_tag>, empty_type_list>
-    >
-{
-};
-
-template <typename CurAllocatorList, std::size_t DimCnt>
-using adjust_allocator_type_list_t = adjust_allocator_type_list<CurAllocatorList, DimCnt>::type;
-
-} // export namespace fmia::meta
-
 export namespace fmia {
 
 enum class exception_safety { basic, strong };

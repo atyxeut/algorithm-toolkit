@@ -17,7 +17,7 @@ export module fmia.std_extension;
 
 import std;
 
-import fmia.memory.core;
+import fmia.memory.allocator;
 import fmia.meta;
 
 export namespace fmia::meta {
