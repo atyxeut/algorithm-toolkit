@@ -180,8 +180,7 @@ constexpr void get_an_eulerian_trail_impl_for_undirected_iterative(const G& g, T
         vis[id] = true;
         stack.emplace_back(v);
       }
-    }
-    else {
+    } else {
       path.emplace_back(u);
       stack.pop_back();
     }

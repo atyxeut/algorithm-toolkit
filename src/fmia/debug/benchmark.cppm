@@ -17,9 +17,9 @@ export module fmia.debug.benchmark;
 
 import std;
 
-namespace fmia::benchmark {
+export namespace fmia::benchmark {
 
-export template <typename Rep, typename Period = std::milli, typename OtherRep, typename OtherPeriod>
+template <typename Rep, typename Period = std::milli, typename OtherRep, typename OtherPeriod>
 void print_duration_as(std::chrono::duration<OtherRep, OtherPeriod> duration, bool endline = true)
 {
   const auto dur = std::chrono::duration_cast<std::chrono::duration<Rep, Period>>(duration);
@@ -32,7 +32,7 @@ void print_duration_as(std::chrono::duration<OtherRep, OtherPeriod> duration, bo
     std::println(std::cerr);
 }
 
-export template <typename Rep, typename Period>
+template <typename Rep, typename Period>
 void print_duration(std::chrono::duration<Rep, Period> duration, bool endline = true)
 {
   print_duration_as<Rep, Period>(duration, endline);
@@ -51,7 +51,7 @@ struct timed_invocation_result<Rep, Period, void>
   std::chrono::duration<Rep, Period> duration;
 };
 
-export template <typename Fn, typename... Args>
+template <typename Fn, typename... Args>
 [[nodiscard]] auto timed_invocation(Fn&& func, Args&&... args)
 {
   using time_point_type = std::chrono::steady_clock::time_point;
@@ -85,8 +85,7 @@ export template <typename Fn, typename... Args>
       std::invoke(std::forward<Fn>(func), std::forward<Args>(args)...);
       controller.end_timer();
       return timed_invocation_result<duration_type::rep, duration_type::period, void> {timer_end - timer_begin};
-    }
-    else {
+    } else {
       auto result = std::invoke(std::forward<Fn>(func), std::forward<Args>(args)...);
       controller.end_timer();
       return timed_invocation_result {timer_end - timer_begin, std::move(result)};
@@ -99,7 +98,7 @@ export template <typename Fn, typename... Args>
   }
 }
 
-export class stopwatch
+class stopwatch
 {
 private:
   using time_point_type_ = std::chrono::steady_clock::time_point;

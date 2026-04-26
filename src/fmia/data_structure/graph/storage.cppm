@@ -294,8 +294,7 @@ public:
 template <
   std::signed_integral Vertex, meta::arithmetic Weight,
   meta::precision_gteq<Vertex> Degree = meta::make_higher_precision_t<Vertex>
->
-class weighted_edge_list : public detail::edge_list_base<Vertex, weighted_edge<Vertex, Weight>, Degree>
+> class weighted_edge_list : public detail::edge_list_base<Vertex, weighted_edge<Vertex, Weight>, Degree>
 {
 public:
   using weight_type = Weight;

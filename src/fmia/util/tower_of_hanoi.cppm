@@ -258,8 +258,7 @@ void general_case(u32 disk_cnt, std::span<const u32> from_list, std::span<const 
     from_different_to_one_case(disk_cnt - 1, from_list, aux);
     detail::move(disk_cnt, from, to);
     from_one_to_different_case(disk_cnt - 1, aux, to_list);
-  }
-  else {
+  } else {
     from_different_to_one_case(disk_cnt - 1, from_list, to);
     detail::move(disk_cnt, from, aux);
     from_one_to_one_case(disk_cnt - 1, to, from);

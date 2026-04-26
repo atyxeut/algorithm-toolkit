@@ -157,7 +157,7 @@ BraceWrapping:
   AfterUnion: true
   AfterEnum: false
   BeforeLambdaBody: false
-  BeforeElse: true
+  BeforeElse: false
   BeforeCatch: false
   SplitEmptyFunction: false
   SplitEmptyRecord: true

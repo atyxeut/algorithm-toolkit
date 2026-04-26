@@ -150,7 +150,7 @@ constexpr bool is_std_ostream_interactable_v = is_std_ostream_interactable<T>::v
 
 export namespace fmia::meta {
 
-// note usable: infinitely recursive constraint (llvm 22)
+// not usable: infinitely recursive constraint (llvm 22)
 // however its fine for gcc and msvc
 template <typename T>
 concept std_ostream_interactable = requires(std::ostream& ostr, T t) { ostr << t; };
@@ -159,14 +159,15 @@ concept std_ostream_interactable = requires(std::ostream& ostr, T t) { ostr << t
 
 export namespace fmia {
 
+// clang-format off
+  
 // for a range whose elements can be printed by std::ostream by default
 // e.g. std::vector<int>, std::vector<std::string>
 template <
   std::ranges::input_range Range, std::convertible_to<std::string> Delim = std::string,
   typename Elem = std::ranges::range_value_t<Range>
->
-  requires (meta::legacy::cpp17::is_std_ostream_interactable_v<Elem> && !std::is_array_v<Elem>)
-std::size_t print(std::ostream& ostr, Range&& range, Delim&& delim = std::string(1, ' '), bool new_line = false)
+> requires (meta::legacy::cpp17::is_std_ostream_interactable_v<Elem> && !std::is_array_v<Elem>)
+int print(std::ostream& ostr, Range&& range, Delim&& delim = std::string(1, ' '), bool new_line = false)
 {
   for (auto it = std::ranges::begin(range), it_end = std::ranges::end(range); it != it_end; ++it)
     ostr << *it << (std::ranges::next(it) == it_end ? std::string {} : delim);
@@ -177,19 +178,22 @@ std::size_t print(std::ostream& ostr, Range&& range, Delim&& delim = std::string
   return 1;
 }
 
+// clang-format on
+
+// clang-format off
+
 // for a range whose elements can not be printed by std::ostream by default
 // e.g. std::vector<std::array<int, 4>>, std::vector<std::pair<int, int>>
 template <
   std::ranges::input_range Range, std::convertible_to<std::string> Delim = std::string,
   typename Elem = std::ranges::range_value_t<Range>
->
-  requires (!meta::legacy::cpp17::is_std_ostream_interactable_v<Elem> && std::ranges::input_range<Elem>)
-std::size_t print(std::ostream& ostr, Range&& range, Delim&& delim = std::string(1, ' '), bool new_line = false)
+> requires (!meta::legacy::cpp17::is_std_ostream_interactable_v<Elem> && std::ranges::input_range<Elem>)
+int print(std::ostream& ostr, Range&& range, Delim&& delim = std::string(1, ' '), bool new_line = false)
 {
-  std::size_t cur_dim = 0;
+  int cur_dim = 0;
   for (auto it = std::ranges::begin(range), it_end = std::ranges::end(range); it != it_end; ++it) {
     cur_dim = print(ostr, *it, std::forward<Delim>(delim), false);
-    const auto dimension_delim = std::string(cur_dim, '\n');
+    const auto dimension_delim = std::string(static_cast<std::size_t>(cur_dim), '\n');
     ostr << (std::ranges::next(it) == it_end ? std::string {} : dimension_delim);
   }
 
@@ -198,6 +202,8 @@ std::size_t print(std::ostream& ostr, Range&& range, Delim&& delim = std::string
 
   return cur_dim + 1;
 }
+
+// clang-format on
 
 template <meta::multidimentional_cstyle_array T, std::convertible_to<std::string> Delim = std::string>
 void print(std::ostream& ostr, const T& arr, Delim&& delim = std::string(1, ' '), bool new_line = false)
@@ -222,8 +228,7 @@ export {
 template <
   std::ranges::input_range Range,
   typename = std::enable_if_t<!::fmia::meta::legacy::cpp17::is_std_ostream_interactable_v<Range>>
->
-auto& operator <<(std::ostream& ostr, Range&& range)
+> auto& operator <<(std::ostream& ostr, Range&& range)
 {
   ::fmia::print(ostr, std::forward<Range>(range));
   return ostr;
@@ -333,6 +338,7 @@ class vector_impl<T, DimCnt, meta::type_list<InnermostDimAllocator, Allocators..
 private:
   using adjusted_allocator_type_list_ =
     meta::adjust_allocator_type_list_t<meta::type_list<InnermostDimAllocator, Allocators...>, DimCnt>;
+
   using element_type_ = vector_impl<T, DimCnt - 1, meta::init_t<adjusted_allocator_type_list_>>::type;
 
 public:
@@ -350,6 +356,8 @@ public:
 
 export namespace fmia {
 
+// clang-format off
+  
 // fmia::vector<int> vec1d;
 // same as: std::vector<int> vec1d;
 //
@@ -357,9 +365,10 @@ export namespace fmia {
 // same as: std::vector<std::vector<std::vector<std::vector<int>>>> vec4d;
 template <
   typename T, std::size_t DimCnt = 1, typename InnermostDimAllocator = std_allocator_tag, typename... Allocators
->
-  requires (sizeof...(Allocators) < DimCnt)
+> requires (sizeof...(Allocators) < DimCnt)
 using vector = detail::vector_impl<T, DimCnt, meta::type_list<InnermostDimAllocator, Allocators...>>::type;
+
+// clang-format on
 
 } // namespace fmia
 
@@ -371,16 +380,13 @@ template <typename Elem, typename AllocatorList, typename Dim, typename... Ts>
   using adjusted_allocator_type_list = meta::adjust_allocator_type_list_t<AllocatorList, sizeof...(Ts)>;
   if constexpr (sizeof...(Ts) == 1) {
     using cur_dim_allocator_type = meta::cur_dim_allocator_t<Elem, adjusted_allocator_type_list>;
-
     return vector<Elem, 1, cur_dim_allocator_type>(
       static_cast<std::size_t>(first_dim_size), static_cast<Elem>(args)...
     );
-  }
-  else {
+  } else {
     using inner_allocator_type_list = meta::init_t<adjusted_allocator_type_list>;
     using inner_element_type = vector_impl<Elem, sizeof...(Ts) - 1, inner_allocator_type_list>::type;
     using cur_dim_allocator_type = meta::cur_dim_allocator_t<inner_element_type, adjusted_allocator_type_list>;
-
     return vector<inner_element_type, 1, cur_dim_allocator_type>(
       static_cast<std::size_t>(first_dim_size),
       make_vector_impl<Elem, inner_allocator_type_list>(std::forward<Ts>(args)...)
@@ -392,6 +398,8 @@ template <typename Elem, typename AllocatorList, typename Dim, typename... Ts>
 
 export namespace fmia {
 
+// clang-format off
+  
 // auto vec3d = fmia::make_vector<int>(x, y, z, 1);
 // same as: auto vec3d = std::vector<std::vector<std::vector<int>>>(
 //                         x,
@@ -406,13 +414,14 @@ export namespace fmia {
 template <
   typename Elem, typename InnermostDimAllocator = std_allocator_tag, typename... Allocators, std::integral Dim,
   typename... Ts
->
-  requires (sizeof(Dim) <= sizeof(std::size_t) && sizeof...(Ts) > 0 && sizeof...(Allocators) < sizeof...(Ts))
+> requires (sizeof(Dim) <= sizeof(std::size_t) && sizeof...(Ts) > 0 && sizeof...(Allocators) < sizeof...(Ts))
 [[nodiscard]] constexpr auto make_vector(Dim first_dim_size, Ts&&... args)
 {
   return detail::make_vector_impl<Elem, meta::type_list<InnermostDimAllocator, Allocators...>>(
     first_dim_size, std::forward<Ts>(args)...
   );
 }
+
+// clang-format on
 
 } // namespace fmia
