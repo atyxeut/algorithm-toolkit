@@ -22,62 +22,8 @@ import fmia.math;
 
 export namespace fmia::graph {
 
-// walk: a sequence of vertices and edges, must begin with a vertex and also end with a vertex, if the start vertex is
-// the same as the end vertex, then the walk is called a closed walk, otherwise called an open walk
-//
-// trail: a walk that has no duplicate edges (can have duplicate vertices)
-// circuit: a closed trail, i.e. the first and the last vertex are the same
-//
-// path: a walk that has no duplicate vertices (implies no duplicate edges)
-// cycle: a closed path
-
 enum class trail_tag : u8 { none, circuit };
 enum class path_tag : u8 { none, cycle };
-
-} // namespace fmia::graph
-
-export namespace fmia::graph {
-
-// Eulerian trail: a trail that visits each edge exactly once
-// if a graph has an Eulerian trail, then it is called a semi-Eulerian graph
-// Eulerian circuit: a closed Eulerian trail
-// if a graph has an Eulerian circuit, then it is called an Eulerian graph
-
-// an undirected graph is semi-Eulerian iff:
-// 1. after ignoring isolated vertices, the graph is connected
-// because if not, then you can not go from one connected component to another, some edges will be inevitably missed no
-// matter where the beginning is
-// 2. exactly 0 or 2 vertices have odd degree
-// necessity:
-// let u, v be the start and the end of an Eulerian trail, in the trail, the intermediate vertices will be passed with 2
-// edges consumed, u/v requires 1 extra edge for out/in, but the corresponding in/out edge is not a must, if u has odd
-// degree, then you are not ending on u, thus v must have odd degree, if u has even degree, then the last edge is some
-// vertex t <--> u, so u = v, every vertex has even degree, and the trail is a circuit
-// sufficiency:
-// if there are 2 odd degree vertices u and v, add one edge u <--> v, then it is the 0 odd degree vertices case, in this
-// case, we can start on any vertex t and get a circuit, we call this circuit the "main circuit", if this circuit does
-// not contain every edge, then one of the vertices of the circuit must have an edge connected to a vertex outside this
-// circuit, let this vertex be the new start vertex, then ignore the visited edges, we can get another circuit (using
-// the Handshaking lemma, after removing the visited edges, the vertices still have even degree), this means that we can
-// "insert" this circuit into the main circuit, while not affecting the main circuit, this process can be repeated until
-// every edge is visited, after that, an Eulerian circuit whose start vertex is t is found, if we remove the added edge
-// u <--> v, and make them start/end vertices respectively, then we get an Eulerian trail from u to v
-//
-// the proofs of the following propositions are similar to the above
-//
-// an undirected graph is Eulerian iff:
-// the graph is semi-Eulerian, and each vertex has even degree
-//
-// a directed graph is semi-Eulerian iff:
-// 1. after ignoring isolated vertices, the graph is strongly connected
-// 2. for any vertex u, deg^+(u) = deg^-(u), or there are two vertices u, v, such that deg^+(u) + 1 = deg^-(u), deg^+(v)
-// = deg^-(v) + 1, and for any other vertex t, deg^+(t) = deg^-(t)
-//
-// a directed graph is Eulerian iff:
-// the graph is semi-Eulerian, and for each vertex u, deg^+(u) = deg^-(u)
-
-// to get an Eulerian trail that has the smallest lexicographical order, we need to traverse the neighbors from smaller
-// to bigger (sort the neighbors in ascending order)
 
 enum class eulerian_graph_error : u8 { no_eulerian_trail, no_eulerian_circuit };
 
