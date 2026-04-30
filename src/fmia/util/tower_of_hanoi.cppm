@@ -53,7 +53,7 @@ constexpr auto peg_name_lower = "abc";
 export namespace fmia::tower_of_hanoi::count_move {
 
 // initially all disks stack on one peg `from`, finally they all stack on one peg `to`
-[[nodiscard]] constexpr auto from_one_to_one_case(peg_type disk_cnt) noexcept(nothrow_fn) -> move_cnt_type
+[[nodiscard]] constexpr move_cnt_type from_one_to_one_case(peg_type disk_cnt) noexcept(nothrow_fn)
 {
   // denote the moves of a problem regarding n disks by T(n)
   // 1. to move disk n to `to`, we can first move disk n - 1 to 1 the auxiliary (third) peg, from peg `from`
@@ -76,9 +76,9 @@ export namespace fmia::tower_of_hanoi::count_move {
 
 // initially all disks stack scatteredly, but finally they all stack on one peg `to`
 // from_list[i]: the (i + 1)-th disk's initial peg
-[[nodiscard]] constexpr auto from_different_to_one_case(
+[[nodiscard]] constexpr move_cnt_type from_different_to_one_case(
   peg_type disk_cnt, std::span<const peg_type> from_list, peg_type to
-) noexcept(nothrow_fn) -> move_cnt_type
+) noexcept(nothrow_fn)
 {
   if (disk_cnt == 0)
     return 0;
@@ -97,9 +97,9 @@ export namespace fmia::tower_of_hanoi::count_move {
 
 // initially all disks stack on one peg `from`, but finally they stack scatteredly
 // to_list[i]: the (i + 1)-th disk's destination peg
-[[nodiscard]] constexpr auto from_one_to_different_case(
+[[nodiscard]] constexpr move_cnt_type from_one_to_different_case(
   peg_type disk_cnt, peg_type from, std::span<const peg_type> to_list
-) noexcept(nothrow_fn) -> move_cnt_type
+) noexcept(nothrow_fn)
 {
   if (disk_cnt == 0)
     return 0;
@@ -117,9 +117,9 @@ export namespace fmia::tower_of_hanoi::count_move {
 namespace fmia::tower_of_hanoi::count_move {
 
 // move the largest disk from peg `from` to peg `to` using only one step (in most cases this is optimal)
-[[nodiscard]] constexpr auto general_case_one_step_strategy(
+[[nodiscard]] constexpr move_cnt_type general_case_one_step_strategy(
   peg_type disk_cnt, std::span<const peg_type> from_list, std::span<const peg_type> to_list
-) noexcept(nothrow_fn) -> move_cnt_type
+) noexcept(nothrow_fn)
 {
   // 1. move disks above the largest disk n and on peg `to[n]` to peg `aux`, so that disk n can move
   // 2. move disk n to the destination, then move the remaining n - 1 disks on peg `aux` to their destinations
@@ -150,9 +150,9 @@ namespace fmia::tower_of_hanoi::count_move {
 // move 2 from C to A
 // move 1 from B to A
 // move 3 from B to A (the second move)
-[[nodiscard]] constexpr auto general_case_two_step_strategy(
+[[nodiscard]] constexpr move_cnt_type general_case_two_step_strategy(
   peg_type disk_cnt, std::span<const peg_type> from_list, std::span<const peg_type> to_list
-) noexcept(nothrow_fn) -> move_cnt_type
+) noexcept(nothrow_fn)
 {
   // 1. clear disks above the largest disk n and on peg `aux`, move them to peg `to[n]`
   // 2. move disk n to peg `aux` (the first move)
@@ -170,9 +170,9 @@ namespace fmia::tower_of_hanoi::count_move {
 export namespace fmia::tower_of_hanoi::count_move {
 
 // initially all disks stack scatteredly, and finally they also stack scatteredly
-[[nodiscard]] constexpr auto general_case(
+[[nodiscard]] constexpr move_cnt_type general_case(
   peg_type disk_cnt, std::span<const peg_type> from_list, std::span<const peg_type> to_list
-) noexcept(nothrow_fn) -> move_cnt_type
+) noexcept(nothrow_fn)
 {
   if (disk_cnt == 0)
     return 0;

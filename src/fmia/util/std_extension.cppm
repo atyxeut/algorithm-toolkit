@@ -104,7 +104,7 @@ void print(std::ostream& ostr, const std::tuple<Ts...>& t, Delim&& delim = std::
 export {
 
 template <typename... Ts>
-std::ostream& operator <<(std::ostream& ostr, const std::tuple<Ts...>& t)
+auto& operator <<(std::ostream& ostr, const std::tuple<Ts...>& t)
 {
   ::fmia::print(ostr, t);
   return ostr;
@@ -309,7 +309,7 @@ constexpr void fill_array(std::array<Elem, Dim>& arr, const T& val)
 // auto arr4d = fmia::make_array<int, 5, 8, 3, 2>(val);
 // combines `fmia::array<int, 5, 8, 3, 2> arr4d` and `fmia::fill_array(arr4d, val)`
 template <typename Elem, std::size_t... Dims, typename T>
-[[nodiscard]] constexpr auto make_array(const T& val)
+[[nodiscard]] constexpr array<Elem, Dims...> make_array(const T& val)
 {
   array<Elem, Dims...> arr;
   fill_array(arr, static_cast<Elem>(val));

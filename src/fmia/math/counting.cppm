@@ -28,7 +28,7 @@ namespace fmia {
 // count occurrences of digit x in all integers in [0, n]
 // time complexity: O(log n)
 template <typename T>
-[[nodiscard]] constexpr auto count_digit_occurrence_impl(const T& n, int x)
+[[nodiscard]] constexpr meta::make_higher_precision_t<T> count_digit_occurrence_impl(const T& n, int x)
 {
   // the answer will easily exceed n, for example: for n = 2147483647, all answers for x in [0, 9] exceed 2147483647
   meta::make_higher_precision_t<T> ans = 0;
@@ -63,7 +63,10 @@ template <typename T>
       ans += coeff;
   }
 
-  return ans + (x == 0);
+  if (x == 0)
+    ++ans;
+
+  return ans;
 }
 
 } // namespace fmia
@@ -84,7 +87,7 @@ template <meta::fixed_precision_integral T>
 // count occurrences of digit x in n
 // time complexity: O(log n)
 template <meta::fixed_precision_integral T>
-[[nodiscard]] constexpr auto count_digit_occurrence(T n, int x) noexcept
+[[nodiscard]] constexpr T count_digit_occurrence(T n, int x) noexcept
 {
   assert(n >= 0 && 0 <= x && x <= 9);
 

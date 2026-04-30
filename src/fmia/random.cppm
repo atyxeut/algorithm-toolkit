@@ -42,7 +42,7 @@ template <std::floating_point T>
 
 template <typename T, typename Engine = std::mt19937>
   requires std::is_arithmetic_v<T>
-[[nodiscard]] T rand(T l, T r, Engine& engine = mt19937_engine)
+[[nodiscard]] auto rand(T l, T r, Engine& engine = mt19937_engine)
 {
   return uniform_distribution(l, r)(engine);
 }
@@ -54,7 +54,7 @@ namespace fmia::random {
 constexpr char decimal_digit_character[10] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
 template <bool AllowNegative>
-[[nodiscard]] auto generate_integer_impl(usize length)
+[[nodiscard]] std::string generate_integer_impl(usize length)
 {
   if (length == 0)
     throw std::invalid_argument("length must be positive");
@@ -88,7 +88,7 @@ export namespace fmia::random {
 }
 
 template <std::integral T>
-[[nodiscard]] auto generate_permutation(T begin, T end)
+[[nodiscard]] std::vector<T> generate_permutation(T begin, T end)
 {
   if (begin > end)
     throw std::invalid_argument("invalid integer range");
@@ -100,8 +100,8 @@ template <std::integral T>
 }
 
 // get the edge list of a random unweighted tree
-template <bool FlowerGraph = false, std::integral T>
-[[nodiscard]] auto generate_unweighted_tree(T vertex_begin, T vertex_end)
+template <bool FlowerGraph = false, std::integral Vertex>
+[[nodiscard]] graph::basic_unweighted_edge_list<Vertex> generate_unweighted_tree(Vertex vertex_begin, Vertex vertex_end)
 {
   if (vertex_begin > vertex_end)
     throw std::invalid_argument("invalid vertex index range");
@@ -109,7 +109,7 @@ template <bool FlowerGraph = false, std::integral T>
   const auto p = permutation(vertex_begin, vertex_end);
 
   const auto edge_cnt = vertex_end - vertex_begin;
-  graph::basic_unweighted_edge_list<T> data;
+  graph::basic_unweighted_edge_list<Vertex> data;
   data.reserve(edge_cnt);
 
   for (auto v = 1uz; v <= edge_cnt; ++v) {
@@ -124,7 +124,7 @@ template <bool FlowerGraph = false, std::integral T>
 
 // get the edge list of a random weighted tree
 template <bool FlowerGraph = false, std::integral Vertex, std::integral Weight>
-[[nodiscard]] auto generate_weighted_tree(
+[[nodiscard]] graph::basic_weighted_edge_list<Vertex, Weight> generate_weighted_tree(
   Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end
 )
 {

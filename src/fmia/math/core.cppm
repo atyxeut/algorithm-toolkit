@@ -33,8 +33,8 @@ import fmia.meta;
 
 export {
 
-using i8  = std::int8_t;
-using u8  = std::uint8_t;
+using i8 = std::int8_t;
+using u8 = std::uint8_t;
 using i16 = std::int16_t;
 using u16 = std::uint16_t;
 using i32 = std::int32_t;
@@ -509,8 +509,6 @@ constexpr bool is_custom_ieee754_decimal_floating_point_v = is_custom_ieee754_de
 
 } // namespace fmia::meta
 
-// clang-format off
-
 export {
 
 // f128 precision: 33 to 35 decimal places
@@ -521,9 +519,7 @@ __extension__ using f128 = __float128;
 using f128 = ::fmia::ieee754_float::f<128>;
 #endif
 
-}
-
-// clang-format on
+} // export
 
 export namespace fmia::meta {
 
@@ -718,20 +714,22 @@ export namespace fmia::big_integer::naive {
 
 // support +, -, *, /, % operations using free functions for nonnegative operands
 
+using mag_type = std::vector<int>;
+
 struct sub_result
 {
   int sgn;
-  std::vector<int> mag;
+  mag_type mag;
 };
 
 template <typename Remainder>
 struct div_result
 {
-  std::vector<int> q;
+  mag_type q;
   Remainder r;
 };
 
-void print(const std::vector<int>& num, bool new_line = false)
+void print(const mag_type& num, bool new_line = false)
 {
   for (auto i = num.size(); i > 0; --i)
     std::cout << num[i - 1];
@@ -746,10 +744,10 @@ void print(const sub_result& result, bool new_line = false)
   print(result.mag, new_line);
 }
 
-[[nodiscard]] constexpr auto to_big_integer(std::string_view s)
+[[nodiscard]] constexpr mag_type to_big_integer(std::string_view s)
 {
   const auto n = s.size();
-  std::vector<int> ret(n);
+  mag_type ret(n);
 
   for (auto i = 0uz; i < n; ++i)
     ret[i] = s[n - i - 1] - '0';
@@ -757,7 +755,7 @@ void print(const sub_result& result, bool new_line = false)
   return ret;
 }
 
-[[nodiscard]] constexpr bool is_zero(const std::vector<int>& num) noexcept
+[[nodiscard]] constexpr bool is_zero(const mag_type& num) noexcept
 {
   return num.size() == 1 && num[0] == 0;
 }
@@ -775,13 +773,13 @@ void print(const sub_result& result, bool new_line = false)
   return (la > lb) - (la < lb);
 }
 
-constexpr void remove_lz(std::vector<int>& num) noexcept
+constexpr void remove_lz(mag_type& num) noexcept
 {
   while (num.size() > 1 && num.back() == 0)
     num.pop_back();
 }
 
-constexpr void carry(std::vector<int>& num) noexcept
+constexpr void carry(mag_type& num) noexcept
 {
   int c = 0, r;
   for (auto& digit : num) {
@@ -792,9 +790,9 @@ constexpr void carry(std::vector<int>& num) noexcept
   }
 }
 
-[[nodiscard]] constexpr auto add(const std::vector<int>& a, const std::vector<int>& b)
+[[nodiscard]] constexpr mag_type add(const mag_type& a, const mag_type& b)
 {
-  std::vector<int> ans(std::max(a.size(), b.size()) + 1);
+  mag_type ans(std::max(a.size(), b.size()) + 1);
 
   for (auto i = 0uz; i < a.size(); ++i)
     ans[i] += a[i];
@@ -806,9 +804,9 @@ constexpr void carry(std::vector<int>& num) noexcept
   return ans;
 }
 
-[[nodiscard]] constexpr auto sub(const std::vector<int>& a, const std::vector<int>& b) -> sub_result
+[[nodiscard]] constexpr sub_result sub(const mag_type& a, const mag_type& b)
 {
-  std::vector<int> ans(std::max(a.size(), b.size()));
+  mag_type ans(std::max(a.size(), b.size()));
 
   const int sgn = compare(a, b);
 
@@ -819,18 +817,18 @@ constexpr void carry(std::vector<int>& num) noexcept
 
   carry(ans);
   remove_lz(ans);
-  return {sgn, ans};
+  return {sgn, std::move(ans)};
 }
 
-[[nodiscard]] constexpr auto mul(const std::vector<int>& a, const std::vector<int>& b)
+[[nodiscard]] constexpr mag_type mul(const mag_type& a, const mag_type& b)
 {
   if (is_zero(a) || is_zero(b))
-    return std::vector<int> {0};
+    return mag_type {0};
 
   // delayed carry is basically always safe here:
   // ans[k] accumulates at most min(la, lb) additions, assume that every addition is ans[k] += 9 * 9, it still requires
   // over 1e7 additions to overflow, in such cases, the inputs are far beyond the capability of this O(n^2) algorithm
-  std::vector<int> ans(a.size() + b.size());
+  mag_type ans(a.size() + b.size());
 
   for (auto i = 0uz; i < a.size(); ++i)
     for (auto j = 0uz; j < b.size(); ++j)
@@ -843,11 +841,11 @@ constexpr void carry(std::vector<int>& num) noexcept
 
 // used when b is way smaller than a
 template <meta::fixed_precision_integral T>
-[[nodiscard]] constexpr auto div(const std::vector<int>& a, const T& b) -> div_result<T>
+[[nodiscard]] constexpr div_result<T> div(const mag_type& a, const T& b)
 {
   assert(b != 0 && "divisor cannot be zero");
 
-  std::vector<int> q(a.size());
+  mag_type q(a.size());
   meta::make_higher_precision_t<T> r = 0;
 
   for (auto i = q.size(); i > 0; --i) {
@@ -857,18 +855,18 @@ template <meta::fixed_precision_integral T>
   }
 
   remove_lz(q);
-  return {q, static_cast<T>(r)};
+  return {std::move(q), static_cast<T>(r)};
 }
 
-[[nodiscard]] constexpr auto div(const std::vector<int>& a, const std::vector<int>& b) -> div_result<std::vector<int>>
+[[nodiscard]] constexpr div_result<mag_type> div(const mag_type& a, const mag_type& b)
 {
   assert(!is_zero(b) && "divisor cannot be zero");
 
   if (compare(a, b) < 0)
     return {{0}, a};
 
-  std::vector<int> q(a.size() - b.size() + 1), r(b.size() + 1);
-  std::copy(a.begin() + static_cast<typename std::vector<int>::difference_type>(q.size()), a.end(), r.begin());
+  mag_type q(a.size() - b.size() + 1), r(b.size() + 1);
+  std::copy(a.begin() + static_cast<typename mag_type::difference_type>(q.size()), a.end(), r.begin());
 
   for (auto i = q.size(); i > 0; --i) {
     std::move_backward(r.begin(), r.end() - 1, r.end());
@@ -883,7 +881,7 @@ template <meta::fixed_precision_integral T>
 
   remove_lz(q);
   remove_lz(r);
-  return {q, r};
+  return {std::move(q), std::move(r)};
 }
 
 } // namespace fmia::big_integer::naive

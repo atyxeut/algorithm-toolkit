@@ -36,8 +36,9 @@ namespace fmia::graph::shortest_path::single_source {
 //
 // time complexity: O(VE)
 template <typename EdgeList, typename Vertex, typename Weight = EdgeList::weight_type>
-constexpr auto bellman_ford_impl(const EdgeList& edges, Vertex vertex_count, Vertex source)
-  -> std::expected<std::vector<Weight>, error>
+constexpr std::expected<std::vector<Weight>, error> bellman_ford_impl(
+  const EdgeList& edges, Vertex vertex_count, Vertex source
+)
 {
   if (edges.empty())
     return std::unexpected(error::empty_graph);
@@ -96,8 +97,9 @@ template <typename Vertex, typename Weight>
 // this implementation uses a queue to hold the vertices, guarantees to be not worse than the vanilla bellman-ford,
 // because a normal queue does not affect the original update order of the bellman-ford, and is faster in average cases
 template <meta::graph T, typename Vertex = T::vertex_type, typename Weight = T::weight_type>
-[[nodiscard]] constexpr auto bellman_ford_queue_optimized(const T& g, Vertex source)
-  -> std::expected<std::vector<Weight>, error>
+[[nodiscard]] constexpr std::expected<std::vector<Weight>, error> bellman_ford_queue_optimized(
+  const T& g, Vertex source
+)
 {
   if (g.empty())
     return std::unexpected(error::empty_graph);
@@ -161,8 +163,9 @@ template <meta::graph T, typename Vertex = T::vertex_type, typename Weight = T::
 // Dimitri P. Bertsekas, Francesca Guerriero, and Roberto Musmanno
 // https://web.mit.edu/dimitrib/www/parallelsp.pdf
 template <meta::graph T, typename Vertex = T::vertex_type, typename Weight = T::weight_type>
-[[nodiscard]] constexpr auto bellman_ford_deque_optimized(const T& g, Vertex source)
-  -> std::expected<std::vector<Weight>, error>
+[[nodiscard]] constexpr std::expected<std::vector<Weight>, error> bellman_ford_deque_optimized(
+  const T& g, Vertex source
+)
 {
   if (g.empty())
     return std::unexpected(error::empty_graph);
