@@ -12,3 +12,9 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+target("benchmark-fmia")
+  set_kind("object")
+  add_deps("fmia");
+  add_files("fmia/**.cppm", { public = true })
+target_end()
