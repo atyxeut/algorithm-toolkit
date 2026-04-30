@@ -264,12 +264,12 @@ using last_t = last<T>::type;
 
 } // namespace fmia::meta
 
-namespace fmia::meta::detail {
+namespace fmia::meta {
 
 template <std::size_t I, typename T>
 indexed_type<I, T> lookup_indexed_type_helper(indexed_type<I, T>);
 
-} // namespace fmia::meta::detail
+} // namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -282,7 +282,7 @@ template <std::size_t I, typename IndexedTypeList>
   requires is_indexed_type_list_v<IndexedTypeList>
 struct lookup
 {
-  using type = decltype(detail::lookup_indexed_type_helper<I>(std::declval<IndexedTypeList>()));
+  using type = decltype(lookup_indexed_type_helper<I>(std::declval<IndexedTypeList>()));
 };
 
 template <std::size_t I, typename IndexedTypeList>
@@ -340,7 +340,7 @@ using snoc_t = snoc<T, AnyTypeList>::type;
 
 } // namespace fmia::meta
 
-namespace fmia::meta::detail {
+namespace fmia::meta {
 
 template <typename, typename>
 struct replicate_impl;
@@ -351,7 +351,7 @@ struct replicate_impl<T, std::index_sequence<Is...>>
   using type = type_list<std::enable_if_t<(Is >= 0), T>...>;
 };
 
-} // namespace fmia::meta::detail
+} // namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -361,7 +361,7 @@ export namespace fmia::meta {
 //
 // O(1) time complexity
 template <std::size_t N, typename T>
-using replicate = detail::replicate_impl<T, std::make_index_sequence<N>>;
+using replicate = replicate_impl<T, std::make_index_sequence<N>>;
 
 template <std::size_t N, typename T>
 using replicate_t = replicate<N, T>::type;
@@ -430,7 +430,7 @@ constexpr auto invoke_v = invoke<WrappedTemplate, Args...>::value;
 
 } // namespace fmia::meta
 
-namespace fmia::meta::detail {
+namespace fmia::meta {
 
 template <template <typename...> typename, typename>
 struct is_predicate_tester;
@@ -454,13 +454,13 @@ struct is_predicate_impl<T, std::index_sequence<Is...>>
 {
 };
 
-} // namespace fmia::meta::detail
+} // namespace fmia::meta
 
 export namespace fmia::meta {
 
 template <template <typename...> typename T, std::size_t ArityLimit = 5>
   requires (ArityLimit > 0)
-struct is_predicate : detail::is_predicate_impl<T, std::make_index_sequence<ArityLimit>>
+struct is_predicate : is_predicate_impl<T, std::make_index_sequence<ArityLimit>>
 {
 };
 
@@ -475,7 +475,7 @@ concept wrapped_predicate = wrapped_template<T> && predicate<T::template type>;
 
 } // namespace fmia::meta
 
-namespace fmia::meta::detail {
+namespace fmia::meta {
 
 template <typename... AnyTypeLists>
 struct concat_impl
@@ -564,7 +564,7 @@ struct concat_get_result_helper<Result, true>
 {
 };
 
-} // namespace fmia::meta::detail
+} // namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -576,7 +576,7 @@ export namespace fmia::meta {
 // O(Nlog N) time complexity for indexed_type_list (because of the validation for indices), where N is the count of
 // types over all given type lists
 template <list_of_types... Ts>
-using concat = detail::concat_get_result_helper<typename detail::concat_impl<Ts...>::type>;
+using concat = concat_get_result_helper<typename concat_impl<Ts...>::type>;
 
 template <typename... AnyTypeLists>
 using concat_t = concat<AnyTypeLists...>::type;
@@ -699,7 +699,7 @@ using drop_end_t = drop_end<N, AnyTypeList>::type;
 
 } // namespace fmia::meta
 
-namespace fmia::meta::detail {
+namespace fmia::meta {
 
 template <template <typename> typename, typename, typename = empty_type_list>
 struct take_while_impl;
@@ -729,7 +729,7 @@ struct take_while_impl<Pred, type_list<T, Ts...>, type_list<Taken...>>
 {
 };
 
-} // namespace fmia::meta::detail
+} // namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -740,7 +740,7 @@ export namespace fmia::meta {
 // O(k) time complexity, where k is the length of the longest prefix
 template <template <typename> typename Pred, list_of_types T>
   requires predicate<Pred>
-using take_while = detail::take_while_impl<Pred, T>;
+using take_while = take_while_impl<Pred, T>;
 
 template <template <typename> typename Pred, typename TypeList>
 using take_while_t = take_while<Pred, TypeList>::type;
@@ -759,7 +759,7 @@ using take_while_end_t = take_while_end<Pred, TypeList>::type;
 
 } // namespace fmia::meta
 
-namespace fmia::meta::detail {
+namespace fmia::meta {
 
 template <template <typename> typename, typename>
 struct drop_while_impl;
@@ -789,7 +789,7 @@ struct drop_while_impl<Pred, type_list<T, Ts...>>
 {
 };
 
-} // namespace fmia::meta::detail
+} // namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -800,7 +800,7 @@ export namespace fmia::meta {
 // O(k) time complexity, where k is the longest dropped prefix
 template <template <typename> typename Pred, list_of_types T>
   requires predicate<Pred>
-using drop_while = detail::drop_while_impl<Pred, T>;
+using drop_while = drop_while_impl<Pred, T>;
 
 template <template <typename> typename Pred, typename TypeList>
 using drop_while_t = drop_while<Pred, TypeList>::type;

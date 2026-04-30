@@ -31,8 +31,6 @@ import std;
 
 import fmia.meta;
 
-// clang-format off
-
 export {
 
 using i8  = std::int8_t;
@@ -47,9 +45,7 @@ using u64 = std::uint64_t;
 using isize = std::ptrdiff_t;
 using usize = std::size_t;
 
-}
-
-// clang-format on
+} // export
 
 export namespace fmia::meta {
 
@@ -149,8 +145,6 @@ constexpr bool is_custom_fixed_precision_unsigned_integral_v = is_custom_fixed_p
 
 } // namespace fmia::meta
 
-// clang-format off
-
 export {
 
 #ifdef __SIZEOF_INT128__
@@ -165,11 +159,7 @@ using i128 = ::fmia::fixed_precision_integer::i<128>;
 using u128 = ::fmia::fixed_precision_integer::u<128>;
 #endif
 
-}
-
-// clang-format on
-
-// clang-format off
+} // export
 
 export {
 
@@ -231,9 +221,7 @@ auto& operator <<(std::ostream& ostr, i128 n)
   return ostr;
 }
 
-}
-
-// clang-format on
+} // export
 
 export namespace fmia::meta {
 
@@ -260,7 +248,7 @@ concept custom_fixed_precision_integral =
 
 } // namespace fmia::meta
 
-namespace fmia::meta::detail {
+namespace fmia::meta {
 
 template <typename T, typename = std::remove_cv_t<T>>
 struct make_signed_selector : std::make_signed<T>
@@ -287,19 +275,19 @@ struct make_signed_selector<T, fixed_precision_integer::u<Bits>> : claim_cv<T, f
 {
 };
 
-} // namespace fmia::meta::detail
+} // namespace fmia::meta
 
 export namespace fmia::meta {
 
 template <fixed_precision_integral T>
-using make_signed = detail::make_signed_selector<T>;
+using make_signed = make_signed_selector<T>;
 
 template <typename T>
 using make_signed_t = make_signed<T>::type;
 
 } // namespace fmia::meta
 
-namespace fmia::meta::detail {
+namespace fmia::meta {
 
 template <typename T, typename = std::remove_cv_t<T>>
 struct make_unsigned_selector : std::make_unsigned<T>
@@ -326,12 +314,12 @@ struct make_unsigned_selector<T, fixed_precision_integer::u<Bits>> : claim_cv<T,
 {
 };
 
-} // namespace fmia::meta::detail
+} // namespace fmia::meta
 
 export namespace fmia::meta {
 
 template <fixed_precision_integral T>
-using make_unsigned = detail::make_unsigned_selector<T>;
+using make_unsigned = make_unsigned_selector<T>;
 
 template <typename T>
 using make_unsigned_t = make_unsigned<T>::type;
@@ -368,7 +356,7 @@ concept nonbool_integral = integral<T> && !boolean<T>;
 
 } // namespace fmia::meta
 
-namespace fmia::meta::detail {
+namespace fmia::meta {
 
 template <typename T, usize TypeSize>
 struct make_higher_precision_selector_for_standard_integral_impl;
@@ -449,9 +437,7 @@ struct make_higher_precision_selector<T>
 {
 };
 
-} // namespace fmia::meta::detail
-
-// clang-format off
+} // namespace fmia::meta
 
 export {
 
@@ -459,9 +445,7 @@ using f32 = float;       // precision: 6 to 9 decimal places
 using f64 = double;      // precision: 15 to 17 decimal places
 using f80 = long double; // precision: 18 to 20 decimal places (probably, on MSVC long double is double)
 
-}
-
-// clang-format on
+} // export
 
 // forward declaration
 export namespace fmia::ieee754_float {
@@ -575,7 +559,7 @@ concept floating_point = fixed_precision_floating_point<T> || arbitrary_precisio
 
 } // namespace fmia::meta
 
-namespace fmia::meta::detail {
+namespace fmia::meta {
 
 template <typename T, typename = std::remove_cv_t<T>, bool = is_big_decimal_v<T>>
 struct make_higher_precision_selector_for_floating_point;
@@ -623,7 +607,7 @@ struct make_higher_precision_selector<T> : make_higher_precision_selector_for_fl
 {
 };
 
-} // namespace fmia::meta::detail
+} // namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -644,7 +628,7 @@ concept arbitratry_precision_arithmetic = is_big_integer_v<T> || is_big_decimal_
 //
 // cv-qualifiers and signedness (only for integer types) are kept
 template <typename T>
-using make_higher_precision = detail::make_higher_precision_selector<T>;
+using make_higher_precision = make_higher_precision_selector<T>;
 
 template <typename T>
 using make_higher_precision_t = make_higher_precision<T>::type;

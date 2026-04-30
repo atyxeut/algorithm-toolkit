@@ -75,8 +75,6 @@ void print(std::ostream& ostr, const std::pair<T1, T2>& p, Delim&& delim = std::
 
 } // namespace fmia
 
-// clang-format off
-
 export {
 
 template <typename T1, typename T2>
@@ -86,9 +84,7 @@ auto& operator <<(std::ostream& ostr, const std::pair<T1, T2>& p)
   return ostr;
 }
 
-}
-
-// clang-format on
+} // export
 
 export namespace fmia {
 
@@ -105,8 +101,6 @@ void print(std::ostream& ostr, const std::tuple<Ts...>& t, Delim&& delim = std::
 
 } // namespace fmia
 
-// clang-format off
-
 export {
 
 template <typename... Ts>
@@ -116,11 +110,9 @@ std::ostream& operator <<(std::ostream& ostr, const std::tuple<Ts...>& t)
   return ostr;
 }
 
-}
+} // export
 
-// clang-format on
-
-namespace fmia::meta::legacy::cpp17::detail {
+namespace fmia::meta::cpp17 {
 
 template <typename, typename = void>
 struct is_std_ostream_interactable_impl : std::false_type
@@ -133,20 +125,20 @@ struct is_std_ostream_interactable_impl<T, std::void_t<decltype(std::declval<std
 {
 };
 
-} // namespace fmia::meta::legacy::cpp17::detail
+} // namespace fmia::meta::cpp17
 
-export namespace fmia::meta::legacy::cpp17 {
+export namespace fmia::meta::cpp17 {
 
 // check if T has an overload of operator << of std::ostream&
 // to make fmia::meta::is_std_ostream_interactable<...>::value evaluate to true, the candidate overload must be already
 // defined above it
 template <typename T>
-using is_std_ostream_interactable = detail::is_std_ostream_interactable_impl<T>;
+using is_std_ostream_interactable = is_std_ostream_interactable_impl<T>;
 
 template <typename T>
 constexpr bool is_std_ostream_interactable_v = is_std_ostream_interactable<T>::value;
 
-} // namespace fmia::meta::legacy::cpp17
+} // namespace fmia::meta::cpp17
 
 export namespace fmia::meta {
 
@@ -166,7 +158,7 @@ export namespace fmia {
 template <
   std::ranges::input_range Range, std::convertible_to<std::string> Delim = std::string,
   typename Elem = std::ranges::range_value_t<Range>
-> requires (meta::legacy::cpp17::is_std_ostream_interactable_v<Elem> && !std::is_array_v<Elem>)
+> requires (meta::cpp17::is_std_ostream_interactable_v<Elem> && !std::is_array_v<Elem>)
 int print(std::ostream& ostr, Range&& range, Delim&& delim = std::string(1, ' '), bool new_line = false)
 {
   for (auto it = std::ranges::begin(range), it_end = std::ranges::end(range); it != it_end; ++it)
@@ -187,7 +179,7 @@ int print(std::ostream& ostr, Range&& range, Delim&& delim = std::string(1, ' ')
 template <
   std::ranges::input_range Range, std::convertible_to<std::string> Delim = std::string,
   typename Elem = std::ranges::range_value_t<Range>
-> requires (!meta::legacy::cpp17::is_std_ostream_interactable_v<Elem> && std::ranges::input_range<Elem>)
+> requires (!meta::cpp17::is_std_ostream_interactable_v<Elem> && std::ranges::input_range<Elem>)
 int print(std::ostream& ostr, Range&& range, Delim&& delim = std::string(1, ' '), bool new_line = false)
 {
   int cur_dim = 0;
@@ -220,19 +212,21 @@ void print(std::ostream& ostr, const T& arr, Delim&& delim = std::string(1, ' ')
 
 } // namespace fmia
 
-// clang-format off
-
 export {
+
+// clang-format off
 
 // avoid ambiguous overloads when Range is std::string&, int[2][3], ...
 template <
   std::ranges::input_range Range,
-  typename = std::enable_if_t<!::fmia::meta::legacy::cpp17::is_std_ostream_interactable_v<Range>>
+  typename = std::enable_if_t<!::fmia::meta::cpp17::is_std_ostream_interactable_v<Range>>
 > auto& operator <<(std::ostream& ostr, Range&& range)
 {
   ::fmia::print(ostr, std::forward<Range>(range));
   return ostr;
 }
+
+// clang-format on
 
 // C-style arrays can decay and be output directly as a pointer, thus need a specific overload
 // this overload covers multidimentional arrays
@@ -244,11 +238,9 @@ auto& operator <<(std::ostream& ostr, const T (&arr)[N])
   return ostr;
 }
 
-}
+} // export
 
-// clang-format on
-
-namespace fmia::detail {
+namespace fmia {
 
 template <typename, std::size_t...>
 struct array_impl;
@@ -264,14 +256,14 @@ struct array_impl<T, Dim, Dims...> : array_impl<typename array_impl<T, Dims...>:
 {
 };
 
-} // namespace fmia::detail
+} // namespace fmia
 
 export namespace fmia {
 
 // fmia::array<int, 3, 5, 2> arr3d {};
 // same as: std::array<std::array<std::array<int, 2>, 5>, 3> arr3d {};
 template <typename T, std::size_t... Dims>
-using array = detail::array_impl<T, Dims...>::type;
+using array = array_impl<T, Dims...>::type;
 
 } // namespace fmia
 
@@ -326,7 +318,7 @@ template <typename Elem, std::size_t... Dims, typename T>
 
 } // namespace fmia
 
-namespace fmia::detail {
+namespace fmia {
 
 template <typename, std::size_t DimCnt, typename>
   requires (DimCnt != 0)
@@ -352,7 +344,7 @@ public:
   using type = std::vector<T, meta::cur_dim_allocator_t<T, meta::type_list<Allocator>>>;
 };
 
-} // namespace fmia::detail
+} // namespace fmia
 
 export namespace fmia {
 
@@ -366,13 +358,13 @@ export namespace fmia {
 template <
   typename T, std::size_t DimCnt = 1, typename InnermostDimAllocator = std_allocator_tag, typename... Allocators
 > requires (sizeof...(Allocators) < DimCnt)
-using vector = detail::vector_impl<T, DimCnt, meta::type_list<InnermostDimAllocator, Allocators...>>::type;
+using vector = vector_impl<T, DimCnt, meta::type_list<InnermostDimAllocator, Allocators...>>::type;
 
 // clang-format on
 
 } // namespace fmia
 
-namespace fmia::detail {
+namespace fmia {
 
 template <typename Elem, typename AllocatorList, typename Dim, typename... Ts>
 [[nodiscard]] constexpr auto make_vector_impl(Dim first_dim_size, Ts&&... args)
@@ -394,7 +386,7 @@ template <typename Elem, typename AllocatorList, typename Dim, typename... Ts>
   }
 }
 
-} // namespace fmia::detail
+} // namespace fmia
 
 export namespace fmia {
 
@@ -417,7 +409,7 @@ template <
 > requires (sizeof(Dim) <= sizeof(std::size_t) && sizeof...(Ts) > 0 && sizeof...(Allocators) < sizeof...(Ts))
 [[nodiscard]] constexpr auto make_vector(Dim first_dim_size, Ts&&... args)
 {
-  return detail::make_vector_impl<Elem, meta::type_list<InnermostDimAllocator, Allocators...>>(
+  return make_vector_impl<Elem, meta::type_list<InnermostDimAllocator, Allocators...>>(
     first_dim_size, std::forward<Ts>(args)...
   );
 }

@@ -37,7 +37,7 @@ constexpr bool is_cv_v = is_cv<T>::value;
 
 } // namespace fmia::meta
 
-namespace fmia::meta::detail {
+namespace fmia::meta {
 
 template <typename From, typename To, bool = std::is_const_v<From>, bool = std::is_volatile_v<From>>
 struct claim_cv_selector;
@@ -67,13 +67,13 @@ struct claim_cv_selector<From, To, false, false>
   using type = To;
 };
 
-} // namespace fmia::meta::detail
+} // namespace fmia::meta
 
 export namespace fmia::meta {
 
 // extract the cv-qualifiers of From and apply them to To
 template <typename From, typename To>
-using claim_cv = detail::claim_cv_selector<From, To>;
+using claim_cv = claim_cv_selector<From, To>;
 
 template <typename From, typename To>
 using claim_cv_t = claim_cv<From, To>::type;

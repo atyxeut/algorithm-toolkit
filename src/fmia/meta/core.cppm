@@ -45,7 +45,7 @@ using index_constant = std::integral_constant<std::size_t, N>;
 
 } // namespace fmia::meta
 
-namespace fmia::meta::detail {
+namespace fmia::meta {
 
 template <typename>
 struct make_reversed_integer_sequence_impl;
@@ -56,7 +56,7 @@ struct make_reversed_integer_sequence_impl<std::integer_sequence<Int, Is...>>
   using type = std::integer_sequence<Int, (sizeof...(Is) - 1 - Is)...>;
 };
 
-} // namespace fmia::meta::detail
+} // namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -66,7 +66,7 @@ export namespace fmia::meta {
 // recursive implementation
 template <std::integral T, T N>
 using make_reversed_integer_sequence =
-  detail::make_reversed_integer_sequence_impl<std::make_integer_sequence<T, N>>::type;
+  make_reversed_integer_sequence_impl<std::make_integer_sequence<T, N>>::type;
 
 template <std::size_t N>
 using make_reversed_index_sequence = make_reversed_integer_sequence<std::size_t, N>;
@@ -76,7 +76,7 @@ using reversed_index_sequence_for = make_reversed_index_sequence<sizeof...(Ts)>;
 
 } // namespace fmia::meta
 
-namespace fmia::meta::detail {
+namespace fmia::meta {
 
 template <typename Int, Int, typename>
 struct make_integer_sequence_of_range_impl;
@@ -87,7 +87,7 @@ struct make_integer_sequence_of_range_impl<Int, Begin, std::integer_sequence<Int
   using type = std::integer_sequence<Int, (Begin + Is)...>;
 };
 
-} // namespace fmia::meta::detail
+} // namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -98,14 +98,14 @@ export namespace fmia::meta {
 template <std::integral T, T Begin, T End>
   requires (Begin <= End)
 using make_integer_sequence_of_range =
-  detail::make_integer_sequence_of_range_impl<T, Begin, std::make_integer_sequence<T, End - Begin + 1>>::type;
+  make_integer_sequence_of_range_impl<T, Begin, std::make_integer_sequence<T, End - Begin + 1>>::type;
 
 template <std::size_t Begin, std::size_t End>
 using make_index_sequence_of_range = make_integer_sequence_of_range<std::size_t, Begin, End>;
 
 } // namespace fmia::meta
 
-namespace fmia::meta::detail {
+namespace fmia::meta {
 
 template <typename Int, Int, typename>
 struct make_reversed_integer_sequence_of_range_impl;
@@ -116,7 +116,7 @@ struct make_reversed_integer_sequence_of_range_impl<Int, End, std::integer_seque
   using type = std::integer_sequence<Int, (End - Is)...>;
 };
 
-} // namespace fmia::meta::detail
+} // namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -127,7 +127,7 @@ export namespace fmia::meta {
 template <std::integral T, T Begin, T End>
   requires (Begin <= End)
 using make_reversed_integer_sequence_of_range =
-  detail::make_reversed_integer_sequence_of_range_impl<T, End, std::make_integer_sequence<T, End - Begin + 1>>::type;
+  make_reversed_integer_sequence_of_range_impl<T, End, std::make_integer_sequence<T, End - Begin + 1>>::type;
 
 template <std::size_t Begin, std::size_t End>
 using make_reversed_index_sequence_of_range = make_reversed_integer_sequence_of_range<std::size_t, Begin, End>;

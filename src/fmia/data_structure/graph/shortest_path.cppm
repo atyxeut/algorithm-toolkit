@@ -26,7 +26,7 @@ enum class error : u8 { empty_graph, negative_cycle };
 
 } // namespace fmia::graph::shortest_path
 
-namespace fmia::graph::shortest_path::single_source::detail {
+namespace fmia::graph::shortest_path::single_source {
 
 // brief explaination for correctness:
 // 1. the shortest path can have at most V - 1 edges
@@ -67,7 +67,7 @@ constexpr auto bellman_ford_impl(const EdgeList& edges, Vertex vertex_count, Ver
   return distance;
 }
 
-} // namespace fmia::graph::shortest_path::single_source::detail
+} // namespace fmia::graph::shortest_path::single_source
 
 export namespace fmia::graph::shortest_path::single_source {
 
@@ -76,13 +76,13 @@ template <typename Vertex, typename Weight>
   const basic_weighted_edge_list<Vertex, Weight>& edges, Vertex vertex_count, Vertex source
 )
 {
-  return detail::bellman_ford_impl(edges, vertex_count, source);
+  return bellman_ford_impl(edges, vertex_count, source);
 }
 
 template <typename Vertex, typename Weight>
 [[nodiscard]] constexpr auto bellman_ford(const weighted_edge_list<Vertex, Weight>& edges, Vertex source)
 {
-  return detail::bellman_ford_impl(edges, edges.vertex_size(), source);
+  return bellman_ford_impl(edges, edges.vertex_size(), source);
 }
 
 // Moore's variation:

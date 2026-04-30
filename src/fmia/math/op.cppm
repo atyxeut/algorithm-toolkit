@@ -62,8 +62,6 @@ struct is_enum_flag<operator_property> : std::true_type
 
 } // namespace fmia::meta
 
-// clang-format off
-
 export {
 
 [[nodiscard]] constexpr auto operator &(::fmia::operator_property a, ::fmia::operator_property b) noexcept
@@ -96,9 +94,7 @@ constexpr auto& operator |=(::fmia::operator_property& a, ::fmia::operator_prope
   return a = a | b;
 };
 
-}
-
-// clang-format on
+} // export
 
 export namespace fmia::meta {
 

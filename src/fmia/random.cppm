@@ -49,33 +49,46 @@ template <typename T, typename Engine = std::mt19937>
 
 } // namespace fmia::random
 
-namespace fmia::random::generate::detail {
+namespace fmia::random {
 
 constexpr char decimal_digit_character[10] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-} // namespace fmia::random::generate::detail
-
-export namespace fmia::random::generate {
-
-template <bool OnlyPositiveInteger = false>
-[[nodiscard]] auto integer(usize integer_length)
+template <bool AllowNegative>
+[[nodiscard]] auto generate_integer_impl(usize length)
 {
+  if (length == 0)
+    throw std::invalid_argument("length must be positive");
+
   std::string data;
-  data.reserve(integer_length);
+  data.reserve(length + AllowNegative);
 
-  if (!OnlyPositiveInteger & rand(0uz, 1uz))
-    data += '-';
+  if constexpr (AllowNegative)
+    if (rand(0uz, 1uz))
+      data += '-';
 
-  auto dist = uniform_distribution(0uz, 9uz);
-  data += detail::decimal_digit_character[rand(1uz, 9uz)];
-  while (integer_length-- > 1)
-    data += detail::decimal_digit_character[dist(mt19937_engine)];
+  data += decimal_digit_character[rand(1uz, 9uz)];
+  for (auto dist = uniform_distribution(0uz, 9uz); length-- > 1;)
+    data += decimal_digit_character[dist(mt19937_engine)];
 
   return data;
 }
 
+} // namespace fmia::random
+
+export namespace fmia::random {
+
+[[nodiscard]] auto generate_positive_integer(usize length)
+{
+  return generate_integer_impl<false>(length);
+}
+
+[[nodiscard]] auto generate_integer(usize length)
+{
+  return generate_integer_impl<true>(length);
+}
+
 template <std::integral T>
-[[nodiscard]] auto permutation(T begin, T end)
+[[nodiscard]] auto generate_permutation(T begin, T end)
 {
   if (begin > end)
     throw std::invalid_argument("invalid integer range");
@@ -88,7 +101,7 @@ template <std::integral T>
 
 // get the edge list of a random unweighted tree
 template <bool FlowerGraph = false, std::integral T>
-[[nodiscard]] auto unweighted_tree(T vertex_begin, T vertex_end)
+[[nodiscard]] auto generate_unweighted_tree(T vertex_begin, T vertex_end)
 {
   if (vertex_begin > vertex_end)
     throw std::invalid_argument("invalid vertex index range");
@@ -111,7 +124,9 @@ template <bool FlowerGraph = false, std::integral T>
 
 // get the edge list of a random weighted tree
 template <bool FlowerGraph = false, std::integral Vertex, std::integral Weight>
-[[nodiscard]] auto weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end)
+[[nodiscard]] auto generate_weighted_tree(
+  Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end
+)
 {
   if (vertex_begin > vertex_end)
     throw std::invalid_argument("invalid vertex index range");
@@ -136,4 +151,4 @@ template <bool FlowerGraph = false, std::integral Vertex, std::integral Weight>
   return data;
 }
 
-} // namespace fmia::random::generate
+} // namespace fmia::random

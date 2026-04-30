@@ -17,3 +17,5 @@ target("fmia")
   set_kind("object")
   add_files("**.cppm", { public = true })
 target_end()
+
+add_includedirs("fmia")

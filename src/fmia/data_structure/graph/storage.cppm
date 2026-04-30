@@ -25,7 +25,7 @@ enum class graph_tag : u8 { undirected, directed };
 
 } // namespace fmia::graph
 
-namespace fmia::graph::detail {
+namespace fmia::graph {
 
 template <typename Vertex>
 struct edge_from_base
@@ -50,28 +50,28 @@ struct edge_id
   Degree id;
 };
 
-} // namespace fmia::graph::detail
+} // namespace fmia::graph
 
 export namespace fmia::graph {
 
 template <std::signed_integral Vertex, meta::precision_gteq<Vertex> Degree>
-struct unweighted_edge_from : detail::edge_from_base<Vertex>, detail::edge_id<Degree>
+struct unweighted_edge_from : edge_from_base<Vertex>, edge_id<Degree>
 {
 };
 
 template <std::signed_integral Vertex, meta::precision_gteq<Vertex> Degree>
-struct unweighted_edge_to : detail::edge_to_base<Vertex>, detail::edge_id<Degree>
+struct unweighted_edge_to : edge_to_base<Vertex>, edge_id<Degree>
 {
 };
 
 template <std::signed_integral Vertex, meta::precision_gteq<Vertex> Degree>
-struct unweighted_edge : detail::edge_base<Vertex>, detail::edge_id<Degree>
+struct unweighted_edge : edge_base<Vertex>, edge_id<Degree>
 {
 };
 
 } // namespace fmia::graph
 
-namespace fmia::graph::detail {
+namespace fmia::graph {
 
 template <typename>
 struct weight;
@@ -91,22 +91,22 @@ struct weight<T>
   T w;
 };
 
-} // namespace fmia::graph::detail
+} // namespace fmia::graph
 
 export namespace fmia::graph {
 
 template <std::signed_integral Vertex, typename Weight>
-struct weighted_edge_from : detail::edge_from_base<Vertex>, detail::weight<Weight>
+struct weighted_edge_from : edge_from_base<Vertex>, weight<Weight>
 {
 };
 
 template <std::signed_integral Vertex, typename Weight>
-struct weighted_edge_to : detail::edge_to_base<Vertex>, detail::weight<Weight>
+struct weighted_edge_to : edge_to_base<Vertex>, weight<Weight>
 {
 };
 
 template <std::signed_integral Vertex, typename Weight>
-struct weighted_edge : detail::edge_base<Vertex>, detail::weight<Weight>
+struct weighted_edge : edge_base<Vertex>, weight<Weight>
 {
 };
 
@@ -194,7 +194,7 @@ concept basic_edge_list = is_no_cv_basic_edge_list_v<std::remove_cvref_t<T>>;
 
 } // namespace fmia::meta
 
-namespace fmia::graph::detail {
+namespace fmia::graph {
 
 template <typename Vertex, typename Edge, typename Degree>
 class basic_edge_list_base
@@ -240,12 +240,12 @@ public:
   [[nodiscard]] constexpr auto vertex_size() const noexcept { return static_cast<Vertex>(exist_.size()); }
 };
 
-} // namespace fmia::graph::detail
+} // namespace fmia::graph
 
 export namespace fmia::graph {
 
 template <std::signed_integral Vertex, meta::precision_gteq<Vertex> Degree = meta::make_higher_precision_t<Vertex>>
-struct basic_unweighted_edge_list : public detail::basic_edge_list_base<Vertex, unweighted_edge<Vertex, Degree>, Degree>
+struct basic_unweighted_edge_list : public basic_edge_list_base<Vertex, unweighted_edge<Vertex, Degree>, Degree>
 {
   constexpr void add_edge(Vertex u, Vertex v) { this->edges_.emplace_back(u, v, this->edge_size()); }
 };
@@ -254,7 +254,7 @@ template <
   std::signed_integral Vertex, meta::arithmetic Weight,
   meta::precision_gteq<Vertex> Degree = meta::make_higher_precision_t<Vertex>
 >
-struct basic_weighted_edge_list : public detail::basic_edge_list_base<Vertex, weighted_edge<Vertex, Weight>, Degree>
+struct basic_weighted_edge_list : public basic_edge_list_base<Vertex, weighted_edge<Vertex, Weight>, Degree>
 {
   using weight_type = Weight;
 
@@ -281,7 +281,7 @@ struct is_no_cv_basic_edge_list<graph::basic_weighted_edge_list<Vertex, Weight, 
 export namespace fmia::graph {
 
 template <std::signed_integral Vertex, meta::precision_gteq<Vertex> Degree = meta::make_higher_precision_t<Vertex>>
-class unweighted_edge_list : public detail::edge_list_base<Vertex, unweighted_edge<Vertex, Degree>, Degree>
+class unweighted_edge_list : public edge_list_base<Vertex, unweighted_edge<Vertex, Degree>, Degree>
 {
 public:
   constexpr void add_edge(Vertex u, Vertex v)
@@ -294,7 +294,7 @@ public:
 template <
   std::signed_integral Vertex, meta::arithmetic Weight,
   meta::precision_gteq<Vertex> Degree = meta::make_higher_precision_t<Vertex>
-> class weighted_edge_list : public detail::edge_list_base<Vertex, weighted_edge<Vertex, Weight>, Degree>
+> class weighted_edge_list : public edge_list_base<Vertex, weighted_edge<Vertex, Weight>, Degree>
 {
 public:
   using weight_type = Weight;

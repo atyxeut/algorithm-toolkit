@@ -29,7 +29,7 @@ enum class eulerian_graph_error : u8 { no_eulerian_trail, no_eulerian_circuit };
 
 } // namespace fmia::graph
 
-namespace fmia::graph::detail {
+namespace fmia::graph {
 
 template <graph_tag GraphTag, typename Graph, typename Vertex = Graph::vertex_type>
 constexpr auto get_eulerian_trail_start_vertex(const Graph& g) noexcept -> std::pair<Vertex, bool>
@@ -96,9 +96,9 @@ constexpr auto init_current_edge_iterators(const Graph& g)
   return res;
 }
 
-} // namespace fmia::graph::detail
+} // namespace fmia::graph
 
-namespace fmia::graph::detail {
+namespace fmia::graph {
 
 // Hierholzer's algorithm
 // time complexity: O(V + E)
@@ -170,16 +170,16 @@ constexpr void get_an_eulerian_trail_impl(T& path, const G& g, U start)
     get_an_eulerian_trail_impl_for_directed_iterative(g, start, cur_edge_it, path);
 }
 
-} // namespace fmia::graph::detail
+} // namespace fmia::graph
 
-namespace fmia::graph::detail {
+namespace fmia::graph {
 
 template <trail_tag TrailTag, graph_tag GraphTag, typename Graph, typename Vertex = Graph::vertex_type>
 constexpr auto get_an_eulerian_trail(const Graph& g) -> std::expected<std::vector<Vertex>, eulerian_graph_error>
 {
   std::vector<Vertex> path;
 
-  const auto [start, is_circuit] = detail::get_eulerian_trail_start_vertex<GraphTag>(g);
+  const auto [start, is_circuit] = get_eulerian_trail_start_vertex<GraphTag>(g);
 
   if constexpr (TrailTag == trail_tag::circuit)
     if (!is_circuit)
@@ -197,7 +197,7 @@ constexpr auto get_an_eulerian_trail(const Graph& g) -> std::expected<std::vecto
   return path;
 }
 
-} // namespace fmia::graph::detail
+} // namespace fmia::graph
 
 export namespace fmia::graph {
 
@@ -207,25 +207,25 @@ export namespace fmia::graph {
 template <meta::graph T>
 [[nodiscard]] constexpr auto get_an_eulerian_trail_for_undirected(const T& g)
 {
-  return detail::get_an_eulerian_trail<trail_tag::none, graph_tag::undirected>(g);
+  return get_an_eulerian_trail<trail_tag::none, graph_tag::undirected>(g);
 }
 
 template <meta::graph T>
 [[nodiscard]] constexpr auto get_an_eulerian_circuit_for_undirected(const T& g)
 {
-  return detail::get_an_eulerian_trail<trail_tag::circuit, graph_tag::undirected>(g);
+  return get_an_eulerian_trail<trail_tag::circuit, graph_tag::undirected>(g);
 }
 
 template <meta::graph T>
 [[nodiscard]] constexpr auto get_an_eulerian_trail_for_directed(const T& g)
 {
-  return detail::get_an_eulerian_trail<trail_tag::none, graph_tag::directed>(g);
+  return get_an_eulerian_trail<trail_tag::none, graph_tag::directed>(g);
 }
 
 template <meta::graph T>
 [[nodiscard]] constexpr auto get_an_eulerian_circuit_for_directed(const T& g)
 {
-  return detail::get_an_eulerian_trail<trail_tag::circuit, graph_tag::directed>(g);
+  return get_an_eulerian_trail<trail_tag::circuit, graph_tag::directed>(g);
 }
 
 } // namespace fmia::graph
@@ -247,7 +247,7 @@ enum class toposort_tag : u8 { none, lexicographical };
 
 } // namespace fmia::graph
 
-namespace fmia::graph::detail {
+namespace fmia::graph {
 
 template <toposort_tag Order, typename Graph, typename Fn>
 constexpr auto toposort_impl(const Graph& g, Fn&& fn) -> std::expected<bool, toposort_error>
@@ -294,20 +294,20 @@ constexpr auto toposort_impl(const Graph& g, Fn&& fn) -> std::expected<bool, top
   return unique_order;
 }
 
-} // namespace fmia::graph::detail
+} // namespace fmia::graph
 
 export namespace fmia::graph {
 
 template <meta::graph T, typename Fn>
 [[nodiscard]] constexpr auto toposort(const T& g, Fn&& fn)
 {
-  return detail::toposort_impl<toposort_tag::none>(g, std::forward<Fn>(fn));
+  return toposort_impl<toposort_tag::none>(g, std::forward<Fn>(fn));
 }
 
 template <meta::graph T, typename Fn>
 [[nodiscard]] constexpr auto toposort_lexicographical(const T& g, Fn&& fn)
 {
-  return detail::toposort_impl<toposort_tag::lexicographical>(g, std::forward<Fn>(fn));
+  return toposort_impl<toposort_tag::lexicographical>(g, std::forward<Fn>(fn));
 }
 
 } // namespace fmia::graph
