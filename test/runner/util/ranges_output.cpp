@@ -15,8 +15,6 @@
 
 import test.fmia.util;
 
-using namespace test::fmia::util;
-
 int main()
 {
   cstyle_string_literal_output_no_ambiguous_overloads();

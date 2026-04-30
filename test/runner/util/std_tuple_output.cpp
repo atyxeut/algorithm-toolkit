@@ -15,8 +15,6 @@
 
 import test.fmia.util;
 
-using namespace test::fmia::util;
-
 int main()
 {
   std_pair_output_with_custom_print_and_std_ostream();

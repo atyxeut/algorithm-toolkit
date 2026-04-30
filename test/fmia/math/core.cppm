@@ -19,19 +19,8 @@ import std;
 
 import fmia.math.core;
 
-namespace test::fmia {
-
-using namespace ::fmia;
-
-} // namespace test::fmia
-
-namespace test::fmia::meta {
-
-using namespace ::fmia::meta;
-
-} // namespace test::fmia::meta
-
-export namespace test::fmia::meta {
+using namespace fmia;
+using namespace fmia::meta;
 
 consteval void does_is_boolean_work() noexcept
 {
@@ -167,9 +156,7 @@ consteval void does_compare_precision_for_floating_point_work() noexcept
   static_assert(!precision_comparable<fp::d<128>, fp::f<256>>);
 }
 
-} // namespace test::fmia::meta
-
-export namespace test::fmia::math {
+export {
 
 void int128_input_with_std_istream() noexcept
 {
@@ -190,4 +177,4 @@ void int128_output_with_std_ostream_and_std_print() noexcept
   std::println("{:05} {:05}\n", a + b, c + d);
 }
 
-} // namespace test::fmia::math
+} // export

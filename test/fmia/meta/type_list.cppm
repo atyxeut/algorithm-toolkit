@@ -20,13 +20,7 @@ import std;
 import fmia.meta.core;
 import fmia.meta.type_list;
 
-namespace test::fmia::meta {
-
-using namespace ::fmia::meta;
-
-} // namespace test::fmia::meta
-
-export namespace test::fmia::meta {
+using namespace fmia::meta;
 
 consteval void does_is_any_of_work() noexcept
 {
@@ -55,10 +49,6 @@ consteval void does_all_the_same_work() noexcept
   static_assert(all_the_same_v<int, int, int, int, int, int, int, int> == true);
 }
 
-} // namespace test::fmia::meta
-
-namespace test::fmia::meta {
-
 using type_list_1 = type_list<double, float, std::vector<int>, long long>;
 using type_list_2 = type_list<std::string, unsigned, const volatile bool, bool>;
 using type_list_3 = type_list<int, char, const int, volatile char>;
@@ -78,10 +68,6 @@ using indexed_type_list_3 = indexed_type_list<std::make_index_sequence<length_v<
 using indexed_type_list_4 = indexed_type_list<std::make_index_sequence<length_v<type_list_4>>, type_list_4>;
 using indexed_type_list_5 = indexed_type_list<std::make_index_sequence<length_v<type_list_5>>, type_list_5>;
 using indexed_type_list_6 = indexed_type_list<std::make_index_sequence<length_v<type_list_6>>, type_list_6>;
-
-} // namespace test::fmia::meta
-
-export namespace test::fmia::meta {
 
 // clang-format off
 
@@ -157,10 +143,6 @@ consteval void does_replicate_work() noexcept
   static_assert(std::same_as<replicate_t<5, int>, int_replicateed_5_times_type_list>);
 }
 
-} // namespace test::fmia::meta
-
-namespace test::fmia::meta::detail {
-
 template <list_of_types>
 struct huge_concat_test_helper;
 
@@ -171,10 +153,6 @@ struct huge_concat_test_helper<type_list<Ts...>> : concat<Ts...>
 
 template <list_of_types T>
 using huge_concat_test_helper_t = huge_concat_test_helper<T>::type;
-
-} // namespace test::fmia::meta::detail
-
-export namespace test::fmia::meta {
 
 consteval void does_concat_work() noexcept
 {
@@ -207,7 +185,7 @@ consteval void does_concat_work() noexcept
 
   // test `concat` complexity, 1500 recursion depth (for a O(n) recursive implementation) will make the compiler crash
   // by default
-  static_assert(std::same_as<detail::huge_concat_test_helper_t<huge_concatenation_before>, huge_concatenation_after>);
+  static_assert(std::same_as<huge_concat_test_helper_t<huge_concatenation_before>, huge_concatenation_after>);
 
   using list_1 = indexed_type_list<
     std::index_sequence<0, 1, 2, 3, 4>, type_list<double, float, std::vector<int>, long long, std::string>
@@ -584,5 +562,3 @@ consteval void does_is_predicate_work() noexcept
   static_assert(predicate<std::add_const> == false);
   static_assert(wrapped_predicate<template_wrapper<std::add_const>> == false);
 }
-
-} // namespace test::fmia::meta

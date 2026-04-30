@@ -15,8 +15,6 @@
 
 import test.fmia.util;
 
-using namespace test::fmia::util;
-
 int main()
 {
   does_make_vector_work();

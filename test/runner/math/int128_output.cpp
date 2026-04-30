@@ -15,8 +15,6 @@
 
 import test.fmia.math;
 
-using namespace test::fmia::math;
-
 int main()
 {
   int128_output_with_std_ostream_and_std_print();

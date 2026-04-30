@@ -24,13 +24,9 @@ import std;
 import fmia.memory.core;
 import fmia.util.std_extension;
 
-namespace test::fmia::util {
+using namespace fmia;
 
-using namespace ::fmia;
-
-} // namespace test::fmia::util
-
-export namespace test::fmia::util {
+export {
 
 void std_pair_output_with_custom_print_and_std_ostream() noexcept
 {
@@ -191,9 +187,7 @@ void multidimensional_ranges_output_with_custom_print_and_std_ostream() noexcept
   std::cout << '\n';
 }
 
-} // namespace test::fmia::util
-
-export namespace test::fmia::util {
+} // export
 
 consteval void fmia_array_should_be_nested_std_array() noexcept
 {
@@ -250,6 +244,8 @@ consteval void every_empty_allocator_template_parameter_of_fmia_vector_defaults_
   static_assert(std::same_as<T2, T2_> && std::same_as<T2_, T2__>);
 }
 
+export {
+
 void does_make_vector_work()
 {
   auto get_v1 = [] consteval noexcept {
@@ -270,4 +266,4 @@ void does_make_vector_work()
   assert(v2 == v2_ && v2_ == v2__);
 }
 
-} // namespace test::fmia::util
+} // export

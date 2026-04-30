@@ -19,13 +19,7 @@ import std;
 
 import fmia.meta.core;
 
-namespace test::fmia::meta {
-
-using namespace ::fmia::meta;
-
-} // namespace test::fmia::meta
-
-export namespace test::fmia::meta {
+using namespace fmia::meta;
 
 consteval void do_custom_integer_sequence_helpers_work() noexcept
 {
@@ -79,5 +73,3 @@ consteval void does_is_no_duplication_integer_sequence_work() noexcept
   static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1, 2, 1, 2, 1, 2, 1>> == false);
   static_assert(is_no_duplication_integer_sequence_v<std::index_sequence<1, 2, 3, 4, 3, 3, 3>> == false);
 }
-
-} // namespace test::fmia::meta
