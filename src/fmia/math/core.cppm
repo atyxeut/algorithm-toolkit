@@ -23,6 +23,8 @@ module;
 #include <__msvc_int128.hpp>
 #endif
 
+#include <macro/wconversion_switch.hpp>
+
 export module fmia.math.core;
 
 // core arithmetic types, functions and metaprogramming utils
@@ -779,7 +781,7 @@ constexpr void remove_lz(mag_type& num) noexcept
     num.pop_back();
 }
 
-constexpr void carry(mag_type& num) noexcept
+constexpr void carry(std::span<int> num) noexcept
 {
   int c = 0, r;
   for (auto& digit : num) {
@@ -858,30 +860,38 @@ template <meta::fixed_precision_integral T>
   return {std::move(q), static_cast<T>(r)};
 }
 
+FMIA_WCONVERSION_PUSH()
+
 [[nodiscard]] constexpr idiv_result<mag_type> idiv(const mag_type& a, const mag_type& b)
 {
   assert(!is_zero(b));
 
-  if (compare(a, b) < 0)
+  const int cmp_result = compare(a, b);
+  if (cmp_result < 0)
     return {{0}, a};
+  if (cmp_result == 0)
+    return {{1}, {0}};
 
-  mag_type q(a.size() - b.size() + 1), r(b.size() + 1);
-  std::copy(a.begin() + static_cast<typename mag_type::difference_type>(q.size()), a.end(), r.begin());
+  mag_type q(a.size() - b.size() + 1), r(a);
 
-  for (auto i = q.size(); i > 0; --i) {
-    std::move_backward(r.begin(), r.end() - 1, r.end());
-    r[0] = a[i - 1];
-    while (r.back() != 0 || compare(std::span(r.begin(), b.size()), b) >= 0) {
-      ++q[i - 1];
+  bool not_first_digit = false;
+  for (auto _ = q.size(); _ > 0; --_) {
+    const auto i = _ - 1;
+    while ((not_first_digit && r[i + b.size()] != 0) || compare(std::span(r.begin() + i, b.size()), b) >= 0) {
+      ++q[i];
       for (auto j = 0uz; j < b.size(); ++j)
-        r[j] -= b[j];
-      carry(r);
+        r[i + j] -= b[j];
+      carry(std::span(r.begin() + i, b.size() + not_first_digit));
     }
+    not_first_digit = true;
   }
 
   remove_lz(q);
+  r.resize(b.size());
   remove_lz(r);
   return {std::move(q), std::move(r)};
 }
+
+FMIA_WCONVERSION_POP()
 
 } // export namespace fmia::big_integer::naive
