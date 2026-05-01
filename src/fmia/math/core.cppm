@@ -75,7 +75,7 @@ concept nonbool_standard_integral = std::integral<T> && !boolean<T>;
 template <typename T>
 concept size_integral = std::same_as<T, u32> || std::same_as<T, usize>;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export namespace fmia {
 
@@ -85,7 +85,7 @@ template <meta::nonbool_standard_unsigned_integral T>
   return x != 0 & (x & x - 1) == 0;
 }
 
-} // namespace fmia
+} // export namespace fmia
 
 // forward declaration
 export namespace fmia::fixed_precision_integer {
@@ -98,7 +98,7 @@ template <usize Bits>
   requires (Bits >= 128 && is_power_of_2(Bits))
 class u;
 
-} // namespace fmia::fixed_precision_integer
+} // export namespace fmia::fixed_precision_integer
 
 export namespace fmia::meta {
 
@@ -143,7 +143,7 @@ using is_custom_fixed_precision_unsigned_integral =
 template <typename T>
 constexpr bool is_custom_fixed_precision_unsigned_integral_v = is_custom_fixed_precision_unsigned_integral<T>::value;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export {
 
@@ -246,7 +246,7 @@ template <typename T>
 concept custom_fixed_precision_integral =
   is_custom_fixed_precision_signed_integral_v<T> || is_custom_fixed_precision_unsigned_integral_v<T>;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 namespace fmia::meta {
 
@@ -285,7 +285,7 @@ using make_signed = make_signed_selector<T>;
 template <typename T>
 using make_signed_t = make_signed<T>::type;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 namespace fmia::meta {
 
@@ -324,7 +324,7 @@ using make_unsigned = make_unsigned_selector<T>;
 template <typename T>
 using make_unsigned_t = make_unsigned<T>::type;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -357,7 +357,143 @@ concept nonbool_integral = integral<T> && !boolean<T>;
 template <typename T>
 concept nothrow_integral = fixed_precision_integral<T>;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
+
+export {
+
+using f32 = float;       // precision: 6 to 9 decimal places
+using f64 = double;      // precision: 15 to 17 decimal places
+using f80 = long double; // precision: 18 to 20 decimal places (probably, on MSVC long double is double)
+
+} // export
+
+// forward declaration
+export namespace fmia::ieee754_float {
+
+// IEEE 754 binary floating-point
+template <usize Bits>
+  requires (Bits >= 128 && is_power_of_2(Bits))
+class f;
+
+// IEEE 754 decimal floating-point
+template <usize Bits>
+  requires (Bits >= 32 && is_power_of_2(Bits))
+class d;
+
+} // export namespace fmia::ieee754_float
+
+export namespace fmia::meta {
+
+template <typename>
+struct is_no_cv_custom_ieee754_binary_floating_point : std::false_type
+{
+};
+
+template <usize Bits>
+struct is_no_cv_custom_ieee754_binary_floating_point<ieee754_float::f<Bits>> : std::true_type
+{
+};
+
+template <typename T>
+constexpr bool is_no_cv_custom_ieee754_binary_floating_point_v =
+  is_no_cv_custom_ieee754_binary_floating_point<T>::value;
+
+template <typename T>
+using is_custom_ieee754_binary_floating_point = is_no_cv_custom_ieee754_binary_floating_point<std::remove_cv_t<T>>;
+
+template <typename T>
+constexpr bool is_custom_ieee754_binary_floating_point_v = is_custom_ieee754_binary_floating_point<T>::value;
+
+template <typename>
+struct is_no_cv_custom_ieee754_decimal_floating_point : std::false_type
+{
+};
+
+template <usize Bits>
+struct is_no_cv_custom_ieee754_decimal_floating_point<ieee754_float::d<Bits>> : std::true_type
+{
+};
+
+template <typename T>
+constexpr bool is_no_cv_custom_ieee754_decimal_floating_point_v =
+  is_no_cv_custom_ieee754_decimal_floating_point<T>::value;
+
+template <typename T>
+using is_custom_ieee754_decimal_floating_point = is_no_cv_custom_ieee754_decimal_floating_point<std::remove_cv_t<T>>;
+
+template <typename T>
+constexpr bool is_custom_ieee754_decimal_floating_point_v = is_custom_ieee754_decimal_floating_point<T>::value;
+
+} // export namespace fmia::meta
+
+export {
+
+// f128 precision: 33 to 35 decimal places
+#ifdef __SIZEOF_FLOAT128__
+// https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+__extension__ using f128 = __float128;
+#else
+using f128 = ::fmia::ieee754_float::f<128>;
+#endif
+
+} // export
+
+export namespace fmia::meta {
+
+template <typename T>
+concept ieee754_binary_floating_point =
+  std::floating_point<T> || std::same_as<std::remove_cv_t<T>, f128> || is_custom_ieee754_binary_floating_point_v<T>;
+
+template <typename T>
+concept ieee754_decimal_floating_point = is_custom_ieee754_decimal_floating_point_v<T>;
+
+template <typename T>
+concept ieee754_floating_point = ieee754_binary_floating_point<T> || ieee754_decimal_floating_point<T>;
+
+template <typename>
+struct is_no_cv_big_decimal : std::false_type
+{
+};
+
+template <typename T>
+constexpr bool is_no_cv_big_decimal_v = is_no_cv_big_decimal<T>::value;
+
+template <typename T>
+using is_big_decimal = is_no_cv_big_decimal<std::remove_cv_t<T>>;
+
+template <typename T>
+constexpr bool is_big_decimal_v = is_big_decimal<T>::value;
+
+template <typename T>
+concept fixed_precision_floating_point = ieee754_floating_point<T>;
+
+template <typename T>
+concept arbitrary_precision_floating_point = is_big_decimal_v<T>;
+
+template <typename T>
+concept floating_point = fixed_precision_floating_point<T> || arbitrary_precision_floating_point<T>;
+
+template <typename T>
+concept nothrow_floating_point = fixed_precision_floating_point<T>;
+
+} // export namespace fmia::meta
+
+
+export namespace fmia::meta {
+
+template <typename T>
+concept arithmetic = integral<T> || floating_point<T>;
+
+template <typename T>
+concept fixed_precision_arithmetic = fixed_precision_integral<T> || fixed_precision_floating_point<T>;
+
+template <typename T>
+concept arbitratry_precision_arithmetic = is_big_integer_v<T> || is_big_decimal_v<T>;
+
+template <typename T>
+concept nothrow_arithmetic = nothrow_integral<T> || nothrow_floating_point<T>;
+
+} // export namespace fmia::meta
 
 namespace fmia::meta {
 
@@ -428,141 +564,6 @@ struct make_higher_precision_selector_for_custom_integral<T, std::remove_cv_t<T>
   using type = T;
 };
 
-template <typename>
-struct make_higher_precision_selector;
-
-template <integral T>
-struct make_higher_precision_selector<T>
-  : std::conditional_t<
-      std::integral<T>, make_higher_precision_selector_for_standard_integral<T>,
-      make_higher_precision_selector_for_custom_integral<T>
-    >
-{
-};
-
-} // namespace fmia::meta
-
-export {
-
-using f32 = float;       // precision: 6 to 9 decimal places
-using f64 = double;      // precision: 15 to 17 decimal places
-using f80 = long double; // precision: 18 to 20 decimal places (probably, on MSVC long double is double)
-
-} // export
-
-// forward declaration
-export namespace fmia::ieee754_float {
-
-// IEEE 754 binary floating-point
-template <usize Bits>
-  requires (Bits >= 128 && is_power_of_2(Bits))
-class f;
-
-// IEEE 754 decimal floating-point
-template <usize Bits>
-  requires (Bits >= 32 && is_power_of_2(Bits))
-class d;
-
-} // namespace fmia::ieee754_float
-
-export namespace fmia::meta {
-
-template <typename>
-struct is_no_cv_custom_ieee754_binary_floating_point : std::false_type
-{
-};
-
-template <usize Bits>
-struct is_no_cv_custom_ieee754_binary_floating_point<ieee754_float::f<Bits>> : std::true_type
-{
-};
-
-template <typename T>
-constexpr bool is_no_cv_custom_ieee754_binary_floating_point_v =
-  is_no_cv_custom_ieee754_binary_floating_point<T>::value;
-
-template <typename T>
-using is_custom_ieee754_binary_floating_point = is_no_cv_custom_ieee754_binary_floating_point<std::remove_cv_t<T>>;
-
-template <typename T>
-constexpr bool is_custom_ieee754_binary_floating_point_v = is_custom_ieee754_binary_floating_point<T>::value;
-
-template <typename>
-struct is_no_cv_custom_ieee754_decimal_floating_point : std::false_type
-{
-};
-
-template <usize Bits>
-struct is_no_cv_custom_ieee754_decimal_floating_point<ieee754_float::d<Bits>> : std::true_type
-{
-};
-
-template <typename T>
-constexpr bool is_no_cv_custom_ieee754_decimal_floating_point_v =
-  is_no_cv_custom_ieee754_decimal_floating_point<T>::value;
-
-template <typename T>
-using is_custom_ieee754_decimal_floating_point = is_no_cv_custom_ieee754_decimal_floating_point<std::remove_cv_t<T>>;
-
-template <typename T>
-constexpr bool is_custom_ieee754_decimal_floating_point_v = is_custom_ieee754_decimal_floating_point<T>::value;
-
-} // namespace fmia::meta
-
-export {
-
-// f128 precision: 33 to 35 decimal places
-#ifdef __SIZEOF_FLOAT128__
-// https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
-__extension__ using f128 = __float128;
-#else
-using f128 = ::fmia::ieee754_float::f<128>;
-#endif
-
-} // export
-
-export namespace fmia::meta {
-
-template <typename T>
-concept ieee754_binary_floating_point =
-  std::floating_point<T> || std::same_as<std::remove_cv_t<T>, f128> || is_custom_ieee754_binary_floating_point_v<T>;
-
-template <typename T>
-concept ieee754_decimal_floating_point = is_custom_ieee754_decimal_floating_point_v<T>;
-
-template <typename T>
-concept ieee754_floating_point = ieee754_binary_floating_point<T> || ieee754_decimal_floating_point<T>;
-
-template <typename>
-struct is_no_cv_big_decimal : std::false_type
-{
-};
-
-template <typename T>
-constexpr bool is_no_cv_big_decimal_v = is_no_cv_big_decimal<T>::value;
-
-template <typename T>
-using is_big_decimal = is_no_cv_big_decimal<std::remove_cv_t<T>>;
-
-template <typename T>
-constexpr bool is_big_decimal_v = is_big_decimal<T>::value;
-
-template <typename T>
-concept fixed_precision_floating_point = ieee754_floating_point<T>;
-
-template <typename T>
-concept arbitrary_precision_floating_point = is_big_decimal_v<T>;
-
-template <typename T>
-concept floating_point = fixed_precision_floating_point<T> || arbitrary_precision_floating_point<T>;
-
-template <typename T>
-concept nothrow_floating_point = fixed_precision_floating_point<T>;
-
-} // namespace fmia::meta
-
-namespace fmia::meta {
-
 template <typename T, typename = std::remove_cv_t<T>, bool = is_big_decimal_v<T>>
 struct make_higher_precision_selector_for_floating_point;
 
@@ -604,6 +605,18 @@ struct make_higher_precision_selector_for_floating_point<T, std::remove_cv_t<T>,
   using type = T;
 };
 
+template <typename>
+struct make_higher_precision_selector;
+
+template <integral T>
+struct make_higher_precision_selector<T>
+  : std::conditional_t<
+      std::integral<T>, make_higher_precision_selector_for_standard_integral<T>,
+      make_higher_precision_selector_for_custom_integral<T>
+    >
+{
+};
+
 template <floating_point T>
 struct make_higher_precision_selector<T> : make_higher_precision_selector_for_floating_point<T>
 {
@@ -612,18 +625,6 @@ struct make_higher_precision_selector<T> : make_higher_precision_selector_for_fl
 } // namespace fmia::meta
 
 export namespace fmia::meta {
-
-template <typename T>
-concept arithmetic = integral<T> || floating_point<T>;
-
-template <typename T>
-concept fixed_precision_arithmetic = fixed_precision_integral<T> || fixed_precision_floating_point<T>;
-
-template <typename T>
-concept arbitratry_precision_arithmetic = is_big_integer_v<T> || is_big_decimal_v<T>;
-
-template <typename T>
-concept nothrow_arithmetic = nothrow_integral<T> || nothrow_floating_point<T>;
 
 // for a fixed-precision integer type: obtain i/u32 if its precision is smaller than 32 bits, otherwise obtain a
 // fixed-precision integer type that has double precision
@@ -638,7 +639,7 @@ using make_higher_precision = make_higher_precision_selector<T>;
 template <typename T>
 using make_higher_precision_t = make_higher_precision<T>::type;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -708,7 +709,7 @@ concept precision_gt = compare_precision_v<T, U> > 0;
 template <typename T, typename U>
 concept precision_gteq = compare_precision_v<T, U> >= 0;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export namespace fmia::big_integer::naive {
 
@@ -884,4 +885,4 @@ template <meta::fixed_precision_integral T>
   return {std::move(q), std::move(r)};
 }
 
-} // namespace fmia::big_integer::naive
+} // export namespace fmia::big_integer::naive

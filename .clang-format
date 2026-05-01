@@ -122,7 +122,7 @@ AllowShortEnumsOnASingleLine: true
 
 #namespace / extern / export
 IndentExternBlock: false
-FixNamespaceComments: true
+FixNamespaceComments: false
 ShortNamespaceLines: 0
 NamespaceIndentation: None
 IndentExportBlock: false

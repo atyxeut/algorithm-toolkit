@@ -36,14 +36,14 @@ concept no_cvref_same_as = std::same_as<std::remove_cvref_t<T>, std::remove_cvre
 template <typename T, typename U>
 concept no_cvref_not_same_as = !no_cvref_same_as<T, U>;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export namespace fmia::meta {
 
 template <std::size_t N>
 using index_constant = std::integral_constant<std::size_t, N>;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 namespace fmia::meta {
 
@@ -73,7 +73,7 @@ using make_reversed_index_sequence = make_reversed_integer_sequence<std::size_t,
 template <typename... Ts>
 using reversed_index_sequence_for = make_reversed_index_sequence<sizeof...(Ts)>;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 namespace fmia::meta {
 
@@ -102,7 +102,7 @@ using make_integer_sequence_of_range =
 template <std::size_t Begin, std::size_t End>
 using make_index_sequence_of_range = make_integer_sequence_of_range<std::size_t, Begin, End>;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 namespace fmia::meta {
 
@@ -184,7 +184,7 @@ using is_no_duplication_integer_sequence = is_no_cv_no_duplication_integer_seque
 template <typename T>
 constexpr bool is_no_duplication_integer_sequence_v = is_no_duplication_integer_sequence<T>::value;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -209,7 +209,7 @@ concept contiguous_range_of = std::ranges::contiguous_range<T> && std::same_as<U
 template <typename T>
 concept multidimentional_cstyle_array = std::rank_v<std::remove_cvref_t<T>> > 1;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -224,4 +224,4 @@ constexpr bool is_enum_flag_v = is_enum_flag<T>::value;
 template <typename T>
 concept enum_flag = is_enum_flag_v<T>;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta

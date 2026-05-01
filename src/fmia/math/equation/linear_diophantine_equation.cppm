@@ -23,4 +23,4 @@ class linear_diophantine_equation
 {
 };
 
-} // namespace fmia
+} // export namespace fmia

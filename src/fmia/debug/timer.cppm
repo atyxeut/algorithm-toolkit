@@ -151,4 +151,4 @@ public:
   void print_laps() const { print_laps(1, lap_count()); }
 };
 
-} // namespace fmia::debug
+} // export namespace fmia::debug

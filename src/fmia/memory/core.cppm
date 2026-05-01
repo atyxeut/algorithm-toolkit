@@ -32,7 +32,7 @@ struct std_pmr_allocator_tag
 {
 };
 
-} // namespace fmia
+} // export namespace fmia
 
 export namespace fmia::meta {
 
@@ -72,7 +72,7 @@ struct adjust_allocator_type_list
 template <typename CurAllocatorList, std::size_t DimCnt>
 using adjust_allocator_type_list_t = adjust_allocator_type_list<CurAllocatorList, DimCnt>::type;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export namespace fmia {
 
@@ -82,4 +82,4 @@ constexpr T dynamic_capacity = static_cast<T>(-1);
 enum class resource_location { inplace, heap };
 enum class exception_safety { basic, strong };
 
-} // namespace fmia
+} // export namespace fmia

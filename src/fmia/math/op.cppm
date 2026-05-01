@@ -45,13 +45,13 @@ template <element_for_operator Operation, typename T>
     return elem == 1;
 }
 
-} // namespace fmia
+} // export namespace fmia
 
 export namespace fmia {
 
 enum class operator_property { none = 0, associative = 1, commutative = 1 << 1 };
 
-} // namespace fmia
+} // export namespace fmia
 
 export namespace fmia::meta {
 
@@ -60,7 +60,7 @@ struct is_enum_flag<operator_property> : std::true_type
 {
 };
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export {
 
@@ -105,4 +105,4 @@ concept multipliable = requires(T a, T b) {
   { T(neutral_element_tag<element_for_operator::mul> {}) } -> std::same_as<T>;
 };
 
-} // namespace fmia::meta
+} // export namespace fmia::meta

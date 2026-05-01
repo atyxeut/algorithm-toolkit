@@ -47,7 +47,7 @@ template <typename T, typename Engine = std::mt19937>
   return uniform_distribution(l, r)(engine);
 }
 
-} // namespace fmia::random
+} // export namespace fmia::random
 
 namespace fmia::random {
 
@@ -150,4 +150,4 @@ generate_weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_beg
   return data;
 }
 
-} // namespace fmia::random
+} // export namespace fmia::random

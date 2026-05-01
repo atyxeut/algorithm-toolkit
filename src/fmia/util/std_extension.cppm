@@ -60,7 +60,7 @@ using is_std_duration = is_no_cv_std_duration<std::remove_cv_t<T>>;
 template <typename T>
 constexpr bool is_std_duration_v = is_std_duration<T>::value;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export namespace fmia {
 
@@ -73,7 +73,7 @@ void print(std::ostream& ostr, const std::pair<T1, T2>& p, Delim&& delim = std::
     ostr << '\n';
 }
 
-} // namespace fmia
+} // export namespace fmia
 
 export {
 
@@ -99,7 +99,7 @@ void print(std::ostream& ostr, const std::tuple<Ts...>& t, Delim&& delim = std::
     ostr << '\n';
 }
 
-} // namespace fmia
+} // export namespace fmia
 
 export {
 
@@ -138,7 +138,7 @@ using is_std_ostream_interactable = is_std_ostream_interactable_impl<T>;
 template <typename T>
 constexpr bool is_std_ostream_interactable_v = is_std_ostream_interactable<T>::value;
 
-} // namespace fmia::meta::cpp17
+} // export namespace fmia::meta::cpp17
 
 export namespace fmia::meta {
 
@@ -147,7 +147,7 @@ export namespace fmia::meta {
 template <typename T>
 concept std_ostream_interactable = requires(std::ostream& ostr, T t) { ostr << t; };
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export namespace fmia {
 
@@ -210,7 +210,7 @@ void print(std::ostream& ostr, const T& arr, Delim&& delim = std::string(1, ' ')
     ostr << '\n';
 }
 
-} // namespace fmia
+} // export namespace fmia
 
 export {
 
@@ -265,7 +265,7 @@ export namespace fmia {
 template <typename T, std::size_t... Dims>
 using array = array_impl<T, Dims...>::type;
 
-} // namespace fmia
+} // export namespace fmia
 
 export namespace fmia::meta {
 
@@ -288,7 +288,7 @@ using is_std_array = is_no_cv_std_array<std::remove_cv_t<T>>;
 template <typename T>
 constexpr bool is_std_array_v = is_std_array<T>::value;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export namespace fmia {
 
@@ -316,7 +316,7 @@ template <typename Elem, std::size_t... Dims, typename T>
   return arr;
 }
 
-} // namespace fmia
+} // export namespace fmia
 
 namespace fmia {
 
@@ -362,7 +362,7 @@ using vector = vector_impl<T, DimCnt, meta::type_list<InnermostDimAllocator, All
 
 // clang-format on
 
-} // namespace fmia
+} // export namespace fmia
 
 namespace fmia {
 
@@ -416,4 +416,4 @@ template <
 
 // clang-format on
 
-} // namespace fmia
+} // export namespace fmia

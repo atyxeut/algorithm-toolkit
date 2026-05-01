@@ -24,7 +24,7 @@ export namespace fmia::graph::shortest_path {
 
 enum class error : u8 { empty_graph, negative_cycle };
 
-} // namespace fmia::graph::shortest_path
+} // export namespace fmia::graph::shortest_path
 
 namespace fmia::graph::shortest_path::single_source {
 
@@ -217,8 +217,8 @@ bellman_ford_deque_optimized(const T& g, Vertex source)
   return distance;
 }
 
-} // namespace fmia::graph::shortest_path::single_source
+} // export namespace fmia::graph::shortest_path::single_source
 
 export namespace fmia::graph::shortest_path::all_pairs {
 
-}
+} // export namespace fmia::graph::shortest_path::all_pairs

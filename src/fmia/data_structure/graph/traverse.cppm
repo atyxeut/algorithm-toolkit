@@ -20,14 +20,18 @@ import std;
 import fmia.data_structure.graph.storage;
 import fmia.math;
 
-export namespace fmia::graph {
+namespace fmia::graph {
 
 enum class trail_tag : u8 { none, circuit };
 enum class path_tag : u8 { none, cycle };
 
+} // namespace fmia::graph
+
+export namespace fmia::graph {
+
 enum class eulerian_graph_error : u8 { no_eulerian_trail, no_eulerian_circuit };
 
-} // namespace fmia::graph
+} // export namespace fmia::graph
 
 namespace fmia::graph {
 
@@ -170,10 +174,6 @@ constexpr void get_an_eulerian_trail_impl(T& path, const G& g, U start)
     get_an_eulerian_trail_impl_for_directed_iterative(g, start, cur_edge_it, path);
 }
 
-} // namespace fmia::graph
-
-namespace fmia::graph {
-
 template <trail_tag TrailTag, graph_tag GraphTag, typename Graph, typename Vertex = Graph::vertex_type>
 constexpr std::expected<std::vector<Vertex>, eulerian_graph_error> get_an_eulerian_trail(const Graph& g)
 {
@@ -228,26 +228,17 @@ template <meta::graph T>
   return get_an_eulerian_trail<trail_tag::circuit, graph_tag::directed>(g);
 }
 
-} // namespace fmia::graph
-
-export namespace fmia::graph {
-
-// Hamiltonian path: a path that visits each vertex exactly once
-// if a graph has a Hamiltonian path, then it is called a semi-Hamiltonian graph
-//
-// Hamiltonian cycle: a closed Hamiltonian path
-// if a graph has a Hamiltonian cycle, then it is called a Hamiltonian graph
-
-} // namespace fmia::graph
+} // export namespace fmia::graph
 
 export namespace fmia::graph {
 
 enum class toposort_error : u8 { has_cycle };
-enum class toposort_tag : u8 { none, lexicographical };
 
-} // namespace fmia::graph
+} // export namespace fmia::graph
 
 namespace fmia::graph {
+  
+enum class toposort_tag : u8 { none, lexicographical };
 
 template <toposort_tag Order, typename Graph, typename Fn>
 constexpr std::expected<bool, toposort_error> toposort_impl(const Graph& g, Fn&& fn)
@@ -310,4 +301,4 @@ template <meta::graph T, typename Fn>
   return toposort_impl<toposort_tag::lexicographical>(g, std::forward<Fn>(fn));
 }
 
-} // namespace fmia::graph
+} // export namespace fmia::graph

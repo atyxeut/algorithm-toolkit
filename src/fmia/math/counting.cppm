@@ -100,4 +100,4 @@ template <meta::fixed_precision_integral T>
   return ans;
 }
 
-} // namespace fmia
+} // export namespace fmia

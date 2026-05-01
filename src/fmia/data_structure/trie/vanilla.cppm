@@ -292,4 +292,4 @@ using upper_char_trie = trie<char, 26, decltype([](char ch) constexpr noexcept {
 template <typename Char, std::regular_invocable<Char> Hash, exception_safety E = exception_safety::strong>
 using hash_trie = trie_base<Char, trie_normal_hash_map<Char, Hash, std::unordered_map>, E>;
 
-} // namespace fmia
+} // export namespace fmia

@@ -58,7 +58,7 @@ struct all_the_same<T, U> : std::bool_constant<std::same_as<T, U>>
 template <typename... Ts>
 constexpr bool all_the_same_v = all_the_same<Ts...>::value;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -262,7 +262,7 @@ using last = nth<length_v<T> - 1, T>;
 template <typename T>
 using last_t = last<T>::type;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 namespace fmia::meta {
 
@@ -338,7 +338,7 @@ struct snoc<T, indexed_type_list<std::index_sequence<Is...>, type_list<Ts...>>>
 template <typename T, typename AnyTypeList>
 using snoc_t = snoc<T, AnyTypeList>::type;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 namespace fmia::meta {
 
@@ -428,7 +428,7 @@ using invoke_t = invoke<WrappedTemplate, Args...>::type;
 template <typename WrappedTemplate, typename... Args>
 constexpr auto invoke_v = invoke<WrappedTemplate, Args...>::value;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 namespace fmia::meta {
 
@@ -473,7 +473,7 @@ concept predicate = is_predicate_v<T>;
 template <typename T>
 concept wrapped_predicate = wrapped_template<T> && predicate<T::template type>;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 namespace fmia::meta {
 
@@ -697,7 +697,7 @@ using drop_end = take<length_v<T> - N, T>;
 template <std::size_t N, typename AnyTypeList>
 using drop_end_t = drop_end<N, AnyTypeList>::type;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 namespace fmia::meta {
 
@@ -757,7 +757,7 @@ struct take_while_end : reverse<take_while_t<Pred, reverse_t<T>>>
 template <template <typename> typename Pred, typename TypeList>
 using take_while_end_t = take_while_end<Pred, TypeList>::type;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 namespace fmia::meta {
 
@@ -953,4 +953,4 @@ using has_none = std::negation<has_any<T, U>>;
 template <typename T, typename U>
 constexpr bool has_none_v = has_none<T, U>::value;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta

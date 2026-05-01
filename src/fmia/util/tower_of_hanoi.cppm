@@ -110,7 +110,7 @@ from_one_to_different_case(peg_type disk_cnt, peg_type from, std::span<const peg
   return from_one_to_one_case(disk_cnt - 1) + 1 + from_one_to_different_case(disk_cnt - 1, aux, to_list);
 }
 
-} // namespace fmia::tower_of_hanoi::count_move
+} // export namespace fmia::tower_of_hanoi::count_move
 
 namespace fmia::tower_of_hanoi::count_move {
 
@@ -186,7 +186,7 @@ export namespace fmia::tower_of_hanoi::count_move {
   );
 }
 
-} // namespace fmia::tower_of_hanoi::count_move
+} // export namespace fmia::tower_of_hanoi::count_move
 
 namespace fmia::tower_of_hanoi::print_move {
 
@@ -272,6 +272,6 @@ void general_case(peg_type disk_cnt, std::span<const peg_type> from_list, std::s
   }
 }
 
-} // namespace fmia::tower_of_hanoi::print_move
+} // export namespace fmia::tower_of_hanoi::print_move
 
 FMIA_WCONVERSION_POP()

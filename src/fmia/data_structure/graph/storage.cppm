@@ -23,7 +23,7 @@ export namespace fmia::graph {
 
 enum class graph_tag : u8 { undirected, directed };
 
-} // namespace fmia::graph
+} // export namespace fmia::graph
 
 namespace fmia::graph {
 
@@ -69,7 +69,7 @@ struct unweighted_edge : edge_base<Vertex>, edge_id<Degree>
 {
 };
 
-} // namespace fmia::graph
+} // export namespace fmia::graph
 
 namespace fmia::graph {
 
@@ -110,7 +110,7 @@ struct weighted_edge : edge_base<Vertex>, weight<Weight>
 {
 };
 
-}; // namespace fmia::graph
+}; // export namespace fmia::graph
 
 export namespace fmia::meta {
 
@@ -166,7 +166,7 @@ concept basic_weighted_graph = is_no_cv_basic_weighted_graph_v<std::remove_cvref
 template <typename T>
 concept basic_graph = basic_unweighted_graph<T> || basic_weighted_graph<T>;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -192,7 +192,7 @@ constexpr bool is_no_cv_basic_edge_list_v = is_no_cv_basic_edge_list<T>::value |
 template <typename T>
 concept basic_edge_list = is_no_cv_basic_edge_list_v<std::remove_cvref_t<T>>;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 namespace fmia::graph {
 
@@ -262,10 +262,6 @@ struct basic_weighted_edge_list : public basic_edge_list_base<Vertex, weighted_e
   constexpr void add_edge(Vertex u, Vertex v, Weight&& w) { this->edges_.emplace_back(u, v, std::move(w)); }
 };
 
-} // namespace fmia::graph
-
-export namespace fmia::meta {
-
 template <typename Vertex, typename Degree>
 struct is_no_cv_basic_edge_list<graph::basic_unweighted_edge_list<Vertex, Degree>> : std::true_type
 {
@@ -276,7 +272,7 @@ struct is_no_cv_basic_edge_list<graph::basic_weighted_edge_list<Vertex, Weight, 
 {
 };
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 export namespace fmia::graph {
 
@@ -312,10 +308,6 @@ public:
   }
 };
 
-} // namespace fmia::graph
-
-export namespace fmia::meta {
-
 template <typename Vertex>
 struct is_no_cv_edge_list<graph::unweighted_edge_list<Vertex>> : std::true_type
 {
@@ -326,4 +318,4 @@ struct is_no_cv_edge_list<graph::weighted_edge_list<Vertex, Weight>> : std::true
 {
 };
 
-} // namespace fmia::meta
+} // export namespace fmia::meta

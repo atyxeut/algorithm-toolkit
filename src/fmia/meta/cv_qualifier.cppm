@@ -35,7 +35,7 @@ struct is_cv : std::bool_constant<std::is_const_v<T> && std::is_volatile_v<T>>
 template <typename T>
 constexpr bool is_cv_v = is_cv<T>::value;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
 
 namespace fmia::meta {
 
@@ -78,4 +78,4 @@ using claim_cv = claim_cv_selector<From, To>;
 template <typename From, typename To>
 using claim_cv_t = claim_cv<From, To>::type;
 
-} // namespace fmia::meta
+} // export namespace fmia::meta
