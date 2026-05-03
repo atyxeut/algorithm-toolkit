@@ -1,0 +1,6 @@
+[package]
+name = "fmia-doc"
+version = "0.0.1"
+authors = ["atyxeut"]
+entrypoint = "index.typ"
+license = "GPL-3.0-or-later"
