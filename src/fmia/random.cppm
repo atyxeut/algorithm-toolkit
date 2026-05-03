@@ -100,7 +100,7 @@ template <std::integral T>
 }
 
 // get the edge list of a random unweighted tree
-template <bool FlowerGraph = false, std::integral Vertex>
+template <bool GenerateStar = false, std::integral Vertex>
 [[nodiscard]] graph::basic_unweighted_edge_list<Vertex> generate_unweighted_tree(Vertex vertex_begin, Vertex vertex_end)
 {
   if (vertex_begin > vertex_end)
@@ -113,7 +113,7 @@ template <bool FlowerGraph = false, std::integral Vertex>
   data.reserve(edge_cnt);
 
   for (auto v = 1uz; v <= edge_cnt; ++v) {
-    if constexpr (FlowerGraph)
+    if constexpr (GenerateStar)
       data.add_edge(p[0], p[v]);
     else
       data.add_edge(p[rand(0uz, v - 1)], p[v]);
@@ -123,7 +123,7 @@ template <bool FlowerGraph = false, std::integral Vertex>
 }
 
 // get the edge list of a random weighted tree
-template <bool FlowerGraph = false, std::integral Vertex, std::integral Weight>
+template <bool GenerateStar = false, std::integral Vertex, std::integral Weight>
 [[nodiscard]] graph::basic_weighted_edge_list<Vertex, Weight>
 generate_weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_begin, Weight weight_end)
 {
@@ -141,7 +141,7 @@ generate_weighted_tree(Vertex vertex_begin, Vertex vertex_end, Weight weight_beg
 
   auto w_dist = uniform_dist(weight_begin, weight_end);
   for (auto v = 1uz; v <= edge_cnt; ++v) {
-    if constexpr (FlowerGraph)
+    if constexpr (GenerateStar)
       data.add_edge(p[0], p[v], w_dist(mt19937_engine));
     else
       data.add_edge(p[rand(0uz, v - 1)], p[v], w_dist(mt19937_engine));
