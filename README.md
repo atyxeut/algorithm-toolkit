@@ -8,6 +8,6 @@ This project is licensed under the **GNU GPL 3.0 or later**, see [`COPYING`](COP
 
 Exceptions:
 
-1. The core library (in src/) is licensed under the **GNU LGPL 3.0 or later**, see [`COPYING.LESSER`](COPYING.LESSER). Refer to the notice at the top of each file for details.
+1. The core library (in folder src/) is licensed under the **GNU LGPL 3.0 or later**, see [`COPYING.LESSER`](COPYING.LESSER).
 
-2. The C++ example code in the documentation (in doc/) is unlicensed, see http://unlicense.org/.
+2. The C++ example code in the documentation (in folder doc/) is unlicensed, see http://unlicense.org/.
