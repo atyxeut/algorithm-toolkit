@@ -13,6 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export module test.fmia.util;
+import test.fmia.std_extension;
 
-export import test.fmia.util.std_extension;
+int main()
+{
+  does_make_vector_work();
+}

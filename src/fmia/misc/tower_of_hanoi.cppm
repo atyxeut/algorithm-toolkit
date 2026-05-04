@@ -17,7 +17,7 @@ module;
 
 #include <macro/wconversion_switch.hpp>
 
-export module fmia.util.tower_of_hanoi;
+export module fmia.misc.tower_of_hanoi;
 
 import std;
 

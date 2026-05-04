@@ -13,16 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia;
+export module fmia.misc;
 
-export import fmia.data_structure;
-export import fmia.debug;
-export import fmia.enum_flag;
-export import fmia.math;
-export import fmia.memory;
-export import fmia.meta;
-export import fmia.misc;
-export import fmia.random;
-export import fmia.simd;
-export import fmia.sort;
-export import fmia.std_extension;
+export import fmia.misc.binary_search;
+export import fmia.misc.compress_coordinates;
+export import fmia.misc.tower_of_hanoi;

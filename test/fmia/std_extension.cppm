@@ -17,12 +17,12 @@ module;
 
 #include <cassert>
 
-export module test.fmia.util.std_extension;
+export module test.fmia.std_extension;
 
 import std;
 
 import fmia.memory.core;
-import fmia.util.std_extension;
+import fmia.std_extension;
 
 using namespace fmia;
 
