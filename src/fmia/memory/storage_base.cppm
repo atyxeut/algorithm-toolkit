@@ -22,15 +22,15 @@ import fmia.memory.core;
 
 export namespace fmia {
 
-template <meta::size_integral T>
-constexpr T dynamic_capacity = static_cast<T>(-1);
-
-enum class resource_location : u8 { inplace, heap };
+enum class storage_location { heap, inplace };
 
 } // export namespace fmia
 
 namespace fmia {
 
+template <meta::size_integral T>
+constexpr T dynamic_capacity = static_cast<T>(-1);
+  
 template <typename Size, Size Capacity>
 class heap_capacity;
 
