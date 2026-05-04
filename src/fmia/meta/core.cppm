@@ -210,18 +210,3 @@ template <typename T>
 concept multidimentional_cstyle_array = std::rank_v<std::remove_cvref_t<T>> > 1;
 
 } // export namespace fmia::meta
-
-export namespace fmia::meta {
-
-template <typename>
-struct is_enum_flag : std::false_type
-{
-};
-
-template <typename T>
-constexpr bool is_enum_flag_v = is_enum_flag<T>::value;
-
-template <typename T>
-concept enum_flag = is_enum_flag_v<T>;
-
-} // export namespace fmia::meta
