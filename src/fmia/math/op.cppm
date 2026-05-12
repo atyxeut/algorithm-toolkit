@@ -19,7 +19,7 @@ export module fmia.math.op;
 
 import std;
 
-import fmia.enum_flag;
+import fmia.util.enum_flag;
 import fmia.math.core;
 import fmia.meta;
 
