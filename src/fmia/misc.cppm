@@ -15,6 +15,5 @@
 
 export module fmia.misc;
 
-export import fmia.misc.binary_search;
 export import fmia.misc.compress_coordinates;
 export import fmia.misc.tower_of_hanoi;

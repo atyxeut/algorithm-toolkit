@@ -23,6 +23,7 @@ export import fmia.memory;
 export import fmia.meta;
 export import fmia.misc;
 export import fmia.random;
+export import fmia.search;
 export import fmia.simd;
 export import fmia.sort;
 export import fmia.std_extension;
