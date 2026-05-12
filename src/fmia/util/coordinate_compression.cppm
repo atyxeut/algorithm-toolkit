@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.misc.coordinate_compression;
+export module fmia.util.coordinate_compression;
 
 import std;
 
