@@ -15,6 +15,7 @@
 
 export module fmia;
 
+export import fmia.concurrency;
 export import fmia.data_structure;
 export import fmia.debug;
 export import fmia.enum_flag;
