@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export module test.fmia.math.integer.twos_complement;
+export module test.fmia.math.integer.fixed_precision;
 
 import std;
 
-import fmia.math.integer.twos_complement;
+import fmia.math.integer.fixed_precision;
 
 using namespace fmia;
 using namespace fmia::meta;
@@ -39,31 +39,25 @@ consteval void does_is_boolean_work() noexcept
 
 consteval void does_make_signed_work() noexcept
 {
-  namespace fp = twos_complement;
-
   static_assert(std::same_as<make_signed_t<int>, int> == true);
   static_assert(std::same_as<make_signed_t<const int>, const int> == true);
   static_assert(std::same_as<make_signed_t<const volatile unsigned int>, const volatile int> == true);
   static_assert(std::same_as<make_signed_t<const u64>, const i64> == true);
   static_assert(std::same_as<make_signed_t<i128>, i128> == true);
   static_assert(std::same_as<make_signed_t<u128>, i128> == true);
-  static_assert(std::same_as<make_signed_t<fp::u<1024>>, fp::i<1024>> == true);
+  static_assert(std::same_as<make_signed_t<integer::u<1024>>, integer::i<1024>> == true);
 }
 
 consteval void does_make_unsigned_work() noexcept
 {
-  namespace fp = twos_complement;
-
   static_assert(std::same_as<make_unsigned_t<int>, unsigned int> == true);
   static_assert(std::same_as<make_unsigned_t<const int>, const unsigned int> == true);
   static_assert(std::same_as<make_unsigned_t<const volatile unsigned int>, const volatile unsigned int> == true);
   static_assert(std::same_as<make_unsigned_t<const u64>, const u64> == true);
   static_assert(std::same_as<make_unsigned_t<i128>, u128> == true);
   static_assert(std::same_as<make_unsigned_t<u128>, u128> == true);
-  static_assert(std::same_as<make_unsigned_t<fp::i<1024>>, fp::u<1024>> == true);
+  static_assert(std::same_as<make_unsigned_t<integer::i<1024>>, integer::u<1024>> == true);
 }
-
-// clang-format off
 
 export {
 
@@ -86,5 +80,3 @@ void int128_output_with_std_ostream_and_std_print() noexcept
 }
 
 } // export
-
-// clang-format on

@@ -15,4 +15,4 @@
 
 export module test.fmia.math.integer;
 
-export import test.fmia.math.integer.twos_complement;
+export import test.fmia.math.integer.fixed_precision;

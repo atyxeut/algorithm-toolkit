@@ -21,7 +21,7 @@ export module fmia.meta.arithmetic;
 
 import std;
 
-import fmia.math.integer.twos_complement;
+import fmia.math.integer.fixed_precision;
 import fmia.math.integer.arbitrary_precision;
 import fmia.math.floating_point.ieee754;
 import fmia.math.floating_point.arbitrary_precision;
@@ -30,13 +30,13 @@ import fmia.meta.cv_qualifier;
 export namespace fmia::meta {
 
 template <typename T>
-concept arithmetic = integral<T> || floating_point<T>;
-
-template <typename T>
-concept fixed_precision_arithmetic = twos_complement_integral<T> || ieee754_floating_point<T>;
+concept fixed_precision_arithmetic = fixed_precision_integral<T> || ieee754_floating_point<T>;
 
 template <typename T>
 concept arbitratry_precision_arithmetic = arbitrary_precision_integral<T> || arbitrary_precision_floating_point<T>;
+
+template <typename T>
+concept arithmetic = integral<T> || floating_point<T>;
 
 template <typename T>
 concept nothrow_arithmetic = nothrow_integral<T> || nothrow_floating_point<T>;
@@ -58,10 +58,10 @@ template <>
 constexpr usize precision_bits_v<f128> = 128;
 
 template <usize Bits>
-constexpr usize precision_bits_v<twos_complement::i<Bits>> = Bits;
+constexpr usize precision_bits_v<integer::i<Bits>> = Bits;
 
 template <usize Bits>
-constexpr usize precision_bits_v<twos_complement::u<Bits>> = Bits;
+constexpr usize precision_bits_v<integer::u<Bits>> = Bits;
 
 template <usize Bits>
 constexpr usize precision_bits_v<ieee754::f<Bits>> = Bits;
@@ -137,7 +137,7 @@ struct make_higher_precision_selector_for_standard_integral_impl<T, 64>
 template <typename T>
 struct make_higher_precision_selector_for_standard_integral_impl<T, 128>
   : std::conditional<
-      twos_complement_signed_integral<T>, claim_cv_t<T, twos_complement::i<256>>, claim_cv_t<T, twos_complement::u<256>>
+      twos_complement_signed_integral<T>, claim_cv_t<T, integer::i<256>>, claim_cv_t<T, integer::u<256>>
     >
 {
 };
@@ -154,24 +154,24 @@ template <typename T, typename = std::remove_cv_t<T>, bool = arbitrary_precision
 struct make_higher_precision_selector_for_custom_integral;
 
 template <typename T>
-struct make_higher_precision_selector_for_custom_integral<T, i128, false> : claim_cv<T, twos_complement::i<256>>
+struct make_higher_precision_selector_for_custom_integral<T, i128, false> : claim_cv<T, integer::i<256>>
 {
 };
 
 template <typename T>
-struct make_higher_precision_selector_for_custom_integral<T, u128, false> : claim_cv<T, twos_complement::u<256>>
+struct make_higher_precision_selector_for_custom_integral<T, u128, false> : claim_cv<T, integer::u<256>>
 {
 };
 
 template <typename T, usize Bits>
-struct make_higher_precision_selector_for_custom_integral<T, twos_complement::i<Bits>, false>
-  : claim_cv<T, twos_complement::i<Bits * 2>>
+struct make_higher_precision_selector_for_custom_integral<T, integer::i<Bits>, false>
+  : claim_cv<T, integer::i<Bits * 2>>
 {
 };
 
 template <typename T, usize Bits>
-struct make_higher_precision_selector_for_custom_integral<T, twos_complement::u<Bits>, false>
-  : claim_cv<T, twos_complement::u<Bits * 2>>
+struct make_higher_precision_selector_for_custom_integral<T, integer::u<Bits>, false>
+  : claim_cv<T, integer::u<Bits * 2>>
 {
 };
 

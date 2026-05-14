@@ -26,16 +26,14 @@ using namespace fmia::meta;
 
 consteval void does_make_higher_precision_for_integral_work() noexcept
 {
-  namespace fp = twos_complement;
-
   static_assert(std::same_as<make_higher_precision_t<int>, i64> == true);
   static_assert(std::same_as<make_higher_precision_t<const int>, const i64> == true);
   static_assert(std::same_as<make_higher_precision_t<const volatile unsigned int>, const volatile u64> == true);
   static_assert(std::same_as<make_higher_precision_t<const u64>, const u128> == true);
-  static_assert(std::same_as<make_higher_precision_t<i128>, fp::i<256>> == true);
-  static_assert(std::same_as<make_higher_precision_t<u128>, fp::u<256>> == true);
-  static_assert(std::same_as<make_higher_precision_t<fp::u<1024>>, fp::u<2048>> == true);
-  static_assert(std::same_as<make_higher_precision_t<fp::i<256>>, fp::i<512>> == true);
+  static_assert(std::same_as<make_higher_precision_t<i128>, integer::i<256>> == true);
+  static_assert(std::same_as<make_higher_precision_t<u128>, integer::u<256>> == true);
+  static_assert(std::same_as<make_higher_precision_t<integer::u<1024>>, integer::u<2048>> == true);
+  static_assert(std::same_as<make_higher_precision_t<integer::i<256>>, integer::i<512>> == true);
 }
 
 consteval void does_make_higher_precision_for_floating_point_work() noexcept
@@ -55,18 +53,16 @@ consteval void does_make_higher_precision_for_floating_point_work() noexcept
 
 consteval void does_compare_precision_for_integral_work() noexcept
 {
-  namespace fp = twos_complement;
-
   static_assert(compare_precision_v<int, int> == 0);
   static_assert(compare_precision_v<int, long long> == -1);
   static_assert(compare_precision_v<int, signed char> == 1);
   static_assert(!precision_comparable<int, unsigned int>);
   static_assert(!precision_comparable<unsigned int, int>);
 
-  static_assert(compare_precision_v<int, fp::i<256>> == -1);
-  static_assert(compare_precision_v<fp::i<256>, int> == 1);
-  static_assert(!precision_comparable<int, fp::u<256>>);
-  static_assert(!precision_comparable<fp::u<256>, int>);
+  static_assert(compare_precision_v<int, integer::i<256>> == -1);
+  static_assert(compare_precision_v<integer::i<256>, int> == 1);
+  static_assert(!precision_comparable<int, integer::u<256>>);
+  static_assert(!precision_comparable<integer::u<256>, int>);
 
   static_assert(compare_precision_v<int, i128> == -1);
   static_assert(compare_precision_v<i128, int> == 1);
@@ -76,25 +72,23 @@ consteval void does_compare_precision_for_integral_work() noexcept
   static_assert(compare_precision_v<i128, i128> == 0);
   static_assert(!precision_comparable<i128, u128>);
 
-  static_assert(compare_precision_v<i128, fp::i<128>> == 0);
-  static_assert(compare_precision_v<fp::u<128>, u128> == 0);
+  static_assert(compare_precision_v<i128, integer::i<128>> == 0);
+  static_assert(compare_precision_v<integer::u<128>, u128> == 0);
 
-  static_assert(compare_precision_v<fp::i<128>, fp::i<128>> == 0);
-  static_assert(compare_precision_v<fp::i<128>, fp::i<1024>> == -1);
-  static_assert(compare_precision_v<fp::i<256>, fp::i<128>> == 1);
+  static_assert(compare_precision_v<integer::i<128>, integer::i<128>> == 0);
+  static_assert(compare_precision_v<integer::i<128>, integer::i<1024>> == -1);
+  static_assert(compare_precision_v<integer::i<256>, integer::i<128>> == 1);
 
-  static_assert(compare_precision_v<fp::u<128>, fp::u<128>> == 0);
-  static_assert(compare_precision_v<fp::u<128>, fp::u<1024>> == -1);
-  static_assert(compare_precision_v<fp::u<256>, fp::u<128>> == 1);
+  static_assert(compare_precision_v<integer::u<128>, integer::u<128>> == 0);
+  static_assert(compare_precision_v<integer::u<128>, integer::u<1024>> == -1);
+  static_assert(compare_precision_v<integer::u<256>, integer::u<128>> == 1);
 
-  static_assert(!precision_comparable<fp::i<128>, fp::u<128>>);
-  static_assert(!precision_comparable<fp::u<128>, fp::i<128>>);
+  static_assert(!precision_comparable<integer::i<128>, integer::u<128>>);
+  static_assert(!precision_comparable<integer::u<128>, integer::i<128>>);
 }
 
 consteval void does_compare_precision_for_floating_point_work() noexcept
 {
-  namespace fp = ieee754;
-
   static_assert(compare_precision_v<float, float> == 0);
   static_assert(compare_precision_v<float, double> == -1);
   static_assert(compare_precision_v<double, float> == 1);
@@ -102,17 +96,17 @@ consteval void does_compare_precision_for_floating_point_work() noexcept
   static_assert(compare_precision_v<double, f128> == -1);
   static_assert(compare_precision_v<f128, f128> == 0);
 
-  static_assert(compare_precision_v<double, fp::f<128>> == -1);
+  static_assert(compare_precision_v<double, ieee754::f<128>> == -1);
 
-  static_assert(compare_precision_v<fp::f<128>, fp::f<128>> == 0);
-  static_assert(compare_precision_v<fp::f<128>, fp::f<256>> == -1);
-  static_assert(compare_precision_v<fp::f<256>, fp::f<128>> == 1);
+  static_assert(compare_precision_v<ieee754::f<128>, ieee754::f<128>> == 0);
+  static_assert(compare_precision_v<ieee754::f<128>, ieee754::f<256>> == -1);
+  static_assert(compare_precision_v<ieee754::f<256>, ieee754::f<128>> == 1);
 
-  static_assert(compare_precision_v<fp::d<128>, fp::d<128>> == 0);
-  static_assert(compare_precision_v<fp::d<128>, fp::d<256>> == -1);
-  static_assert(compare_precision_v<fp::d<256>, fp::d<128>> == 1);
+  static_assert(compare_precision_v<ieee754::d<128>, ieee754::d<128>> == 0);
+  static_assert(compare_precision_v<ieee754::d<128>, ieee754::d<256>> == -1);
+  static_assert(compare_precision_v<ieee754::d<256>, ieee754::d<128>> == 1);
 
-  static_assert(!precision_comparable<fp::f<128>, fp::d<128>>);
-  static_assert(!precision_comparable<fp::f<128>, fp::d<256>>);
-  static_assert(!precision_comparable<fp::d<128>, fp::f<256>>);
+  static_assert(!precision_comparable<ieee754::f<128>, ieee754::d<128>>);
+  static_assert(!precision_comparable<ieee754::f<128>, ieee754::d<256>>);
+  static_assert(!precision_comparable<ieee754::d<128>, ieee754::f<256>>);
 }

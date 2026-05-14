@@ -74,7 +74,7 @@ template <typename T>
 
 export namespace fmia {
 
-template <meta::twos_complement_integral T>
+template <meta::fixed_precision_integral T>
 [[nodiscard]] constexpr auto count_digit_occurrence(const T& l, const T& r, int x)
 {
   assert(0 <= l && l <= r && 0 <= x && x <= 9);
@@ -87,7 +87,7 @@ template <meta::twos_complement_integral T>
 
 // count occurrences of digit x in n
 // time complexity: O(log n)
-template <meta::twos_complement_integral T>
+template <meta::fixed_precision_integral T>
 [[nodiscard]] constexpr T count_digit_occurrence(T n, int x) noexcept
 {
   assert(n >= 0 && 0 <= x && x <= 9);

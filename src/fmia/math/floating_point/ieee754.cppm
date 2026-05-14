@@ -17,9 +17,7 @@ export module fmia.math.floating_point.ieee754;
 
 import std;
 
-import fmia.math.integer.twos_complement;
-
-// clang-format off
+import fmia.math.integer.fixed_precision;
 
 export {
 
@@ -28,8 +26,6 @@ using f64 = double;      // precision: 15 to 17 decimal places
 using f80 = long double; // precision: 18 to 20 decimal places (note that on MSVC long double is double)
 
 } // export
-
-// clang-format on
 
 // forward declarations
 export namespace fmia::ieee754 {

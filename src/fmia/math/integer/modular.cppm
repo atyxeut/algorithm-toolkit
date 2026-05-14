@@ -17,4 +17,4 @@ export module fmia.math.integer.modular;
 
 import std;
 
-import fmia.math.integer.twos_complement;
+import fmia.math.integer.fixed_precision;

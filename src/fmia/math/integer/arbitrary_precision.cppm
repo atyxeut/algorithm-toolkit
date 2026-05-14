@@ -23,7 +23,7 @@ export module fmia.math.integer.arbitrary_precision;
 
 import std;
 
-import fmia.math.integer.twos_complement;
+import fmia.math.integer.fixed_precision;
 
 export namespace fmia::meta {
 
@@ -48,7 +48,7 @@ template <typename T>
 concept signed_integral = twos_complement_signed_integral<T> || arbitrary_precision_integral<T>;
 
 template <typename T>
-concept integral = twos_complement_integral<T> || arbitrary_precision_integral<T>;
+concept integral = fixed_precision_integral<T> || arbitrary_precision_integral<T>;
 
 template <typename T>
 concept nonbool_integral = integral<T> && !boolean<T>;

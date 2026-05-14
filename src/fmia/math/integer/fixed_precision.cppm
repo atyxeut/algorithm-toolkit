@@ -20,13 +20,11 @@ module;
 #include <__msvc_int128.hpp>
 #endif
 
-export module fmia.math.integer.twos_complement;
+export module fmia.math.integer.fixed_precision;
 
 import std;
 
 import fmia.meta.cv_qualifier;
-
-// clang-format off
 
 export {
 
@@ -43,8 +41,6 @@ using isize = std::ptrdiff_t;
 using usize = std::size_t;
 
 } // export
-
-// clang-format on
 
 export namespace fmia::meta {
 
@@ -91,7 +87,7 @@ template <meta::nonbool_standard_unsigned_integral T>
 } // export namespace fmia
 
 // forward declarations
-export namespace fmia::twos_complement {
+export namespace fmia::integer {
 
 template <usize Bits>
   requires (Bits >= 128 && is_power_of_2(Bits))
@@ -101,7 +97,7 @@ template <usize Bits>
   requires (Bits >= 128 && is_power_of_2(Bits))
 class u;
 
-} // export namespace fmia::twos_complement
+} // export namespace fmia::integer
 
 // clang-format off
 
@@ -171,8 +167,8 @@ export {
     return ostr;
   }
 #else
-  using i128 = ::fmia::twos_complement::i<128>;
-  using u128 = ::fmia::twos_complement::u<128>;
+  using i128 = ::fmia::integer::i<128>;
+  using u128 = ::fmia::integer::u<128>;
 #endif
 
 } // export
@@ -187,7 +183,7 @@ struct is_no_cv_custom_twos_complement_signed_integral : std::false_type
 };
 
 template <usize Bits>
-struct is_no_cv_custom_twos_complement_signed_integral<twos_complement::i<Bits>> : std::true_type
+struct is_no_cv_custom_twos_complement_signed_integral<integer::i<Bits>> : std::true_type
 {
 };
 
@@ -211,7 +207,7 @@ struct is_no_cv_custom_unsigned_integral : std::false_type
 };
 
 template <usize Bits>
-struct is_no_cv_custom_unsigned_integral<twos_complement::u<Bits>> : std::true_type
+struct is_no_cv_custom_unsigned_integral<integer::u<Bits>> : std::true_type
 {
 };
 
@@ -225,8 +221,7 @@ template <typename T>
 constexpr bool is_custom_unsigned_integral_v = is_custom_unsigned_integral<T>::value;
 
 template <typename T>
-concept custom_twos_complement_integral =
-  is_custom_twos_complement_signed_integral_v<T> || is_custom_unsigned_integral_v<T>;
+concept custom_twos_complement_signed_integral = is_custom_twos_complement_signed_integral_v<T>;
 
 template <typename T>
 concept unsigned_integral =
@@ -236,13 +231,13 @@ template <typename T>
 concept nonbool_unsigned_integral = unsigned_integral<T> && !boolean<T>;
 
 template <typename T>
-concept twos_complement_integral = twos_complement_signed_integral<T> || unsigned_integral<T>;
+concept fixed_precision_integral = twos_complement_signed_integral<T> || unsigned_integral<T>;
 
 template <typename T>
-concept nonbool_twos_complement_integral = twos_complement_integral<T> && !boolean<T>;
+concept nonbool_fixed_precision_integral = fixed_precision_integral<T> && !boolean<T>;
 
 template <typename T>
-concept nothrow_integral = twos_complement_integral<T>;
+concept nothrow_integral = fixed_precision_integral<T>;
 
 } // export namespace fmia::meta
 
@@ -264,12 +259,12 @@ struct make_signed_selector<T, u128> : claim_cv<T, i128>
 };
 
 template <typename T, usize Bits>
-struct make_signed_selector<T, twos_complement::i<Bits>> : claim_cv<T, twos_complement::i<Bits>>
+struct make_signed_selector<T, integer::i<Bits>> : claim_cv<T, integer::i<Bits>>
 {
 };
 
 template <typename T, usize Bits>
-struct make_signed_selector<T, twos_complement::u<Bits>> : claim_cv<T, twos_complement::i<Bits>>
+struct make_signed_selector<T, integer::u<Bits>> : claim_cv<T, integer::i<Bits>>
 {
 };
 
@@ -277,10 +272,10 @@ struct make_signed_selector<T, twos_complement::u<Bits>> : claim_cv<T, twos_comp
 
 export namespace fmia::meta {
 
-template <twos_complement_integral T>
+template <fixed_precision_integral T>
 using make_signed = make_signed_selector<T>;
 
-template <twos_complement_integral T>
+template <fixed_precision_integral T>
 using make_signed_t = make_signed<T>::type;
 
 } // export namespace fmia::meta
@@ -303,12 +298,12 @@ struct make_unsigned_selector<T, u128> : claim_cv<T, u128>
 };
 
 template <typename T, usize Bits>
-struct make_unsigned_selector<T, twos_complement::i<Bits>> : claim_cv<T, twos_complement::u<Bits>>
+struct make_unsigned_selector<T, integer::i<Bits>> : claim_cv<T, integer::u<Bits>>
 {
 };
 
 template <typename T, usize Bits>
-struct make_unsigned_selector<T, twos_complement::u<Bits>> : claim_cv<T, twos_complement::u<Bits>>
+struct make_unsigned_selector<T, integer::u<Bits>> : claim_cv<T, integer::u<Bits>>
 {
 };
 
@@ -316,10 +311,10 @@ struct make_unsigned_selector<T, twos_complement::u<Bits>> : claim_cv<T, twos_co
 
 export namespace fmia::meta {
 
-template <twos_complement_integral T>
+template <fixed_precision_integral T>
 using make_unsigned = make_unsigned_selector<T>;
 
-template <twos_complement_integral T>
+template <fixed_precision_integral T>
 using make_unsigned_t = make_unsigned<T>::type;
 
 } // export namespace fmia::meta
