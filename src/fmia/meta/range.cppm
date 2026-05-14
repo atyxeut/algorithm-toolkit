@@ -37,5 +37,4 @@ concept random_access_range_of = std::ranges::random_access_range<T> && std::sam
 template <typename T, typename U>
 concept contiguous_range_of = std::ranges::contiguous_range<T> && std::same_as<U, std::ranges::range_value_t<T>>;
 
-
 } // export namespace fmia::meta

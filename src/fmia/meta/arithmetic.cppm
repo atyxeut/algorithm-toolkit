@@ -74,8 +74,7 @@ concept precision_comparable =
   (twos_complement_signed_integral<T> && twos_complement_signed_integral<U>)
   || (unsigned_integral<T> && unsigned_integral<U>)
   || (ieee754_binary_floating_point<T> && ieee754_binary_floating_point<U>)
-  || (ieee754_decimal_floating_point<T> && ieee754_decimal_floating_point<U>)
-;
+  || (ieee754_decimal_floating_point<T> && ieee754_decimal_floating_point<U>);
 
 template <typename T, typename U>
   requires precision_comparable<T, U>
@@ -146,8 +145,8 @@ struct make_higher_precision_selector_for_standard_integral_impl<T, 128>
 template <typename T>
 struct make_higher_precision_selector_for_standard_integral
   : make_higher_precision_selector_for_standard_integral_impl<
-    T, precision_bits_v<T> < precision_bits_v<i32> ? 0 : precision_bits_v<T>
-  >
+      T, (precision_bits_v<T>) < (precision_bits_v<i32>) ? 0 : precision_bits_v<T>
+    >
 {
 };
 
@@ -206,14 +205,12 @@ struct make_higher_precision_selector_for_floating_point<T, f128, false> : claim
 };
 
 template <typename T, usize Bits>
-struct make_higher_precision_selector_for_floating_point<T, ieee754::f<Bits>, false>
-  : claim_cv<T, ieee754::f<Bits * 2>>
+struct make_higher_precision_selector_for_floating_point<T, ieee754::f<Bits>, false> : claim_cv<T, ieee754::f<Bits * 2>>
 {
 };
 
 template <typename T, usize Bits>
-struct make_higher_precision_selector_for_floating_point<T, ieee754::d<Bits>, false>
-  : claim_cv<T, ieee754::d<Bits * 2>>
+struct make_higher_precision_selector_for_floating_point<T, ieee754::d<Bits>, false> : claim_cv<T, ieee754::d<Bits * 2>>
 {
 };
 

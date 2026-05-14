@@ -30,7 +30,7 @@ namespace fmia {
 
 template <meta::size_integral T>
 constexpr T dynamic_capacity = static_cast<T>(-1);
-  
+
 template <typename Size, Size Capacity>
 class heap_capacity;
 

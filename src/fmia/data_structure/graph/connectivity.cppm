@@ -54,7 +54,7 @@ template <meta::graph T, typename V = T::vertex_type>
       } while (v != u);
     }
   };
-  
+
   for (const auto u : g.vertices())
     if (dfn[u] == 0)
       dfs(u);

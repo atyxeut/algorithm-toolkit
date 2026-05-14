@@ -24,7 +24,7 @@ export namespace fmia::meta {
 
 template <typename T>
 concept multidimentional_cstyle_array = std::rank_v<std::remove_cvref_t<T>> > 1;
-  
+
 } // export namespace fmia::meta
 
 namespace fmia {
@@ -271,7 +271,7 @@ auto& operator <<(std::ostream& ostr, const std::tuple<Ts...>& t)
 namespace fmia::meta::cpp17 {
 
 // must be put here, otherwise the range print functions cannot print ranges that contains std::pair or std::tuple
-  
+
 template <typename, typename = void>
 struct is_std_ostream_interactable_impl : std::false_type
 {
@@ -306,7 +306,6 @@ template <typename T>
 concept std_ostream_interactable = requires(std::ostream& ostr, T t) { ostr << t; };
 
 } // export namespace fmia::meta
-
 
 export namespace fmia {
 

@@ -50,7 +50,7 @@ export namespace fmia::meta {
 
 template <typename T>
 concept size_integral = std::same_as<T, u32> || std::same_as<T, usize>;
-  
+
 } // export namespace fmia::meta
 
 export namespace fmia::meta {
@@ -195,7 +195,6 @@ template <typename T>
 constexpr bool is_no_cv_custom_twos_complement_signed_integral_v =
   is_no_cv_custom_twos_complement_signed_integral<T>::value;
 
-
 template <typename T>
 using is_custom_twos_complement_signed_integral = is_no_cv_custom_twos_complement_signed_integral<std::remove_cv_t<T>>;
 
@@ -217,12 +216,10 @@ struct is_no_cv_custom_unsigned_integral<twos_complement::u<Bits>> : std::true_t
 };
 
 template <typename T>
-constexpr bool is_no_cv_custom_unsigned_integral_v =
-  is_no_cv_custom_unsigned_integral<T>::value;
+constexpr bool is_no_cv_custom_unsigned_integral_v = is_no_cv_custom_unsigned_integral<T>::value;
 
 template <typename T>
-using is_custom_unsigned_integral =
-  is_no_cv_custom_unsigned_integral<std::remove_cv_t<T>>;
+using is_custom_unsigned_integral = is_no_cv_custom_unsigned_integral<std::remove_cv_t<T>>;
 
 template <typename T>
 constexpr bool is_custom_unsigned_integral_v = is_custom_unsigned_integral<T>::value;
@@ -232,8 +229,8 @@ concept custom_twos_complement_integral =
   is_custom_twos_complement_signed_integral_v<T> || is_custom_unsigned_integral_v<T>;
 
 template <typename T>
-concept unsigned_integral = std::unsigned_integral<T> || std::same_as<std::remove_cv_t<T>, u128>
-                                            || is_custom_unsigned_integral_v<T>;
+concept unsigned_integral =
+  std::unsigned_integral<T> || std::same_as<std::remove_cv_t<T>, u128> || is_custom_unsigned_integral_v<T>;
 
 template <typename T>
 concept nonbool_unsigned_integral = unsigned_integral<T> && !boolean<T>;
@@ -331,11 +328,9 @@ export namespace fmia::meta {
 
 // unsigned integers implicitly modulo 2^(Bits)
 template <typename T>
-struct is_no_cv_modular_integral 
-: std::bool_constant<
-  std::same_as<T, std::remove_cv_t<T>> && unsigned_integral<T>
->
-{};
+struct is_no_cv_modular_integral : std::bool_constant<std::same_as<T, std::remove_cv_t<T>> && unsigned_integral<T>>
+{
+};
 
 template <typename T>
 constexpr bool is_no_cv_modular_integral_v = is_no_cv_modular_integral<T>::value;

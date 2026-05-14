@@ -57,8 +57,7 @@ struct cur_dim_allocator<Elem, AllocatorList, std_pmr_allocator_tag>
 template <typename Elem, typename AllocatorList>
 using cur_dim_allocator_t = cur_dim_allocator<Elem, AllocatorList>::type;
 
-// used in recursion, add a std::allocator as the default allocator, if the length of the allocator type list
-// < dim count
+// used in recursion, add a default std::allocator, if the length of the allocator type list < dim count
 template <list_of_types CurAllocatorList, std::size_t DimCnt>
 struct adjust_allocator_type_list
   : concat<
