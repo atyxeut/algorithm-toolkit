@@ -13,11 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import test.fmia.io.stl_extension;
+import test.fmia.util.std_container_extension;
 
 int main()
 {
-  cstyle_string_literal_output_no_ambiguous_overloads();
-  common_ranges_output_with_custom_print_and_std_ostream();
-  multidimensional_ranges_output_with_custom_print_and_std_ostream();
+  std_tuple_output_with_custom_print_and_std_ostream();
 }

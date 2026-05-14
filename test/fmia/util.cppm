@@ -15,4 +15,4 @@
 
 export module test.fmia.util;
 
-export import test.fmia.util.mdrange;
+export import test.fmia.util.std_container_extension;

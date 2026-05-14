@@ -14,5 +14,3 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 export module test.fmia.io;
-
-export import test.fmia.io.stl_extension;

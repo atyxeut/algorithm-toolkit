@@ -14,5 +14,3 @@
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
 export module fmia.io;
-
-export import fmia.io.stl_extension;
