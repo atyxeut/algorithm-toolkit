@@ -136,9 +136,7 @@ struct make_higher_precision_selector_for_standard_integral_impl<T, 64>
 // in case std::integral treats i/u128 as a standard integer type (e.g. -std=gnu++ mode)
 template <typename T>
 struct make_higher_precision_selector_for_standard_integral_impl<T, 128>
-  : std::conditional<
-      twos_complement_signed_integral<T>, claim_cv_t<T, integer::i<256>>, claim_cv_t<T, integer::u<256>>
-    >
+  : std::conditional<twos_complement_signed_integral<T>, claim_cv_t<T, integer::i<256>>, claim_cv_t<T, integer::u<256>>>
 {
 };
 

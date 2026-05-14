@@ -26,6 +26,8 @@ import std;
 
 import fmia.meta.cv_qualifier;
 
+// clang-format off
+
 export {
 
 using i8  = std::int8_t;
@@ -41,6 +43,8 @@ using isize = std::ptrdiff_t;
 using usize = std::size_t;
 
 } // export
+
+// clang-format on
 
 export namespace fmia::meta {
 
