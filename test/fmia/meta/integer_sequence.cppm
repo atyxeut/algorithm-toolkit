@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export module test.fmia.meta.core;
+export module test.fmia.meta.integer_sequence;
 
 import std;
 
-import fmia.meta.core;
+import fmia.meta.integer_sequence;
 
 using namespace fmia::meta;
 

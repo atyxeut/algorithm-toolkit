@@ -16,5 +16,5 @@
 export module test.fmia.meta;
 
 export import test.fmia.meta.arithmetic;
-export import test.fmia.meta.core;
+export import test.fmia.meta.integer_sequence;
 export import test.fmia.meta.type_list;

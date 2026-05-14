@@ -17,7 +17,8 @@ export module fmia.meta.type_list;
 
 import std;
 
-import fmia.meta.core;
+import fmia.meta.integer_sequence;
+import fmia.meta.not_same;
 
 export namespace fmia::meta {
 

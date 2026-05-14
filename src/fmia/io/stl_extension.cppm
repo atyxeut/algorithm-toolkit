@@ -18,7 +18,7 @@ export module fmia.io.stl_extension;
 import std;
 
 import fmia.memory.allocator;
-import fmia.meta;
+import fmia.util.mdrange;
 
 export namespace fmia {
 

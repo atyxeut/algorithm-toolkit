@@ -13,12 +13,27 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-// general metaprogramming utilities
-export module fmia.meta;
+export module fmia.meta.not_same;
 
-export import fmia.meta.arithmetic;
-export import fmia.meta.cv_qualifier;
-export import fmia.meta.integer_sequence;
-export import fmia.meta.not_same;
-export import fmia.meta.range;
-export import fmia.meta.type_list;
+import std;
+
+export namespace fmia::meta {
+
+template <typename T, typename U>
+struct not_same : std::negation<std::is_same<T, U>>
+{
+};
+
+template <typename T, typename U>
+constexpr bool not_same_v = not_same<T, U>::value;
+
+template <typename T, typename U>
+concept not_same_as = !std::same_as<T, U>;
+
+template <typename T, typename U>
+concept no_cvref_same_as = std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<U>>;
+
+template <typename T, typename U>
+concept no_cvref_not_same_as = !no_cvref_same_as<T, U>;
+
+} // export namespace fmia::meta

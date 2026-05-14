@@ -20,6 +20,13 @@ import std;
 import fmia.memory.allocator;
 import fmia.meta;
 
+export namespace fmia::meta {
+
+template <typename T>
+concept multidimentional_cstyle_array = std::rank_v<std::remove_cvref_t<T>> > 1;
+  
+} // export namespace fmia::meta
+
 namespace fmia {
 
 template <typename, std::size_t...>

@@ -17,7 +17,6 @@ export module test.fmia.meta.type_list;
 
 import std;
 
-import fmia.meta.core;
 import fmia.meta.type_list;
 
 using namespace fmia::meta;

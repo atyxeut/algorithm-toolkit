@@ -13,30 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.meta.core;
+export module fmia.meta.integer_sequence;
 
 import std;
-
-export namespace fmia::meta {
-
-template <typename T, typename U>
-struct not_same : std::negation<std::is_same<T, U>>
-{
-};
-
-template <typename T, typename U>
-constexpr bool not_same_v = not_same<T, U>::value;
-
-template <typename T, typename U>
-concept not_same_as = !std::same_as<T, U>;
-
-template <typename T, typename U>
-concept no_cvref_same_as = std::same_as<std::remove_cvref_t<T>, std::remove_cvref_t<U>>;
-
-template <typename T, typename U>
-concept no_cvref_not_same_as = !no_cvref_same_as<T, U>;
-
-} // export namespace fmia::meta
 
 export namespace fmia::meta {
 
@@ -183,30 +162,5 @@ using is_no_duplication_integer_sequence = is_no_cv_no_duplication_integer_seque
 
 template <typename T>
 constexpr bool is_no_duplication_integer_sequence_v = is_no_duplication_integer_sequence<T>::value;
-
-} // export namespace fmia::meta
-
-export namespace fmia::meta {
-
-template <typename T, typename U>
-concept range_of = std::ranges::range<T> && std::same_as<U, std::ranges::range_value_t<T>>;
-
-template <typename T, typename U>
-concept input_range_of = std::ranges::input_range<T> && std::same_as<U, std::ranges::range_value_t<T>>;
-
-template <typename T, typename U>
-concept forward_range_of = std::ranges::forward_range<T> && std::same_as<U, std::ranges::range_value_t<T>>;
-
-template <typename T, typename U>
-concept bidirectional_range_of = std::ranges::bidirectional_range<T> && std::same_as<U, std::ranges::range_value_t<T>>;
-
-template <typename T, typename U>
-concept random_access_range_of = std::ranges::random_access_range<T> && std::same_as<U, std::ranges::range_value_t<T>>;
-
-template <typename T, typename U>
-concept contiguous_range_of = std::ranges::contiguous_range<T> && std::same_as<U, std::ranges::range_value_t<T>>;
-
-template <typename T>
-concept multidimentional_cstyle_array = std::rank_v<std::remove_cvref_t<T>> > 1;
 
 } // export namespace fmia::meta
