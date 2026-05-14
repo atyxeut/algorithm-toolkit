@@ -21,6 +21,7 @@ export import fmia.math.floating_point;
 export import fmia.math.fraction;
 export import fmia.math.geometry;
 export import fmia.math.integer;
+export import fmia.math.matrix;
 export import fmia.math.op;
 export import fmia.math.polynomial;
 export import fmia.math.quaternion;
