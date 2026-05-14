@@ -326,3 +326,27 @@ template <twos_complement_integral T>
 using make_unsigned_t = make_unsigned<T>::type;
 
 } // export namespace fmia::meta
+
+export namespace fmia::meta {
+
+// unsigned integers implicitly modulo 2^(Bits)
+template <typename T>
+struct is_no_cv_modular_integral 
+: std::bool_constant<
+  std::same_as<T, std::remove_cv_t<T>> && unsigned_integral<T>
+>
+{};
+
+template <typename T>
+constexpr bool is_no_cv_modular_integral_v = is_no_cv_modular_integral<T>::value;
+
+template <typename T>
+using is_modular_integral = is_no_cv_modular_integral<std::remove_cv_t<T>>;
+
+template <typename T>
+constexpr bool is_modular_integral_v = is_modular_integral<T>::value;
+
+template <typename T>
+concept modular_integral = is_modular_integral_v<T>;
+
+} // export namespace fmia::meta

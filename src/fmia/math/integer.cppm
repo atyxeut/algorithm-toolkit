@@ -16,4 +16,5 @@
 export module fmia.math.integer;
 
 export import fmia.math.integer.arbitrary_precision;
+export import fmia.math.integer.modular;
 export import fmia.math.integer.twos_complement;
