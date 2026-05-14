@@ -17,11 +17,11 @@ module;
 
 #include <cassert>
 
-export module fmia.math.integer.counting;
+export module fmia.math.counting;
 
 import std;
 
-import fmia.math.integer.twos_complement;
+import fmia.math.integer;
 import fmia.meta.arithmetic;
 
 namespace fmia {
