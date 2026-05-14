@@ -19,6 +19,7 @@ import std;
 
 import fmia.data_structure.graph.storage;
 import fmia.math;
+import fmia.meta.arithmetic;
 
 export namespace fmia::graph::shortest_path {
 

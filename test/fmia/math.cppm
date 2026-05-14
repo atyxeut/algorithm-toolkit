@@ -15,4 +15,4 @@
 
 export module test.fmia.math;
 
-export import test.fmia.math.core;
+export import test.fmia.math.integer;

@@ -17,7 +17,7 @@ export module fmia.memory.storage_base;
 
 import std;
 
-import fmia.math.core;
+import fmia.math.integer.twos_complement;
 import fmia.memory.core;
 
 export namespace fmia {

@@ -18,6 +18,7 @@ export module fmia.data_structure.graph.storage;
 import std;
 
 import fmia.math;
+import fmia.meta.arithmetic;
 
 export namespace fmia::graph {
 

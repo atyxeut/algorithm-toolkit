@@ -15,12 +15,9 @@
 
 export module fmia.math.op;
 
-// operator utils
-
 import std;
 
 import fmia.util.enum_flag;
-import fmia.math.core;
 import fmia.meta;
 
 export namespace fmia {

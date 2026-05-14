@@ -21,7 +21,7 @@ export module fmia.util.tower_of_hanoi;
 
 import std;
 
-import fmia.math.core;
+import fmia.math.integer.twos_complement;
 
 FMIA_WCONVERSION_PUSH()
 

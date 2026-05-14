@@ -17,7 +17,6 @@ export module fmia.data_structure.string.trie.vanilla;
 
 import std;
 
-import fmia.math.core;
 import fmia.memory.core;
 import fmia.meta;
 
@@ -29,8 +28,8 @@ class trie_base
 private:
   struct node_
   {
-    usize pass = 0; // count of strings that pass this node
-    usize end = 0;  // count of strings that end with this node
+    std::size_t pass = 0; // count of strings that pass this node
+    std::size_t end = 0;  // count of strings that end with this node
     typename HashMap::template type<node_*> next;
   };
 
@@ -147,7 +146,7 @@ private:
   enum class count_type_ { full_string, prefix };
 
   template <count_type_ CountType, typename T>
-  constexpr usize count_impl_(T&& str) const noexcept
+  constexpr std::size_t count_impl_(T&& str) const noexcept
   {
     if (!root_)
       return 0;
@@ -168,13 +167,13 @@ private:
 
 public:
   template <meta::input_range_of<Char> T>
-  constexpr usize count(T&& str) const noexcept
+  constexpr std::size_t count(T&& str) const noexcept
   {
     return count_impl_<count_type_::full_string>(std::forward<T>(str));
   }
 
   template <meta::input_range_of<Char> T>
-  constexpr usize count_has_prefix(T&& str) const noexcept
+  constexpr std::size_t count_has_prefix(T&& str) const noexcept
   {
     return count_impl_<count_type_::prefix>(std::forward<T>(str));
   }
@@ -206,7 +205,7 @@ public:
 
 // Hash must map the given character to [0, DistinctCharCount) without any collisions, otherwise the behavior is
 // undefined
-template <typename Char, usize DistinctCharCount, typename Hash>
+template <typename Char, std::size_t DistinctCharCount, typename Hash>
 struct trie_default_hash_map
 {
   template <typename NodePtr>
@@ -280,7 +279,7 @@ struct trie_normal_hash_map
 export namespace fmia {
 
 template <
-  typename Char, usize DistinctCharCount, std::regular_invocable<Char> Hash,
+  typename Char, std::size_t DistinctCharCount, std::regular_invocable<Char> Hash,
   exception_safety E = exception_safety::strong
 >
 using trie = detail::trie_base<Char, detail::trie_default_hash_map<Char, DistinctCharCount, Hash>, E>;

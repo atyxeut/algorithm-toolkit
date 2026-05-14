@@ -13,8 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export module test.fmia.meta;
+import test.fmia.math.integer;
 
-export import test.fmia.meta.arithmetic;
-export import test.fmia.meta.core;
-export import test.fmia.meta.type_list;
+int main()
+{
+  int128_input_with_std_istream();
+}

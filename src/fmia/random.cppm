@@ -18,7 +18,6 @@ export module fmia.random;
 import std;
 
 import fmia.data_structure.graph.storage;
-import fmia.math.core;
 
 export namespace fmia::random {
 
@@ -54,7 +53,7 @@ namespace fmia::random {
 constexpr char decimal_digit_character[10] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
 template <bool AllowNegative>
-[[nodiscard]] std::string generate_integer_impl(usize length)
+[[nodiscard]] std::string generate_integer_impl(std::size_t length)
 {
   if (length == 0)
     throw std::invalid_argument("length must be positive");
@@ -77,12 +76,12 @@ template <bool AllowNegative>
 
 export namespace fmia::random {
 
-[[nodiscard]] auto generate_positive_integer(usize length)
+[[nodiscard]] auto generate_positive_integer(std::size_t length)
 {
   return generate_integer_impl<false>(length);
 }
 
-[[nodiscard]] auto generate_integer(usize length)
+[[nodiscard]] auto generate_integer(std::size_t length)
 {
   return generate_integer_impl<true>(length);
 }

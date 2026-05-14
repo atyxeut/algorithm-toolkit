@@ -13,9 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import test.fmia.math;
+export module test.fmia.math.integer;
 
-int main()
-{
-  int128_input_with_std_istream();
-}
+export import test.fmia.math.integer.twos_complement;

@@ -16,6 +16,7 @@
 // general metaprogramming utilities
 export module fmia.meta;
 
+export import fmia.meta.arithmetic;
 export import fmia.meta.core;
 export import fmia.meta.cv_qualifier;
 export import fmia.meta.type_list;

@@ -13,4 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.math.rational_number;
+export module fmia.math.floating_point;
+
+export import fmia.math.floating_point.arbitrary_precision;
+export import fmia.math.floating_point.ieee754;
