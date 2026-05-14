@@ -13,4 +13,4 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this library.  If not, see <https://www.gnu.org/licenses/>.
 
-export module fmia.data_structure.binary_search_tree.avl_tree.flat;
+export module fmia.data_structure.self_balancing_tree.avl_tree.flat;
