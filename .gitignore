@@ -12,6 +12,7 @@
 !fmt_cpp.py
 
 !xmake.lua
+!clean.py
 !init.py
 
 !src

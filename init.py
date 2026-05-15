@@ -14,9 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import argparse
-import shutil
 import subprocess
-from pathlib import Path
 
 # > init.py llvm
 #   specify `llvm` toolchain and build in debug mode (default)
@@ -32,20 +30,8 @@ parser.add_argument("build_mode", type=str, nargs="?", default="debug")
 argv = parser.parse_args()
 
 
-def remove(path: Path):
-  if not path.exists():
-    return
-  if path.is_dir():
-    shutil.rmtree(path)
-  else:
-    path.unlink()
-
-
 def main():
-  remove(Path(".cache"))
-  remove(Path(".xmake"))
-  remove(Path("build"))
-
+  subprocess.run(["python3", "clean.py"])
   subprocess.run(["xmake", "f", "-v", "--toolchain=" + argv.toolchain, "-m", argv.build_mode])
   subprocess.run(["xmake", "project", "-k", "compile_commands", "--outputdir=build"], text=True, stdout=subprocess.PIPE)
 
