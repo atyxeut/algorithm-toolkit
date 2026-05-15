@@ -61,32 +61,12 @@ export namespace fmia::big_integer::naive {
 
 using mag_type = std::vector<int>;
 
-struct sub_result
-{
-  int sgn;
-  mag_type mag;
-};
-
-template <typename Remainder>
-struct idiv_result
-{
-  mag_type q;
-  Remainder r;
-};
-
 void print(const mag_type& num, bool new_line = false)
 {
-  for (auto i = num.size(); i > 0; --i)
-    std::cout << num[i - 1];
+  for (auto i = num.size(); i > 0;)
+    std::cout << num[--i];
   if (new_line)
     std::cout << '\n';
-}
-
-void print(const sub_result& result, bool new_line = false)
-{
-  if (result.sgn < 0)
-    std::cout << '-';
-  print(result.mag, new_line);
 }
 
 [[nodiscard]] constexpr mag_type to_big_integer(std::string_view s)
@@ -110,10 +90,13 @@ void print(const sub_result& result, bool new_line = false)
 {
   const auto la = a.size(), lb = b.size();
 
-  if (la == lb)
-    for (auto i = la; i > 0; --i)
-      if (a[i - 1] != b[i - 1])
-        return (a[i - 1] > b[i - 1]) - (a[i - 1] < b[i - 1]);
+  if (la == lb) {
+    for (auto i = la; i > 0;) {
+      --i;
+      if (a[i] != b[i])
+        return (a[i] > b[i]) - (a[i] < b[i]);
+    }
+  }
 
   return (la > lb) - (la < lb);
 }
@@ -124,10 +107,18 @@ constexpr void remove_lz(mag_type& num) noexcept
     num.pop_back();
 }
 
+constexpr void carry_positive(std::span<int> num) noexcept
+{
+  for (int c = 0; auto& digit : num) {
+    digit += c;
+    c = digit / 10;
+    digit %= 10;
+  }
+}
+
 constexpr void carry(std::span<int> num) noexcept
 {
-  int c = 0, r;
-  for (auto& digit : num) {
+  for (int c = 0, r; auto& digit : num) {
     digit += c;
     r = digit % 10;
     c = digit / 10 - (r < 0);
@@ -144,9 +135,22 @@ constexpr void carry(std::span<int> num) noexcept
   for (auto i = 0uz; i < b.size(); ++i)
     ans[i] += b[i];
 
-  carry(ans);
+  carry_positive(ans);
   remove_lz(ans);
   return ans;
+}
+
+struct sub_result
+{
+  int sgn;
+  mag_type mag;
+};
+
+void print(const sub_result& result, bool new_line = false)
+{
+  if (result.sgn < 0)
+    std::cout << '-';
+  print(result.mag, new_line);
 }
 
 [[nodiscard]] constexpr sub_result sub(const mag_type& a, const mag_type& b)
@@ -170,21 +174,28 @@ constexpr void carry(std::span<int> num) noexcept
   if (is_zero(a) || is_zero(b))
     return mag_type {0};
 
-  // delayed carry is always safe here:
-  // ans[k] accumulates at most min(la, lb) additions, assume that every addition is ans[k] += 9 * 9, it still requires
-  // over 1e7 additions to overflow, in such cases, the inputs are far beyond the capability of this O(n^2) algorithm
+  // delayed carry is always safe here, ans[k] accumulates at most min(la, lb) additions, assume that every addition is
+  // ans[k] += 9 * 9, it still requires (2^31 - 1) / 81 > 1e7 additions to overflow, in such cases, the inputs are far
+  // beyond the capability of this O(n^2) algorithm
   mag_type ans(a.size() + b.size());
 
   for (auto i = 0uz; i < a.size(); ++i)
     for (auto j = 0uz; j < b.size(); ++j)
       ans[i + j] += a[i] * b[j];
 
-  carry(ans);
+  carry_positive(ans);
   remove_lz(ans);
   return ans;
 }
 
 FMIA_WCONVERSION_PUSH()
+
+template <typename Remainder>
+struct idiv_result
+{
+  mag_type q;
+  Remainder r;
+};
 
 // used when b is way smaller than a
 [[nodiscard]] constexpr idiv_result<int> idiv(const mag_type& a, const int& b)
@@ -194,9 +205,10 @@ FMIA_WCONVERSION_PUSH()
   mag_type q(a.size());
   long long r = 0;
 
-  for (auto i = q.size(); i > 0; --i) {
-    r = r * 10 + a[i - 1];
-    q[i - 1] = r / b;
+  for (auto i = q.size(); i > 0;) {
+    --i;
+    r = r * 10 + a[i];
+    q[i] = r / b;
     r %= b;
   }
 
@@ -217,8 +229,8 @@ FMIA_WCONVERSION_PUSH()
   mag_type q(a.size() - b.size() + 1), r(a);
 
   bool not_first_digit = false;
-  for (auto _ = q.size(); _ > 0; --_) {
-    const auto i = _ - 1;
+  for (auto i = q.size(); i > 0;) {
+    --i;
     while ((not_first_digit && r[i + b.size()] != 0) || compare(std::span(r.begin() + i, b.size()), b) >= 0) {
       ++q[i];
       for (auto j = 0uz; j < b.size(); ++j)
