@@ -248,4 +248,23 @@ struct idiv_result
 
 FMIA_WCONVERSION_POP()
 
+[[nodiscard]] constexpr mag_type pow(mag_type a, int n)
+{
+  assert(n >= 0);
+
+  if (n == 0)
+    return {1};
+
+  mag_type ans {1};
+  while (true) {
+    if (n & 1)
+      ans = mul(ans, a);
+    n >>= 1;
+    if (n == 0)
+      break;
+    a = mul(a, a);
+  }
+  return ans;
+}
+
 } // export namespace fmia::big_integer::naive
