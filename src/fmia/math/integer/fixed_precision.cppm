@@ -20,11 +20,14 @@ module;
 #include <__msvc_int128.hpp>
 #endif
 
+#include <cassert>
+
 export module fmia.math.integer.fixed_precision;
 
 import std;
 
 import fmia.meta.cv_qualifier;
+import fmia.meta.type_list;
 
 // clang-format off
 
@@ -45,6 +48,89 @@ using usize = std::size_t;
 } // export
 
 // clang-format on
+
+export namespace fmia::meta {
+  
+template <typename T>
+concept state_integral = is_any_of_v<T, i32, u32, i64, u64>;
+
+} // export namespace fmia::meta
+
+namespace fmia {
+
+// for 32-bit integers:
+//   00000000 ... 00000000
+//   31 ...       7 ...  0
+//
+// for 64-bit integers:
+//   00000000 ... 00000000
+//   63 ...       7 ...  0
+  
+template <meta::state_integral T>
+[[nodiscard]] constexpr bool is_valid_bit_index_for_state(int index) noexcept
+{
+  if (index < 0)
+    return false;
+  if constexpr (meta::is_any_of_v<T, i32, u32>)
+    return index < 32;
+  if constexpr (meta::is_any_of_v<T, i64, u64>)
+    return index < 64;
+}
+  
+} // namespace fmia
+
+export namespace fmia {
+
+template <meta::state_integral T>
+[[nodiscard]] constexpr bool is_bit_set(T state, int index) noexcept
+{
+  assert(is_valid_bit_index_for_state<T>());
+  return static_cast<bool>(state & std::make_unsigned_t<T>(1) << index);
+}
+  
+template <meta::state_integral T>
+constexpr void set_bit(T& state, int index) noexcept
+{
+  assert(is_valid_bit_index_for_state<T>());
+  state |= std::make_unsigned_t<T>(1) << index;
+}
+  
+template <meta::state_integral T>
+[[nodiscard]] constexpr T after_set_bit(T state, int index) noexcept
+{
+  assert(is_valid_bit_index_for_state<T>());
+  return state | std::make_unsigned_t<T>(1) << index;
+}
+
+template <meta::state_integral T>
+constexpr void reset_bit(T& state, int index) noexcept
+{
+  assert(is_valid_bit_index_for_state<T>());
+  state &= ~(std::make_unsigned_t<T>(1) << index);
+}
+
+template <meta::state_integral T>
+[[nodiscard]] constexpr T after_reset_bit(T state, int index) noexcept
+{
+  assert(is_valid_bit_index_for_state<T>());
+  return state & ~(std::make_unsigned_t<T>(1) << index);
+}
+
+template <meta::state_integral T>
+constexpr void flip_bit(T& state, int index) noexcept
+{
+  assert(is_valid_bit_index_for_state<T>());
+  state ^= std::make_unsigned_t<T>(1) << index;
+}
+
+template <meta::state_integral T>
+[[nodiscard]] constexpr T after_flip_bit(T state, int index) noexcept
+{
+  assert(is_valid_bit_index_for_state<T>());
+  return state ^ std::make_unsigned_t<T>(1) << index;
+}
+
+} // export namespace fmia
 
 export namespace fmia::meta {
 
