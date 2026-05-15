@@ -50,7 +50,7 @@ using usize = std::size_t;
 // clang-format on
 
 export namespace fmia::meta {
-  
+
 template <typename T>
 concept state_integral = is_any_of_v<T, i32, u32, i64, u64>;
 
@@ -65,7 +65,7 @@ namespace fmia {
 // for 64-bit integers:
 //   00000000 ... 00000000
 //   63 ...       7 ...  0
-  
+
 template <meta::state_integral T>
 [[nodiscard]] constexpr bool is_valid_bit_index_for_state(int index) noexcept
 {
@@ -76,7 +76,7 @@ template <meta::state_integral T>
   if constexpr (meta::is_any_of_v<T, i64, u64>)
     return index < 64;
 }
-  
+
 } // namespace fmia
 
 export namespace fmia {
@@ -87,14 +87,14 @@ template <meta::state_integral T>
   assert(is_valid_bit_index_for_state<T>());
   return static_cast<bool>(state & std::make_unsigned_t<T>(1) << index);
 }
-  
+
 template <meta::state_integral T>
 constexpr void set_bit(T& state, int index) noexcept
 {
   assert(is_valid_bit_index_for_state<T>());
   state |= std::make_unsigned_t<T>(1) << index;
 }
-  
+
 template <meta::state_integral T>
 [[nodiscard]] constexpr T after_set_bit(T state, int index) noexcept
 {
@@ -259,8 +259,8 @@ export namespace fmia::meta {
 
 // whether std::integral<T> is true for T = i128/u128 depends on the compiler
 template <typename T>
-concept potential_standard_integral = std::integral<T> || std::same_as<std::remove_cv_t<T>, i128> 
-  || std::same_as<std::remove_cv_t<T>, u128>;
+concept potential_standard_integral =
+  std::integral<T> || std::same_as<std::remove_cv_t<T>, i128> || std::same_as<std::remove_cv_t<T>, u128>;
 
 template <typename T>
 concept nonbool_potential_standard_integral = potential_standard_integral<T> && !boolean<T>;
@@ -421,7 +421,8 @@ template <meta::nonbool_potential_standard_integral T>
 
 // an extended version of std::countl_zero
 template <meta::nonbool_potential_standard_integral T>
-[[nodiscard]] constexpr int countl_zero(T x) noexcept {
+[[nodiscard]] constexpr int countl_zero(T x) noexcept
+{
   if (x < 0)
     return 0;
 
@@ -433,7 +434,8 @@ template <meta::nonbool_potential_standard_integral T>
 
 // an extended version of std::countr_zero
 template <meta::nonbool_potential_standard_integral T>
-[[nodiscard]] constexpr int countr_zero(T x) noexcept {
+[[nodiscard]] constexpr int countr_zero(T x) noexcept
+{
   // -x has the same lowbit as x in 2's complement
   if constexpr (meta::nonbool_standard_integral<T>)
     return std::countr_zero<std::make_unsigned_t<T>>(x);
@@ -443,7 +445,8 @@ template <meta::nonbool_potential_standard_integral T>
 
 // an extended version of std::bit_width
 template <meta::nonbool_potential_standard_integral T>
-[[nodiscard]] constexpr int bit_width(T x) noexcept {
+[[nodiscard]] constexpr int bit_width(T x) noexcept
+{
   assert(x >= 0 && "bit widths of negative numbers have no meaning");
   return std::numeric_limits<meta::make_unsigned_t<T>>::digits - countl_zero(x);
 }
