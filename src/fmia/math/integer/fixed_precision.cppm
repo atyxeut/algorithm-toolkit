@@ -166,25 +166,15 @@ concept nonbool_standard_integral = std::integral<T> && !boolean<T>;
 
 } // export namespace fmia::meta
 
-export namespace fmia {
-
-template <meta::nonbool_standard_unsigned_integral T>
-[[nodiscard]] constexpr bool is_power_of_2(T x) noexcept
-{
-  return std::popcount(x) == 1;
-}
-
-} // export namespace fmia
-
 // forward declarations
 export namespace fmia::integer {
 
 template <usize Bits>
-  requires (Bits >= 128 && is_power_of_2(Bits))
+  requires (Bits >= 128 && std::has_single_bit(Bits))
 class i;
 
 template <usize Bits>
-  requires (Bits >= 128 && is_power_of_2(Bits))
+  requires (Bits >= 128 && std::has_single_bit(Bits))
 class u;
 
 } // export namespace fmia::integer

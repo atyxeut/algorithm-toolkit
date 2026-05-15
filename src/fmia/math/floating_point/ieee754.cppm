@@ -32,12 +32,12 @@ export namespace fmia::ieee754 {
 
 // IEEE 754 binary floating-point
 template <usize Bits>
-  requires (Bits >= 128 && is_power_of_2(Bits))
+  requires (Bits >= 128 && std::has_single_bit(Bits))
 class f;
 
 // IEEE 754 decimal floating-point
 template <usize Bits>
-  requires (Bits >= 32 && is_power_of_2(Bits))
+  requires (Bits >= 32 && std::has_single_bit(Bits))
 class d;
 
 } // export namespace fmia::ieee754
