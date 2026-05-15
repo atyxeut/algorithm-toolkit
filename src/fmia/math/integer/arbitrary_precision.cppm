@@ -198,7 +198,7 @@ struct idiv_result
 };
 
 // used when b is way smaller than a
-[[nodiscard]] constexpr idiv_result<int> idiv(const mag_type& a, const int& b)
+[[nodiscard]] constexpr idiv_result<int> idiv(const mag_type& a, int b)
 {
   assert(b != 0);
 
@@ -265,6 +265,38 @@ FMIA_WCONVERSION_POP()
     a = mul(a, a);
   }
   return ans;
+}
+
+FMIA_WCONVERSION_PUSH()
+
+[[nodiscard]] constexpr mag_type iroot(const mag_type& a, int n)
+{
+  assert(n > 0);
+
+  if (n == 1 || is_zero(a))
+    return a;
+
+  mag_type l {0}, r(pow(mag_type {0, 1}, a.size() / n + 1));
+  while (compare(add(l, mag_type {1}), r) < 0) {
+    mag_type mid(idiv(add(l, r), 2).q);
+    if (compare(pow(mid, n), a) <= 0)
+      l = std::move(mid);
+    else
+      r = std::move(mid);
+  }
+  return l;
+}
+
+FMIA_WCONVERSION_POP()
+
+[[nodiscard]] constexpr mag_type isqrt(const mag_type& a)
+{
+  return iroot(a, 2);
+}
+
+[[nodiscard]] constexpr mag_type icbrt(const mag_type& a)
+{
+  return iroot(a, 3);
 }
 
 } // export namespace fmia::big_integer::naive
