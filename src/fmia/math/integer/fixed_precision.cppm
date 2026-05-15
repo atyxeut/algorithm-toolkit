@@ -257,6 +257,14 @@ export {
 
 export namespace fmia::meta {
 
+// whether std::integral<T> is true for T = i128/u128 depends on the compiler
+template <typename T>
+concept potential_standard_integral = std::integral<T> || std::same_as<std::remove_cv_t<T>, i128> 
+  || std::same_as<std::remove_cv_t<T>, u128>;
+
+template <typename T>
+concept nonbool_potential_standard_integral = potential_standard_integral<T> && !boolean<T>;
+
 template <typename>
 struct is_no_cv_custom_twos_complement_signed_integral : std::false_type
 {
@@ -398,6 +406,57 @@ template <fixed_precision_integral T>
 using make_unsigned_t = make_unsigned<T>::type;
 
 } // export namespace fmia::meta
+
+export namespace fmia {
+
+// an extended version of std::abs
+// no compilation error: unsigned int _ = abs(1u);
+// no overflow: unsigned int _ = abs(-2147483647 - 1);
+template <meta::nonbool_potential_standard_integral T>
+[[nodiscard]] constexpr meta::make_unsigned_t<T> abs(T x) noexcept
+{
+  // for negative x, ~x + 1 is |x| if the bit representation is 2's complement
+  return x >= 0 ? static_cast<meta::make_unsigned_t<T>>(x) : ~static_cast<meta::make_unsigned_t<T>>(x) + 1;
+}
+
+// an extended version of std::countl_zero
+template <meta::nonbool_potential_standard_integral T>
+[[nodiscard]] constexpr int countl_zero(T x) noexcept {
+  if (x < 0)
+    return 0;
+
+  if constexpr (meta::nonbool_standard_integral<T>)
+    return std::countl_zero<std::make_unsigned_t<T>>(x);
+  else
+    return x >> 64 ? std::countl_zero<u64>(x >> 64) : 64 + std::countl_zero<u64>(x);
+}
+
+// an extended version of std::countr_zero
+template <meta::nonbool_potential_standard_integral T>
+[[nodiscard]] constexpr int countr_zero(T x) noexcept {
+  // -x has the same lowbit as x in 2's complement
+  if constexpr (meta::nonbool_standard_integral<T>)
+    return std::countr_zero<std::make_unsigned_t<T>>(x);
+  else
+    return static_cast<u64>(x) ? std::countr_zero<u64>(x) : 64 + std::countr_zero<u64>(x >> 64);
+}
+
+// an extended version of std::bit_width
+template <meta::nonbool_potential_standard_integral T>
+[[nodiscard]] constexpr int bit_width(T x) noexcept {
+  assert(x >= 0 && "bit widths of negative numbers have no meaning");
+  return std::numeric_limits<meta::make_unsigned_t<T>>::digits - countl_zero(x);
+}
+
+// calculate floor(log_2 x), ilog2(0) has defined behavior and returns -1
+template <meta::nonbool_potential_standard_integral T>
+[[nodiscard]] constexpr int ilog2(T x) noexcept
+{
+  assert(x >= 0);
+  return bit_width(x) - 1;
+}
+
+} // export namespace fmia
 
 export namespace fmia::meta {
 
