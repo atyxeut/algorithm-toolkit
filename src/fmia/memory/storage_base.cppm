@@ -75,9 +75,12 @@ private:
 public:
   using allocator_type = Allocator;
   using size_type = Size;
-  using difference_type = meta::make_signed_t<Size>;
-  using value_type = alt_::value_type;
+  using difference_type = std::make_signed_t<Size>;
+  using value_type = T;
+  using reference = value_type&;
+  using const_reference = const value_type&;
   using pointer = alt_::pointer;
+  using const_pointer = alt_::const_pointer;
 
 protected:
   size_type size_;
@@ -146,7 +149,7 @@ protected:
       return *this;
     }
 
-    if constexpr (std::is_nothrow_move_constructible_v<T>) {
+    if constexpr (std::is_nothrow_move_constructible_v<value_type>) {
       if (buffer_ == nullptr || this->capacity_ < other.size_) {
         const auto tmp_buffer = alt_::allocate(allocator_, other.size_);
         clear();
